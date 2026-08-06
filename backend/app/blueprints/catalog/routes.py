@@ -1,10 +1,16 @@
 from flask import jsonify, request
 
 from app.extensions import db
-from app.models import Category, Product, ProductVariant, SUBCATEGORIES
+from app.models import Category, Product, ProductVariant, OrderItem, Order, Setting, SUBCATEGORIES, SUCCESSFUL_ORDER_STATUSES
 from app.utils.serializers import serialize_product
 
 from . import catalog_bp
+
+
+@catalog_bp.get("/settings")
+def get_settings():
+    settings = {s.key: s.value for s in Setting.query.all()}
+    return jsonify({"logo_url": settings.get("logo_url"), "banner_url": settings.get("banner_url")})
 
 
 @catalog_bp.get("/categories")
@@ -57,3 +63,34 @@ def list_products():
 def get_product(slug):
     product = Product.query.filter_by(slug=slug).first_or_404()
     return jsonify({"product": serialize_product(product, include_eligible_ids=True)})
+
+
+@catalog_bp.get("/products/bestsellers")
+def bestsellers():
+    limit = min(int(request.args.get("limit", 4)), 20)
+
+    ranked = (
+        db.session.query(OrderItem.product_id, db.func.sum(OrderItem.quantity).label("sold"))
+        .join(Order, OrderItem.order_id == Order.id)
+        .join(Product, OrderItem.product_id == Product.id)
+        .filter(Order.status.in_(SUCCESSFUL_ORDER_STATUSES), Product.is_bundle.is_(False))
+        .group_by(OrderItem.product_id)
+        .order_by(db.desc("sold"))
+        .limit(limit)
+        .all()
+    )
+
+    products = [Product.query.get(row.product_id) for row in ranked]
+
+    if len(products) < limit:
+        # Sin suficiente historial de ventas: completa con productos normales al azar.
+        existing_ids = {p.id for p in products}
+        fallback = (
+            Product.query.filter_by(is_bundle=False)
+            .filter(~Product.id.in_(existing_ids) if existing_ids else True)
+            .limit(limit - len(products))
+            .all()
+        )
+        products += fallback
+
+    return jsonify({"products": [serialize_product(p) for p in products]})

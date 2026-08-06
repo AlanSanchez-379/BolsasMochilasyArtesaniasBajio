@@ -1,4 +1,4 @@
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 
 from app.extensions import db
 from .mixins import UUIDPrimaryKeyMixin, TimestampMixin
@@ -31,7 +31,9 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
 
     # Paquete Emprendedor (Documento de Requerimientos secc. 3)
     is_bundle = db.Column(db.Boolean, nullable=False, default=False)
-    bundle_limit = db.Column(db.Integer, nullable=True)
+    bundle_limit = db.Column(db.Integer, nullable=True)  # suma de bundle_category_limits
+    # Límite exacto de piezas por categoría, ej. {"Bolsas": 5, "Mochilas": 2}. Solo categorías > 0.
+    bundle_category_limits = db.Column(JSONB, nullable=True)
 
     category = db.relationship("Category", back_populates="products")
     variants = db.relationship(

@@ -1,15 +1,22 @@
 import { api } from "../api.js";
 import { productCardHtml } from "../components/productCard.js";
 import { bindNavLinks } from "../dom.js";
+import { currentRenderToken } from "../router.js";
+import { getSettings } from "../settingsCache.js";
 
 export async function renderHome(container) {
+  const token = currentRenderToken();
   container.innerHTML = `<div class="max-w-7xl mx-auto px-4 py-20 text-center text-xl text-gray-400">Cargando...</div>`;
 
-  const [{ categories }, { products: bundles }, { products: regularProducts }] = await Promise.all([
+  const [{ categories }, { products: bundles }, { products: bestsellers }, settings] = await Promise.all([
     api.getCategories(),
     api.getProducts({ is_bundle: "true" }),
-    api.getProducts({ is_bundle: "false" }),
+    api.getBestsellers(4),
+    getSettings(),
   ]);
+  if (token !== currentRenderToken()) return;
+
+  const bannerSrc = settings.banner_url || "https://placehold.co/600x400/9BCEC1/ffffff?text=Emprende+Con+Nosotros";
 
   container.innerHTML = `
     <div class="fade-in">
@@ -27,10 +34,22 @@ export async function renderHome(container) {
             </button>
           </div>
           <div class="md:w-1/2 flex justify-center">
-            <img src="https://placehold.co/600x400/9BCEC1/ffffff?text=Emprende+Con+Nosotros" alt="Hero" class="rounded-2xl shadow-xl transform rotate-2" />
+            <img src="${bannerSrc}" alt="Hero" class="rounded-2xl shadow-xl transform rotate-2 w-full max-h-96 object-cover" />
           </div>
         </div>
       </div>
+
+      ${
+        bestsellers.length
+          ? `
+      <div class="max-w-7xl mx-auto px-4 py-12">
+        <h2 class="text-3xl font-bold mb-8"><i class="fa-solid fa-fire text-brand-salmon mr-2"></i>Lo Más Vendido</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          ${bestsellers.map((p) => productCardHtml(p)).join("")}
+        </div>
+      </div>`
+          : ""
+      }
 
       <div class="max-w-7xl mx-auto px-4 py-12">
         <h2 class="text-3xl font-bold text-center mb-8">¿Qué buscas hoy?</h2>
@@ -66,13 +85,6 @@ export async function renderHome(container) {
       </div>`
           : ""
       }
-
-      <div class="max-w-7xl mx-auto px-4 py-12">
-        <h2 class="text-3xl font-bold mb-8">Productos Más Vendidos</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          ${regularProducts.map((p) => productCardHtml(p)).join("")}
-        </div>
-      </div>
     </div>
   `;
 

@@ -1,5 +1,13 @@
 const routes = [];
 
+// Guard contra condiciones de carrera: si el usuario navega antes de que una vista
+// async termine de cargar datos, esa vista vieja no debe pisar el DOM de la nueva.
+let renderToken = 0;
+
+export function currentRenderToken() {
+  return renderToken;
+}
+
 export function route(pattern, handler) {
   const paramNames = [];
   const regexBody = pattern
@@ -29,6 +37,7 @@ function currentQuery() {
 async function resolve() {
   const path = currentPath();
   const query = currentQuery();
+  renderToken += 1;
 
   for (const r of routes) {
     const match = path.match(r.regex);

@@ -1,6 +1,8 @@
+import { NO_IMAGE_PLACEHOLDER } from "../imageFallback.js";
+
 export function productCardHtml(product) {
   const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
-  const defaultImage = product.variants[0]?.image_url;
+  const defaultImage = product.variants[0]?.image_url || NO_IMAGE_PLACEHOLDER;
 
   return `
     <div data-nav="/producto/${product.slug}" class="bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow group flex flex-col h-full border border-gray-100">

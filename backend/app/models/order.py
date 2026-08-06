@@ -18,6 +18,18 @@ class OrderStatus(str, enum.Enum):
     CANCELLED = "Cancelado / Reembolsado"
 
 
+# Pedidos que ya representan ingreso real (excluye pendientes/en validación/cancelados).
+SUCCESSFUL_ORDER_STATUSES = (
+    OrderStatus.PAYMENT_CONFIRMED,
+    OrderStatus.PREPARING,
+    OrderStatus.SHIPPED,
+    OrderStatus.DELIVERED,
+)
+
+# Pedidos que todavía requieren acción/seguimiento de pago.
+PENDING_ORDER_STATUSES = (OrderStatus.PENDING_PAYMENT, OrderStatus.PAYMENT_IN_VALIDATION)
+
+
 class PaymentMethod(str, enum.Enum):
     CARD = "card"
     SPEI = "spei"

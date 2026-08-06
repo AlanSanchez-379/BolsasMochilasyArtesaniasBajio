@@ -4,11 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        "brand-salmon": "#FFB6A6",
-        "brand-cream": "#FFEBD3",
-        "brand-teal": "#9BCEC1",
-        "brand-blue": "#67A2C5",
-        "brand-blue-dark": "#4A85A8",
+        // Paleta de marca (agosto 2026): principal / hover / fondos suaves / bordes y detalles.
+        "brand-salmon": "#FE81D4", // principal (botones, iconos)
+        "brand-blue-dark": "#FE81D4", // principal (botones, iconos)
+        "brand-blue": "#FAACBF", // hover
+        "brand-cream": "#FFEABB", // fondos suaves
+        "brand-teal": "#FBC3C1", // bordes y detalles
         "text-dark": "#333333",
       },
       fontFamily: {
