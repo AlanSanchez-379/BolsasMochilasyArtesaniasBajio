@@ -1,0 +1,23 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+instance/
+
+# Node (Tailwind build tooling)
+node_modules/
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Flask
+*.log
