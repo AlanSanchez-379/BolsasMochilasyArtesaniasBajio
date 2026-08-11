@@ -1,4 +1,4 @@
-from flask import jsonify, request, make_response
+from flask import jsonify, request, make_response, current_app
 
 from app.extensions import db
 from app.models import User, UserRole
@@ -15,13 +15,12 @@ def _serialize_user(user: User):
 
 
 def _set_session_cookie(response, access_token, expires_in):
-    # Dev: same-site http on localhost. In prod (cross-domain, https) use secure=True, samesite="None".
     response.set_cookie(
         COOKIE_NAME,
         access_token,
         httponly=True,
-        samesite="Lax",
-        secure=False,
+        samesite=current_app.config["COOKIE_SAMESITE"],
+        secure=current_app.config["COOKIE_SECURE"],
         max_age=expires_in,
     )
 
@@ -104,7 +103,11 @@ def oauth_callback():
 @auth_bp.post("/logout")
 def logout():
     response = make_response(jsonify({"message": "Sesión cerrada."}))
-    response.delete_cookie(COOKIE_NAME)
+    response.delete_cookie(
+        COOKIE_NAME,
+        samesite=current_app.config["COOKIE_SAMESITE"],
+        secure=current_app.config["COOKIE_SECURE"],
+    )
     return response
 
 
