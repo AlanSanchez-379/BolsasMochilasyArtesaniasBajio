@@ -6,7 +6,6 @@ export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gDPgAKgsqJlGsxfu7CSAJg_W
 // desarrollo, el backend real en producción.
 const isLocalDev = ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
-// TODO: reemplaza esta URL por la de tu backend ya desplegado (Render, VPS, etc.).
-const PRODUCTION_API_BASE = "https://TU-BACKEND-AQUI.onrender.com/api";
+const PRODUCTION_API_BASE = "https://bolsasmochilasyartesaniasbajio.onrender.com/api";
 
 export const API_BASE = isLocalDev ? "http://127.0.0.1:5000/api" : PRODUCTION_API_BASE;
