@@ -17,7 +17,14 @@ function statCard(icon, label, value, colorClass) {
 export async function renderStatsTab(container, isCurrentTab = () => true) {
   container.innerHTML = `<div class="text-center py-12 text-gray-400">Cargando estadísticas...</div>`;
 
-  const stats = await api.adminStats();
+  let stats;
+  try {
+    stats = await api.adminStats();
+  } catch (err) {
+    if (!isCurrentTab()) return;
+    container.innerHTML = `<p class="text-red-500 text-center py-12">${err.message}</p>`;
+    return;
+  }
   if (!isCurrentTab()) return;
 
   container.innerHTML = `

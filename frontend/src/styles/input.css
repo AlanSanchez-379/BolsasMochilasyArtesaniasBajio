@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    background-color: #fcfcfc;
+    background-color: #ffffff;
     color: #333333;
   }
 }
@@ -13,14 +13,14 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #ffebd3;
+  background: #f1f1f1;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ffb6a6;
+  background: #fe81d4;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9bcec1;
+  background: #e4007c;
 }
 
 .fade-in {

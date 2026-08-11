@@ -9,7 +9,7 @@ def serialize_variant(variant):
     }
 
 
-def serialize_product(product, include_eligible_ids=False):
+def serialize_product(product):
     data = {
         "id": str(product.id),
         "name": product.name,
@@ -26,12 +26,9 @@ def serialize_product(product, include_eligible_ids=False):
         "is_bundle": product.is_bundle,
         "bundle_limit": product.bundle_limit,
         "bundle_category_limits": product.bundle_category_limits,
+        "created_at": product.created_at.isoformat(),
         "variants": [serialize_variant(v) for v in product.variants],
     }
-    if include_eligible_ids and product.is_bundle:
-        data["eligible_product_ids"] = [
-            str(rel.eligible_product_id) for rel in product.bundle_eligible_products
-        ]
     return data
 
 

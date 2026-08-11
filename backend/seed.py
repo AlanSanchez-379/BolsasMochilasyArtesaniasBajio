@@ -10,7 +10,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from app import create_app
 from app.extensions import db
-from app.models import Category, Product, ProductVariant, BundleEligibleProduct
+from app.models import Category, Product, ProductVariant
 from app.models.category import SUBCATEGORIES
 
 CATEGORY_NAMES = ["Bolsas", "Mochilas", "Carteras", "Cosmetiqueras"]
@@ -112,7 +112,7 @@ def run():
         bundles = [
             Product(
                 category=categories["Bolsas"],
-                subcategory="Tricombo",
+                subcategory="Mixto",
                 name="Paquete Emprendedor Básico",
                 slug="paquete-emprendedor-basico",
                 description="Inicia tu negocio con este paquete. Incluye 10 piezas a elegir de nuestros mejores modelos.",
@@ -127,7 +127,7 @@ def run():
             ),
             Product(
                 category=categories["Mochilas"],
-                subcategory="Tricombo",
+                subcategory="Mixto",
                 name="Paquete Emprendedor Medio",
                 slug="paquete-emprendedor-medio",
                 description="Expande tu negocio. Incluye 25 piezas a elegir con un mejor margen de ganancia.",
@@ -142,7 +142,7 @@ def run():
             ),
             Product(
                 category=categories["Bolsas"],
-                subcategory="Tricombo",
+                subcategory="Mixto",
                 name="Súper Paquete Emprendedor",
                 slug="super-paquete-emprendedor",
                 description="Para mayoristas consolidados. Incluye 50 piezas a elegir con el máximo descuento.",
@@ -157,14 +157,6 @@ def run():
             ),
         ]
         db.session.add_all(bundles)
-        db.session.flush()
-
-        for bundle in bundles:
-            for eligible in products:
-                db.session.add(
-                    BundleEligibleProduct(bundle_product_id=bundle.id, eligible_product_id=eligible.id)
-                )
-
         db.session.commit()
         print(f"Sembrado: {len(categories)} categorías, {len(products)} productos, {len(bundles)} paquetes.")
 

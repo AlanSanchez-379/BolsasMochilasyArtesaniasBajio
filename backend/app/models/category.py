@@ -10,6 +10,12 @@ SUBCATEGORIES = [
     "Tricombo",
 ]
 
+# "Categoría de paquete": qué tipo de productos puede elegir el cliente dentro de un
+# Paquete Emprendedor. Reutiliza dos valores de SUBCATEGORIES (así un paquete de "yute"
+# solo admite productos con subcategory="Estampado en yute") más "Mixto", que admite
+# cualquier producto sin importar su subcategoría.
+BUNDLE_SUBCATEGORIES = ["Estampado en yute", "Estampado animado 3D", "Mixto"]
+
 
 class Category(db.Model, UUIDPrimaryKeyMixin):
     __tablename__ = "categories"

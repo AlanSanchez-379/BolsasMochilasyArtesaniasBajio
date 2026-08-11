@@ -151,7 +151,6 @@ def _build_order(items_payload, shipping, payment_method):
             selections = item.get("selections") or []
             category_limits = product.bundle_category_limits or {}
 
-            eligible_ids = {str(rel.eligible_product_id) for rel in product.bundle_eligible_products}
             resolved = []  # (variant, sel_qty, category_name)
             category_totals = {}
             for sel in selections:
@@ -159,7 +158,11 @@ def _build_order(items_payload, shipping, payment_method):
                 sel_qty = int(sel.get("quantity") or 0)
                 if variant is None or sel_qty < 1:
                     raise CheckoutError(f"Selección inválida en el paquete {product.name}.")
-                if str(variant.product_id) not in eligible_ids:
+                # Un producto solo entra en el paquete si coincide con su "categoría de
+                # paquete" (yute/animado 3D) o si el paquete es "Mixto" (cualquiera).
+                if variant.product.is_bundle:
+                    raise CheckoutError(f"Un paquete no puede contener otro paquete ({product.name}).")
+                if product.subcategory != "Mixto" and variant.product.subcategory != product.subcategory:
                     raise CheckoutError(f"Un producto elegido no pertenece al paquete {product.name}.")
                 if variant.stock < sel_qty:
                     raise CheckoutError(

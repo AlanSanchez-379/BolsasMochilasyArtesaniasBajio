@@ -7,12 +7,13 @@ from app.extensions import db
 from app.models import (
     Product,
     ProductVariant,
-    BundleEligibleProduct,
     Category,
     User,
     UserRole,
     Order,
     Setting,
+    SUBCATEGORIES,
+    BUNDLE_SUBCATEGORIES,
     SUCCESSFUL_ORDER_STATUSES,
     PENDING_ORDER_STATUSES,
 )
@@ -25,8 +26,14 @@ from . import admin_bp
 
 STORE_ROLES = (UserRole.ADMIN_STORE.value, UserRole.ADMIN_TECH.value)
 SITE_ASSETS_BUCKET = "site-assets"
+BRANDING_FOLDER = "branding"
+PRODUCT_IMAGES_FOLDER = "products"
 ALLOWED_SETTING_TYPES = {"logo": "logo_url", "banner": "banner_url"}
 ALLOWED_IMAGE_MIMETYPES = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
+
+
+def _public_asset_url_is_valid(url):
+    return bool(url) and f"/storage/v1/object/public/{SITE_ASSETS_BUCKET}/" in url
 
 
 @admin_bp.get("/settings")
@@ -36,8 +43,9 @@ def get_admin_settings():
     return jsonify({"logo_url": settings.get("logo_url"), "banner_url": settings.get("banner_url")})
 
 
-def _upload_image_file(file, path_prefix):
-    """Sube un archivo a Storage y devuelve (public_url, None) o (None, (json, status))."""
+def _upload_image_file(file, folder):
+    """Sube un archivo a Storage (dentro de `folder`) y devuelve (public_url, None)
+    o (None, (json, status))."""
     if not file or not file.filename:
         return None, (jsonify({"message": "Falta el archivo."}), 400)
 
@@ -45,7 +53,7 @@ def _upload_image_file(file, path_prefix):
     if not ext:
         return None, (jsonify({"message": "Formato no soportado. Usa JPG, PNG o WEBP."}), 400)
 
-    path = f"{path_prefix}-{uuid.uuid4().hex}.{ext}"
+    path = f"{folder}/{uuid.uuid4().hex}.{ext}"
     file_bytes = file.read()
 
     try:
@@ -68,7 +76,7 @@ def upload_setting_image():
     if not setting_key:
         return jsonify({"message": "type debe ser 'logo' o 'banner'."}), 400
 
-    public_url, error = _upload_image_file(request.files.get("file"), setting_key)
+    public_url, error = _upload_image_file(request.files.get("file"), f"{BRANDING_FOLDER}/{asset_type}")
     if error:
         return error
 
@@ -80,12 +88,83 @@ def upload_setting_image():
     return jsonify({"key": setting_key, "value": public_url})
 
 
+def _list_folder_images(folder, limit=None):
+    """Lista las imágenes de una carpeta del bucket, más nuevas primero."""
+    options = {"sortBy": {"column": "created_at", "order": "desc"}}
+    if limit:
+        options["limit"] = limit
+
+    client = get_supabase_admin()
+    files = client.storage.from_(SITE_ASSETS_BUCKET).list(folder, options)
+
+    return [
+        {
+            "name": f["name"],
+            "url": client.storage.from_(SITE_ASSETS_BUCKET).get_public_url(f"{folder}/{f['name']}"),
+            "created_at": (f.get("created_at") or (f.get("metadata") or {}).get("lastModified")),
+        }
+        for f in files
+        if f.get("id")  # descarta el placeholder de carpeta vacía, que no trae id
+    ]
+
+
+@admin_bp.get("/settings/history")
+@role_required(UserRole.ADMIN_TECH.value)
+def settings_history():
+    asset_type = request.args.get("type")
+    if asset_type not in ALLOWED_SETTING_TYPES:
+        return jsonify({"message": "type debe ser 'logo' o 'banner'."}), 400
+
+    try:
+        images = _list_folder_images(f"{BRANDING_FOLDER}/{asset_type}")
+    except RuntimeError as e:
+        return jsonify({"message": str(e)}), 500
+    except Exception as e:
+        return jsonify({"message": f"Error al listar el historial: {e}"}), 500
+    return jsonify({"images": images})
+
+
+@admin_bp.patch("/settings")
+@role_required(UserRole.ADMIN_TECH.value)
+def set_setting_value():
+    """Reactiva una imagen ya subida (del historial) como logo/banner actual, sin
+    volver a subir el archivo."""
+    data = request.get_json() or {}
+    key = data.get("key")
+    value = data.get("value")
+
+    if key not in ALLOWED_SETTING_TYPES.values():
+        return jsonify({"message": "key debe ser 'logo_url' o 'banner_url'."}), 400
+    if not _public_asset_url_is_valid(value):
+        return jsonify({"message": "value debe ser una URL de una imagen ya subida a este sitio."}), 400
+
+    setting = Setting.query.get(key) or Setting(key=key)
+    setting.value = value
+    db.session.add(setting)
+    db.session.commit()
+    return jsonify({"key": key, "value": value})
+
+
+@admin_bp.get("/products/image-history")
+@role_required(*STORE_ROLES)
+def product_image_history():
+    """Últimas imágenes de producto subidas (de cualquier producto/variante), para
+    reutilizarlas sin volver a subir el archivo."""
+    try:
+        images = _list_folder_images(PRODUCT_IMAGES_FOLDER, limit=60)
+    except RuntimeError as e:
+        return jsonify({"message": str(e)}), 500
+    except Exception as e:
+        return jsonify({"message": f"Error al listar el historial: {e}"}), 500
+    return jsonify({"images": images})
+
+
 @admin_bp.post("/upload-image")
 @role_required(*STORE_ROLES)
 def upload_generic_image():
     """Sube una imagen suelta (ej. variantes de un producto todavía no guardado) y
     devuelve su URL pública, sin asociarla todavía a ningún registro."""
-    public_url, error = _upload_image_file(request.files.get("file"), "products/new")
+    public_url, error = _upload_image_file(request.files.get("file"), PRODUCT_IMAGES_FOLDER)
     if error:
         return error
     return jsonify({"url": public_url})
@@ -136,11 +215,24 @@ def _apply_product_fields(product, data):
         product.bundle_limit = data["bundle_limit"]
 
 
+def _validate_subcategory(data):
+    """La 'categoría de paquete' (yute / animado 3D / mixto) y la subcategoría de un
+    producto normal comparten columna pero son listas de valores distintas."""
+    if "subcategory" not in data:
+        return None
+    is_bundle = data.get("is_bundle", False)
+    allowed = BUNDLE_SUBCATEGORIES if is_bundle else SUBCATEGORIES
+    if data["subcategory"] not in allowed:
+        kind = "de paquete" if is_bundle else ""
+        return f"Categoría {kind} inválida. Válidas: {', '.join(allowed)}"
+    return None
+
+
 @admin_bp.get("/products")
 @role_required(*STORE_ROLES)
 def list_products():
     products = Product.query.order_by(Product.name).all()
-    return jsonify({"products": [serialize_product(p, include_eligible_ids=True) for p in products]})
+    return jsonify({"products": [serialize_product(p) for p in products]})
 
 
 @admin_bp.post("/products")
@@ -154,6 +246,10 @@ def create_product():
 
     if not Category.query.get(data["category_id"]):
         return jsonify({"message": "Categoría inválida."}), 400
+
+    subcategory_error = _validate_subcategory(data)
+    if subcategory_error:
+        return jsonify({"message": subcategory_error}), 400
 
     product = Product(slug=unique_slug(Product, data["name"]))
     _apply_product_fields(product, data)
@@ -175,7 +271,7 @@ def create_product():
         db.session.rollback()
         return jsonify({"message": f"Error al crear el producto: {e.orig}"}), 400
 
-    return jsonify({"product": serialize_product(product, include_eligible_ids=True)}), 201
+    return jsonify({"product": serialize_product(product)}), 201
 
 
 @admin_bp.patch("/products/<product_id>")
@@ -187,6 +283,10 @@ def update_product(product_id):
     if "name" in data and data["name"] != product.name:
         product.slug = unique_slug(Product, data["name"], exclude_id=product.id)
 
+    subcategory_error = _validate_subcategory({**data, "is_bundle": data.get("is_bundle", product.is_bundle)})
+    if subcategory_error:
+        return jsonify({"message": subcategory_error}), 400
+
     _apply_product_fields(product, data)
 
     try:
@@ -195,7 +295,7 @@ def update_product(product_id):
         db.session.rollback()
         return jsonify({"message": f"Error al actualizar: {e.orig}"}), 400
 
-    return jsonify({"product": serialize_product(product, include_eligible_ids=True)})
+    return jsonify({"product": serialize_product(product)})
 
 
 @admin_bp.delete("/products/<product_id>")
@@ -209,38 +309,6 @@ def delete_product(product_id):
         db.session.rollback()
         return jsonify({"message": "No se puede eliminar: el producto tiene pedidos asociados."}), 400
     return jsonify({"message": "Producto eliminado."})
-
-
-@admin_bp.put("/products/<product_id>/eligible-products")
-@role_required(*STORE_ROLES)
-def set_eligible_products(product_id):
-    bundle = Product.query.get_or_404(product_id)
-    if not bundle.is_bundle:
-        return jsonify({"message": "El producto no es un paquete."}), 400
-
-    data = request.get_json() or {}
-    eligible_ids = data.get("eligible_product_ids", [])
-
-    if bundle.bundle_category_limits:
-        allowed_categories = set(bundle.bundle_category_limits.keys())
-        candidates = Product.query.filter(Product.id.in_(eligible_ids)).all()
-        invalid = [p.name for p in candidates if p.category.name not in allowed_categories]
-        if invalid:
-            return jsonify(
-                {"message": f"Estos productos no pertenecen a categorías con límite asignado: {', '.join(invalid)}"}
-            ), 400
-
-    BundleEligibleProduct.query.filter_by(bundle_product_id=bundle.id).delete()
-    for pid in eligible_ids:
-        db.session.add(BundleEligibleProduct(bundle_product_id=bundle.id, eligible_product_id=pid))
-
-    try:
-        db.session.commit()
-    except IntegrityError as e:
-        db.session.rollback()
-        return jsonify({"message": f"Error: {e.orig}"}), 400
-
-    return jsonify({"product": serialize_product(bundle, include_eligible_ids=True)})
 
 
 @admin_bp.post("/products/<product_id>/variants")
@@ -266,7 +334,7 @@ def create_variant(product_id):
         db.session.rollback()
         return jsonify({"message": f"Error al crear variante: {e.orig}"}), 400
 
-    return jsonify({"product": serialize_product(product, include_eligible_ids=True)}), 201
+    return jsonify({"product": serialize_product(product)}), 201
 
 
 @admin_bp.patch("/variants/<variant_id>")
@@ -286,7 +354,7 @@ def update_variant(variant_id):
         db.session.rollback()
         return jsonify({"message": f"Error: {e.orig}"}), 400
 
-    return jsonify({"product": serialize_product(variant.product, include_eligible_ids=True)})
+    return jsonify({"product": serialize_product(variant.product)})
 
 
 @admin_bp.post("/variants/<variant_id>/image")
@@ -294,13 +362,13 @@ def update_variant(variant_id):
 def upload_variant_image(variant_id):
     variant = ProductVariant.query.get_or_404(variant_id)
 
-    public_url, error = _upload_image_file(request.files.get("file"), f"products/{variant.sku}")
+    public_url, error = _upload_image_file(request.files.get("file"), PRODUCT_IMAGES_FOLDER)
     if error:
         return error
 
     variant.image_path = public_url
     db.session.commit()
-    return jsonify({"product": serialize_product(variant.product, include_eligible_ids=True)})
+    return jsonify({"product": serialize_product(variant.product)})
 
 
 @admin_bp.delete("/variants/<variant_id>")
@@ -314,7 +382,7 @@ def delete_variant(variant_id):
     except IntegrityError:
         db.session.rollback()
         return jsonify({"message": "No se puede eliminar: la variante tiene pedidos asociados."}), 400
-    return jsonify({"product": serialize_product(product, include_eligible_ids=True)})
+    return jsonify({"product": serialize_product(product)})
 
 
 @admin_bp.get("/users")

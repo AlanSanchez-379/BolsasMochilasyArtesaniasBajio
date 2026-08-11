@@ -4,7 +4,15 @@ const ROLES = ["client", "admin_store", "admin_tech"];
 
 export async function renderUsersTab(container, isCurrentTab = () => true) {
   container.innerHTML = `<div class="text-center py-12 text-gray-400">Cargando usuarios...</div>`;
-  const { users } = await api.adminListUsers();
+
+  let users;
+  try {
+    ({ users } = await api.adminListUsers());
+  } catch (err) {
+    if (!isCurrentTab()) return;
+    container.innerHTML = `<p class="text-red-500 text-center py-12">${err.message}</p>`;
+    return;
+  }
   if (!isCurrentTab()) return;
 
   container.innerHTML = `

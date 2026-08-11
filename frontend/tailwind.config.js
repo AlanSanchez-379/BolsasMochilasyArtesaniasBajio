@@ -11,6 +11,12 @@ export default {
         "brand-cream": "#FFEABB", // fondos suaves
         "brand-teal": "#FBC3C1", // bordes y detalles
         "text-dark": "#333333",
+        // Alias con los nombres del maquetado adoptado (mismos valores que arriba)
+        "brand-pink": "#FE81D4",
+        "brand-pink-hover": "#FAACBF",
+        "brand-pink-light": "#FBC3C1",
+        "brand-peach-light": "#FFEABB",
+        "brand-mexican": "#E4007C", // acento (hovers, CTAs)
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],

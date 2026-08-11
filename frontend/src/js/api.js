@@ -1,4 +1,18 @@
 import { API_BASE } from "./config.js";
+import { state, setCurrentUser } from "./state.js";
+import { navigate } from "./router.js";
+
+// Si creíamos tener sesión (currentUser ya cargado) y el backend responde 401, el
+// token de Supabase expiró a medio uso: limpiamos el estado local y mandamos a login
+// en vez de dejar la vista actual colgada con un fetch fallido. Si currentUser ya era
+// null (invitado, o falló un intento de login), no se toca nada — evita loops de
+// redirección en /auth/me al arrancar la app o en la propia pantalla de login.
+function handleUnauthorized() {
+  if (state.currentUser) {
+    setCurrentUser(null);
+    navigate("/login");
+  }
+}
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -7,6 +21,7 @@ async function request(path, options = {}) {
     ...options,
   });
   if (!res.ok) {
+    if (res.status === 401) handleUnauthorized();
     const body = await res.json().catch(() => ({}));
     throw new Error(body.message || `Error ${res.status} en ${path}`);
   }
@@ -20,6 +35,7 @@ async function upload(path, formData) {
     body: formData, // sin Content-Type manual: el navegador arma el boundary del multipart
   });
   if (!res.ok) {
+    if (res.status === 401) handleUnauthorized();
     const body = await res.json().catch(() => ({}));
     throw new Error(body.message || `Error ${res.status} en ${path}`);
   }
@@ -62,11 +78,6 @@ export const api = {
   adminUpdateProduct: (id, payload) =>
     request(`/admin/products/${id}`, { method: "PATCH", body: JSON.stringify(payload) }),
   adminDeleteProduct: (id) => request(`/admin/products/${id}`, { method: "DELETE" }),
-  adminSetEligibleProducts: (id, eligibleProductIds) =>
-    request(`/admin/products/${id}/eligible-products`, {
-      method: "PUT",
-      body: JSON.stringify({ eligible_product_ids: eligibleProductIds }),
-    }),
   adminCreateVariant: (productId, payload) =>
     request(`/admin/products/${productId}/variants`, { method: "POST", body: JSON.stringify(payload) }),
   adminUpdateVariant: (variantId, payload) =>
@@ -82,6 +93,7 @@ export const api = {
     formData.append("file", file);
     return upload(`/admin/variants/${variantId}/image`, formData);
   },
+  adminProductImageHistory: () => request("/admin/products/image-history"),
 
   adminListUsers: () => request("/admin/users"),
   adminUpdateUserRole: (userId, role) =>
@@ -94,4 +106,7 @@ export const api = {
     formData.append("file", file);
     return upload("/admin/settings/upload", formData);
   },
+  adminSettingsHistory: (type) => request(`/admin/settings/history?type=${encodeURIComponent(type)}`),
+  adminSetSetting: (key, value) =>
+    request("/admin/settings", { method: "PATCH", body: JSON.stringify({ key, value }) }),
 };

@@ -40,19 +40,6 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
         "ProductVariant", back_populates="product", cascade="all, delete-orphan", lazy="selectin"
     )
 
-    eligible_for_bundles = db.relationship(
-        "BundleEligibleProduct",
-        foreign_keys="BundleEligibleProduct.eligible_product_id",
-        back_populates="eligible_product",
-        cascade="all, delete-orphan",
-    )
-    bundle_eligible_products = db.relationship(
-        "BundleEligibleProduct",
-        foreign_keys="BundleEligibleProduct.bundle_product_id",
-        back_populates="bundle_product",
-        cascade="all, delete-orphan",
-    )
-
     def price_for_quantity(self, quantity: int):
         if quantity >= self.super_wholesale_min_qty:
             return self.price_super_wholesale
@@ -78,19 +65,3 @@ class ProductVariant(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
 
     def __repr__(self):
         return f"<ProductVariant {self.sku}>"
-
-
-class BundleEligibleProduct(db.Model):
-    """N:M: qué productos (modelos) pueden entrar en cada Paquete Emprendedor."""
-
-    __tablename__ = "bundle_eligible_products"
-
-    bundle_product_id = db.Column(UUID(as_uuid=True), db.ForeignKey("products.id"), primary_key=True)
-    eligible_product_id = db.Column(UUID(as_uuid=True), db.ForeignKey("products.id"), primary_key=True)
-
-    bundle_product = db.relationship(
-        "Product", foreign_keys=[bundle_product_id], back_populates="bundle_eligible_products"
-    )
-    eligible_product = db.relationship(
-        "Product", foreign_keys=[eligible_product_id], back_populates="eligible_for_bundles"
-    )

@@ -1,6 +1,7 @@
 import { state as appState, isAdmin } from "../../state.js";
 import { navigate } from "../../router.js";
 import { renderProductsTab } from "./products.js";
+import { renderBundlesTab } from "./bundles.js";
 import { renderOrdersTab } from "./orders.js";
 import { renderUsersTab } from "./users.js";
 import { renderStatsTab } from "./stats.js";
@@ -23,6 +24,7 @@ export function renderAdmin(container) {
   const tabs = [
     { id: "estadisticas", label: "Estadísticas", icon: "fa-chart-pie" },
     { id: "catalogo", label: "Catálogo", icon: "fa-box" },
+    { id: "paquetes", label: "Paquetes", icon: "fa-gift" },
     { id: "pedidos", label: "Pedidos", icon: "fa-truck" },
     ...(isTech
       ? [
@@ -71,6 +73,7 @@ export function renderAdmin(container) {
 
     if (activeTab === "estadisticas") renderStatsTab(tabContent, isCurrentTab);
     else if (activeTab === "catalogo") renderProductsTab(tabContent, isCurrentTab);
+    else if (activeTab === "paquetes") renderBundlesTab(tabContent, isCurrentTab);
     else if (activeTab === "pedidos") renderOrdersTab(tabContent, isCurrentTab);
     else if (activeTab === "usuarios") renderUsersTab(tabContent, isCurrentTab);
     else if (activeTab === "ajustes") renderSettingsTab(tabContent, isCurrentTab);

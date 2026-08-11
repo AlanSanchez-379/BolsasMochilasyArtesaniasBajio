@@ -1,7 +1,17 @@
 from flask import jsonify, request
 
 from app.extensions import db
-from app.models import Category, Product, ProductVariant, OrderItem, Order, Setting, SUBCATEGORIES, SUCCESSFUL_ORDER_STATUSES
+from app.models import (
+    Category,
+    Product,
+    ProductVariant,
+    OrderItem,
+    Order,
+    Setting,
+    SUBCATEGORIES,
+    BUNDLE_SUBCATEGORIES,
+    SUCCESSFUL_ORDER_STATUSES,
+)
 from app.utils.serializers import serialize_product
 
 from . import catalog_bp
@@ -20,6 +30,7 @@ def list_categories():
         {
             "categories": [{"id": str(c.id), "name": c.name, "slug": c.slug} for c in categories],
             "subcategories": SUBCATEGORIES,
+            "bundle_subcategories": BUNDLE_SUBCATEGORIES,
         }
     )
 
@@ -62,7 +73,7 @@ def list_products():
 @catalog_bp.get("/products/<slug>")
 def get_product(slug):
     product = Product.query.filter_by(slug=slug).first_or_404()
-    return jsonify({"product": serialize_product(product, include_eligible_ids=True)})
+    return jsonify({"product": serialize_product(product)})
 
 
 @catalog_bp.get("/products/bestsellers")

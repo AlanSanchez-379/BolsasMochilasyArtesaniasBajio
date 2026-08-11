@@ -2,6 +2,9 @@ import { api } from "../api.js";
 import { productCardHtml } from "../components/productCard.js";
 import { bindNavLinks } from "../dom.js";
 import { currentRenderToken } from "../router.js";
+import { getCategories } from "../catalogCache.js";
+
+const SPECIAL_CATEGORIES = { Paquetes: "Paquetes Emprendedores", Nuevos: "Nuevos Productos" };
 
 function applyFilters(products, { search, subcategory, color }) {
   return products.filter((p) => {
@@ -18,53 +21,89 @@ function applyFilters(products, { search, subcategory, color }) {
 
 function categoryShell(categories, activeCategory) {
   return `
-    <div class="max-w-7xl mx-auto px-4 py-8 fade-in flex flex-col md:flex-row gap-8">
-      <div class="md:w-1/4">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 md:sticky md:top-24">
-          <h3 class="text-2xl font-bold mb-6 border-b pb-4">Categorías</h3>
-          <ul class="space-y-3 text-lg">
-            <li>
-              <button data-cat="Todos" class="cat-link w-full text-left px-4 py-2 rounded-lg transition-colors ${
-                activeCategory === "Todos" ? "bg-brand-blue-dark text-white font-medium" : "hover:bg-brand-cream text-gray-700"
-              }">Todos los productos</button>
-            </li>
-            ${categories
-              .map(
-                (cat) => `
-              <li>
-                <button data-cat="${cat.name}" class="cat-link w-full text-left px-4 py-2 rounded-lg transition-colors ${
-                  activeCategory === cat.name ? "bg-brand-blue-dark text-white font-medium" : "hover:bg-brand-cream text-gray-700"
-                }">${cat.name}</button>
-              </li>`
-              )
-              .join("")}
-          </ul>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 fade-in">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <div class="w-full lg:w-64 flex-shrink-0">
+          <div class="border border-gray-200 rounded-lg p-6 bg-white lg:sticky lg:top-28">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="font-bold text-lg text-gray-900">Filtros</h3>
+              <i class="fa-solid fa-sliders text-gray-400"></i>
+            </div>
 
-          <div class="mt-8 border-t pt-6">
-            <h4 class="text-xl font-bold mb-4">Filtrar ${activeCategory}</h4>
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2">Buscar (Nombre, Código...)</label>
-              <input id="filter-search" type="text" placeholder="Ej. Yute, Rojo, BYP-1..."
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal focus:ring-1 focus:ring-brand-teal" />
+            <div class="mb-6 border-b border-gray-100 pb-4">
+              <h4 class="font-semibold text-sm text-gray-900 mb-3">Categoría</h4>
+              <ul class="space-y-2">
+                <li>
+                  <button data-cat="Todos" class="cat-link w-full text-left text-sm flex justify-between items-center ${
+                    activeCategory === "Todos" ? "font-bold text-brand-mexican" : "text-gray-600 hover:text-gray-900"
+                  }">
+                    <span>Todos los productos</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                  </button>
+                </li>
+                ${categories
+                  .map(
+                    (cat) => `
+                  <li>
+                    <button data-cat="${cat.name}" class="cat-link w-full text-left text-sm flex justify-between items-center ${
+                      activeCategory === cat.name ? "font-bold text-brand-mexican" : "text-gray-600 hover:text-gray-900"
+                    }">
+                      <span>${cat.name}</span>
+                      <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                  </li>`
+                  )
+                  .join("")}
+              </ul>
             </div>
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2">Tipo / Estampado</label>
-              <select id="filter-subcategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal"></select>
+
+            <div class="mb-6 border-b border-gray-100 pb-4">
+              <h4 class="font-semibold text-sm text-gray-900 mb-3">Accesos Rápidos</h4>
+              <ul class="space-y-2">
+                ${Object.entries(SPECIAL_CATEGORIES)
+                  .map(
+                    ([key, label]) => `
+                  <li>
+                    <button data-cat="${key}" class="cat-link w-full text-left text-sm flex justify-between items-center ${
+                      activeCategory === key ? "font-bold text-brand-mexican" : "text-gray-600 hover:text-gray-900"
+                    }">
+                      <span>${label}</span>
+                      <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                  </li>`
+                  )
+                  .join("")}
+              </ul>
             </div>
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2">Color disponible</label>
-              <select id="filter-color" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal"></select>
+
+            <div class="mb-6">
+              <div class="relative">
+                <input id="filter-search" type="text" placeholder="Buscar..."
+                  class="w-full pl-8 pr-3 py-2 border-b border-gray-200 outline-none text-sm focus:border-brand-pink transition-colors" />
+                <i class="fa-solid fa-search absolute left-0 top-2.5 text-gray-400 text-sm"></i>
+              </div>
+            </div>
+
+            <div class="mb-4 border-t border-gray-100 pt-4">
+              <label class="block font-semibold text-sm text-gray-900 mb-2">Tipo / Estampado</label>
+              <select id="filter-subcategory" class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink"></select>
+            </div>
+            <div class="mb-2">
+              <label class="block font-semibold text-sm text-gray-900 mb-2">Color disponible</label>
+              <select id="filter-color" class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink"></select>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="md:w-3/4">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-3xl font-bold">${activeCategory}</h2>
-          <span id="result-count" class="text-lg text-gray-500"></span>
+        <div class="flex-1">
+          <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+            <h2 class="text-2xl font-bold text-gray-900">${SPECIAL_CATEGORIES[activeCategory] || activeCategory}</h2>
+            <span id="result-count" class="text-sm text-gray-500"></span>
+          </div>
+          <div id="product-grid">
+            <div class="text-center py-20 bg-gray-50 rounded-lg border border-gray-200 text-gray-400">Cargando productos...</div>
+          </div>
         </div>
-        <div id="product-grid"></div>
       </div>
     </div>
   `;
@@ -74,9 +113,9 @@ function renderGrid(gridEl, countEl, products) {
   countEl.textContent = `${products.length} producto${products.length === 1 ? "" : "s"}`;
   if (products.length === 0) {
     gridEl.innerHTML = `
-      <div class="text-center py-20 bg-white rounded-2xl border border-gray-100">
-        <i class="fa-regular fa-face-frown-open text-6xl text-gray-300 mb-4"></i>
-        <p class="text-xl text-gray-500">No encontramos productos en esta categoría.</p>
+      <div class="text-center py-20 bg-gray-50 rounded-lg border border-gray-200">
+        <i class="fa-solid fa-box-open text-4xl text-gray-300 mb-3"></i>
+        <p class="text-gray-500">No encontramos productos en esta categoría.</p>
       </div>`;
   } else {
     gridEl.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -88,13 +127,13 @@ function renderGrid(gridEl, countEl, products) {
 
 export async function renderCategory(container, categoryName) {
   const token = currentRenderToken();
-  container.innerHTML = `<div class="max-w-7xl mx-auto px-4 py-20 text-center text-xl text-gray-400">Cargando...</div>`;
-
   const activeCategory = categoryName || "Todos";
-  const [{ categories }, { products: categoryProducts }] = await Promise.all([
-    api.getCategories(),
-    api.getProducts(activeCategory === "Todos" ? {} : { category: activeCategory }),
-  ]);
+
+  // Las categorías ya están precargadas (o casi) desde el arranque de la app, así que
+  // esto normalmente resuelve al instante: la barra lateral y los filtros aparecen sin
+  // pantalla de "Cargando...". Solo la grilla de productos (que sí cambia por categoría)
+  // muestra su propio estado de carga, mucho más breve y localizado.
+  const { categories } = await getCategories();
   if (token !== currentRenderToken()) return;
 
   container.innerHTML = categoryShell(categories, activeCategory);
@@ -110,6 +149,21 @@ export async function renderCategory(container, categoryName) {
   const colorSelect = container.querySelector("#filter-color");
   const gridEl = container.querySelector("#product-grid");
   const countEl = container.querySelector("#result-count");
+
+  let categoryProducts;
+  if (activeCategory === "Paquetes") {
+    ({ products: categoryProducts } = await api.getProducts({ is_bundle: "true" }));
+  } else if (activeCategory === "Nuevos") {
+    const { products } = await api.getProducts({ is_bundle: "false" });
+    categoryProducts = [...products]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 24);
+  } else {
+    ({ products: categoryProducts } = await api.getProducts(
+      activeCategory === "Todos" ? {} : { category: activeCategory }
+    ));
+  }
+  if (token !== currentRenderToken()) return;
 
   const availableSubcategories = ["Todas", ...new Set(categoryProducts.map((p) => p.subcategory))];
   const availableColors = ["Todos", ...new Set(categoryProducts.flatMap((p) => p.variants.map((v) => v.color)))];

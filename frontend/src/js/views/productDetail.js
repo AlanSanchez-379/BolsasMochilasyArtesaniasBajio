@@ -6,28 +6,28 @@ import { navigate, currentRenderToken } from "../router.js";
 import { NO_IMAGE_PLACEHOLDER } from "../imageFallback.js";
 
 function pricingTiersHtml(product, totalProposedQty) {
-  const tierClass = (active) => (active ? "bg-white shadow border-brand-teal border-2" : "");
+  const tierClass = (active) => (active ? "bg-white border-brand-pink border-2" : "border border-gray-200");
   return `
-    <div class="bg-brand-cream rounded-xl p-6 mb-8 border border-brand-salmon border-opacity-30">
-      <h3 class="font-bold text-xl mb-1 text-center">Niveles de Precio</h3>
-      <p class="text-xs text-gray-500 text-center mb-4">Se calculan sumando todos los productos normales en tu carrito (mix & match)</p>
+    <div class="bg-brand-peach-light bg-opacity-40 rounded-lg p-6 mb-8 border border-gray-200">
+      <h3 class="font-bold text-lg mb-1 text-center text-gray-900">Niveles de Precio</h3>
+      <p class="text-xs text-gray-500 text-center mb-4">Se calculan sumando todos los productos normales en tu carrito (mix &amp; match)</p>
       <div class="grid grid-cols-3 gap-2 text-center">
-        <div class="p-3 rounded-lg ${tierClass(totalProposedQty < product.wholesale_min_qty)}">
-          <p class="text-sm text-gray-500">Menudeo</p>
-          <p class="text-lg font-bold">1-${product.wholesale_min_qty - 1} pz</p>
-          <p class="text-2xl text-brand-blue-dark font-bold">$${product.price_normal}</p>
+        <div class="p-3 rounded ${tierClass(totalProposedQty < product.wholesale_min_qty)}">
+          <p class="text-xs text-gray-500">Menudeo</p>
+          <p class="text-sm font-bold">1-${product.wholesale_min_qty - 1} pz</p>
+          <p class="text-xl text-gray-900 font-bold">$${product.price_normal}</p>
         </div>
-        <div class="p-3 rounded-lg ${tierClass(
+        <div class="p-3 rounded ${tierClass(
           totalProposedQty >= product.wholesale_min_qty && totalProposedQty < product.super_wholesale_min_qty
         )}">
-          <p class="text-sm text-gray-500">Mayoreo</p>
-          <p class="text-lg font-bold">${product.wholesale_min_qty}-${product.super_wholesale_min_qty - 1} pz</p>
-          <p class="text-2xl text-brand-blue-dark font-bold">$${product.price_wholesale}</p>
+          <p class="text-xs text-gray-500">Mayoreo</p>
+          <p class="text-sm font-bold">${product.wholesale_min_qty}-${product.super_wholesale_min_qty - 1} pz</p>
+          <p class="text-xl text-gray-900 font-bold">$${product.price_wholesale}</p>
         </div>
-        <div class="p-3 rounded-lg ${tierClass(totalProposedQty >= product.super_wholesale_min_qty)}">
-          <p class="text-sm text-gray-500">Súper Mayoreo</p>
-          <p class="text-lg font-bold">${product.super_wholesale_min_qty}+ pz</p>
-          <p class="text-2xl text-brand-blue-dark font-bold">$${product.price_super_wholesale}</p>
+        <div class="p-3 rounded ${tierClass(totalProposedQty >= product.super_wholesale_min_qty)}">
+          <p class="text-xs text-gray-500">Súper Mayoreo</p>
+          <p class="text-sm font-bold">${product.super_wholesale_min_qty}+ pz</p>
+          <p class="text-xl text-gray-900 font-bold">$${product.price_super_wholesale}</p>
         </div>
       </div>
     </div>
@@ -51,9 +51,13 @@ export async function renderProductDetail(container, slug) {
   const relatedProducts = categoryProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
   let eligibleBundleProducts = [];
-  if (product.is_bundle && product.eligible_product_ids?.length) {
-    const { products: allProducts } = await api.getProducts();
-    eligibleBundleProducts = allProducts.filter((p) => product.eligible_product_ids.includes(p.id));
+  if (product.is_bundle) {
+    // La elegibilidad se calcula por "categoría de paquete" (subcategory del propio
+    // paquete): yute/animado 3D solo admiten esa subcategoría; Mixto admite cualquiera.
+    const filters = { is_bundle: "false" };
+    if (product.subcategory !== "Mixto") filters.subcategory = product.subcategory;
+    const { products: allProducts } = await api.getProducts(filters);
+    eligibleBundleProducts = allProducts;
   }
 
   if (token !== currentRenderToken()) return;
@@ -89,33 +93,34 @@ export async function renderProductDetail(container, slug) {
     const totalProposedQty = combinedNonBundleQty() + view.quantity;
 
     container.innerHTML = `
-      <div class="max-w-7xl mx-auto px-4 py-8 fade-in">
-        <button id="back-btn" class="text-brand-blue-dark text-lg mb-6 hover:underline flex items-center">
-          <i class="fa-solid fa-arrow-left mr-2"></i> Volver al catálogo
+      <div class="max-w-6xl mx-auto px-4 py-8 fade-in">
+        <button id="back-btn" class="text-sm font-semibold text-gray-500 hover:text-gray-900 mb-6 flex items-center gap-2">
+          <i class="fa-solid fa-arrow-left"></i> Volver al catálogo
         </button>
 
-        <div class="bg-white rounded-3xl shadow-lg p-6 md:p-10 flex flex-col md:flex-row gap-10">
-          <div class="md:w-1/2">
-            <div class="rounded-2xl overflow-hidden border border-gray-100 relative">
-              <img src="${view.selectedVariant.image_url || NO_IMAGE_PLACEHOLDER}" alt="${product.name}" class="w-full h-auto object-cover" />
+        <div class="flex flex-col md:flex-row gap-12">
+          <div class="w-full md:w-1/2">
+            <div class="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 aspect-square relative mb-4">
+              <img src="${view.selectedVariant.image_url || NO_IMAGE_PLACEHOLDER}" alt="${product.name}" class="w-full h-full object-cover" />
               ${
                 view.selectedVariant.stock === 0
-                  ? `<div class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center">
-                      <span class="bg-red-500 text-white px-6 py-3 rounded-lg text-2xl font-bold transform -rotate-12">AGOTADO</span>
+                  ? `<div class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
+                      <span class="bg-gray-800 text-white font-bold py-2 px-6 rounded text-sm">AGOTADO</span>
                     </div>`
                   : ""
               }
             </div>
             ${
               !product.is_bundle
-                ? `<div class="flex gap-3 mt-4 flex-wrap">
+                ? `<div class="grid grid-cols-4 gap-2">
                     ${product.variants
                       .map(
                         (v) => `
-                      <button data-variant="${v.id}" class="variant-swatch w-16 h-16 rounded-lg overflow-hidden border-2 ${
-                          v.id === view.selectedVariant.id ? "border-brand-blue-dark" : "border-transparent"
-                        } ${v.stock === 0 ? "opacity-40" : ""}" title="${v.color} (${v.stock} disp.)">
+                      <button data-variant="${v.id}" class="variant-swatch relative rounded overflow-hidden border-2 aspect-square ${
+                          v.id === view.selectedVariant.id ? "border-gray-900" : "border-transparent opacity-60 hover:opacity-100"
+                        }" title="${v.color} (${v.stock} disp.)">
                         <img src="${v.image_url || NO_IMAGE_PLACEHOLDER}" class="w-full h-full object-cover" />
+                        ${v.stock === 0 ? `<div class="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center"><i class="fa-solid fa-ban text-red-500"></i></div>` : ""}
                       </button>`
                       )
                       .join("")}
@@ -124,10 +129,12 @@ export async function renderProductDetail(container, slug) {
             }
           </div>
 
-          <div class="md:w-1/2 flex flex-col justify-center">
-            <span class="text-brand-salmon font-bold tracking-wider uppercase mb-2">${product.subcategory}</span>
-            <h1 class="text-4xl font-bold mb-4">${product.name}</h1>
-            <p class="text-gray-600 text-lg mb-6 leading-relaxed">${product.description || ""}</p>
+          <div class="w-full md:w-1/2 flex flex-col">
+            <nav class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+              ${product.category} / ${product.subcategory}
+            </nav>
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">${product.name}</h1>
+            <p class="text-gray-600 mb-8 leading-relaxed">${product.description || ""}</p>
 
             ${
               product.is_bundle
@@ -135,17 +142,17 @@ export async function renderProductDetail(container, slug) {
                 : `
               ${pricingTiersHtml(product, totalProposedQty)}
               <div class="flex items-center gap-4 mb-6">
-                <label class="font-bold text-lg">Cantidad:</label>
-                <div class="flex items-center border-2 border-gray-200 rounded-full">
-                  <button id="qty-minus" class="w-10 h-10 text-xl font-bold text-brand-blue-dark">-</button>
-                  <span id="qty-value" class="w-12 text-center text-lg font-bold">${view.quantity}</span>
-                  <button id="qty-plus" class="w-10 h-10 text-xl font-bold text-brand-blue-dark">+</button>
+                <label class="font-bold text-sm text-gray-900">Cantidad:</label>
+                <div class="flex items-center border border-gray-300 rounded h-12">
+                  <button id="qty-minus" class="px-4 text-gray-500 hover:text-gray-900"><i class="fa-solid fa-minus text-xs"></i></button>
+                  <span id="qty-value" class="px-4 font-semibold w-12 text-center">${view.quantity}</span>
+                  <button id="qty-plus" class="px-4 text-gray-500 hover:text-gray-900"><i class="fa-solid fa-plus text-xs"></i></button>
                 </div>
-                <span class="text-gray-500">${view.selectedVariant.stock} disponibles</span>
+                <span class="text-sm text-gray-500">${view.selectedVariant.stock} disponibles</span>
               </div>
               <button id="add-to-cart" ${view.selectedVariant.stock === 0 ? "disabled" : ""}
-                class="bg-brand-blue-dark text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-brand-blue shadow-lg disabled:opacity-40 disabled:cursor-not-allowed">
-                <i class="fa-solid fa-cart-plus mr-2"></i> Agregar al Carrito
+                class="bg-gray-900 hover:bg-brand-mexican disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold h-12 rounded transition-colors">
+                <i class="fa-solid fa-cart-plus mr-2"></i> ${view.selectedVariant.stock === 0 ? "Agotado" : "Añadir al Carrito"}
               </button>
             `
             }
@@ -155,9 +162,9 @@ export async function renderProductDetail(container, slug) {
         ${
           relatedProducts.length
             ? `
-          <div class="mt-16">
-            <h2 class="text-3xl font-bold mb-8">También te puede interesar</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <div class="mt-24 border-t border-gray-100 pt-12">
+            <h2 class="text-2xl font-bold mb-8 text-center text-gray-900">También te podría interesar</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
               ${relatedProducts.map((p) => productCardHtml(p)).join("")}
             </div>
           </div>`
@@ -173,14 +180,14 @@ export async function renderProductDetail(container, slug) {
     const expanded = view.expandedProducts.has(ep.id);
     const inStockVariants = ep.variants.filter((v) => v.stock > 0);
     return `
-      <div class="border border-gray-100 rounded-xl overflow-hidden">
-        <button data-toggle-product="${ep.id}" class="w-full flex justify-between items-center px-4 py-3 bg-gray-50 hover:bg-gray-100 text-left">
-          <span class="font-semibold">${ep.name}</span>
+      <div class="border border-gray-200 rounded overflow-hidden bg-white">
+        <button data-toggle-product="${ep.id}" class="w-full flex justify-between items-center px-4 py-3 bg-gray-50 hover:bg-gray-100 text-left text-sm">
+          <span class="font-semibold text-gray-800">${ep.name}</span>
           <i class="fa-solid ${expanded ? "fa-chevron-up" : "fa-chevron-down"} text-gray-400"></i>
         </button>
         ${
           expanded
-            ? `<div class="p-4 space-y-2">
+            ? `<div class="p-4 border-t border-gray-100 bg-gray-50 space-y-3">
                 ${
                   inStockVariants.length === 0
                     ? `<p class="text-sm text-gray-400">Sin stock disponible en este modelo.</p>`
@@ -190,13 +197,13 @@ export async function renderProductDetail(container, slug) {
                           return `
                         <div class="flex items-center justify-between">
                           <div class="flex items-center gap-2">
-                            <img src="${v.image_url || NO_IMAGE_PLACEHOLDER}" class="w-10 h-10 rounded object-cover" />
-                            <span class="text-sm">${v.color} <span class="text-gray-400">(${v.stock} disp.)</span></span>
+                            <img src="${v.image_url || NO_IMAGE_PLACEHOLDER}" class="w-8 h-8 border rounded object-cover" />
+                            <span class="text-sm text-gray-600">${v.color} <span class="text-xs">(${v.stock})</span></span>
                           </div>
-                          <div class="flex items-center border-2 border-gray-200 rounded-full">
-                            <button data-bundle-minus="${v.id}" class="w-8 h-8 font-bold text-brand-blue-dark">-</button>
-                            <span class="w-8 text-center font-bold">${qty}</span>
-                            <button data-bundle-plus="${v.id}" data-max="${v.stock}" data-category="${ep.category}" class="w-8 h-8 font-bold text-brand-blue-dark">+</button>
+                          <div class="flex items-center bg-white border border-gray-200 rounded overflow-hidden">
+                            <button data-bundle-minus="${v.id}" class="px-2 py-1 bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-minus text-xs"></i></button>
+                            <span class="px-3 text-sm font-bold w-8 text-center">${qty}</span>
+                            <button data-bundle-plus="${v.id}" data-max="${v.stock}" data-category="${ep.category}" class="px-2 py-1 bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-plus text-xs"></i></button>
                           </div>
                         </div>`;
                         })
@@ -225,8 +232,8 @@ export async function renderProductDetail(container, slug) {
             return `
             <div>
               <div class="flex justify-between items-center mb-2">
-                <h4 class="font-bold text-lg">${categoryName}</h4>
-                <span class="font-bold ${categoryTotal === categoryLimit ? "text-brand-teal" : "text-brand-salmon"}">${categoryTotal} / ${categoryLimit}</span>
+                <h4 class="font-bold text-sm text-gray-900">${categoryName}</h4>
+                <span class="font-bold text-sm ${categoryTotal === categoryLimit ? "text-brand-mexican" : "text-gray-400"}">${categoryTotal} / ${categoryLimit}</span>
               </div>
               <div class="space-y-2">
                 ${
@@ -246,11 +253,11 @@ export async function renderProductDetail(container, slug) {
     const limit = product.bundle_limit;
     const total = customTotal();
     return `
-      <div class="mb-4 flex items-center justify-between bg-white border-2 border-brand-teal rounded-xl px-4 py-3">
-        <span class="font-bold">Piezas seleccionadas</span>
-        <span class="text-xl font-bold ${total === limit ? "text-brand-teal" : "text-brand-salmon"}">${total} / ${limit}</span>
+      <div class="mb-4 flex items-center justify-between bg-white border border-gray-200 rounded px-4 py-3">
+        <span class="font-bold text-sm text-gray-900">Piezas seleccionadas</span>
+        <span class="text-lg font-bold ${total === limit ? "text-brand-mexican" : "text-gray-400"}">${total} / ${limit}</span>
       </div>
-      <div class="max-h-96 overflow-y-auto space-y-4 mb-6 pr-1">
+      <div class="max-h-96 overflow-y-auto space-y-3 mb-6 pr-1">
         ${eligibleBundleProducts.map((ep) => productAccordionItemHtml(ep)).join("")}
       </div>
     `;
@@ -261,18 +268,18 @@ export async function renderProductDetail(container, slug) {
       product.bundle_category_limits && Object.keys(product.bundle_category_limits).length > 0;
 
     return `
-      <div class="bg-brand-cream rounded-xl p-6 mb-6 border border-brand-salmon border-opacity-30 text-center">
+      <div class="bg-brand-peach-light bg-opacity-40 rounded-lg p-6 mb-6 border border-gray-200 text-center">
         <p class="text-sm text-gray-500">Precio fijo del paquete</p>
-        <p class="text-3xl font-bold text-brand-blue-dark">$${product.price_normal}</p>
+        <p class="text-3xl font-bold text-gray-900">$${product.price_normal}</p>
         <p class="text-gray-600 mt-1">Incluye <strong>${product.bundle_limit}</strong> piezas a elegir</p>
       </div>
 
       <div class="flex gap-3 mb-6">
-        <button data-mode="surtido" class="mode-btn flex-1 py-3 rounded-full font-semibold border-2 ${
-          view.bundleMode === "surtido" ? "bg-brand-blue-dark text-white border-brand-blue-dark" : "border-gray-300 text-gray-600"
+        <button data-mode="surtido" class="mode-btn flex-1 py-3 rounded font-semibold border-2 ${
+          view.bundleMode === "surtido" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
         }">Surtido al Azar</button>
-        <button data-mode="personalizado" class="mode-btn flex-1 py-3 rounded-full font-semibold border-2 ${
-          view.bundleMode === "personalizado" ? "bg-brand-blue-dark text-white border-brand-blue-dark" : "border-gray-300 text-gray-600"
+        <button data-mode="personalizado" class="mode-btn flex-1 py-3 rounded font-semibold border-2 ${
+          view.bundleMode === "personalizado" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
         }">Elegir mis diseños</button>
       </div>
 
@@ -281,11 +288,11 @@ export async function renderProductDetail(container, slug) {
           ? hasCategoryLimits
             ? categoryAccordionHtml()
             : flatSelectionListHtml()
-          : `<p class="text-gray-500 mb-6"><i class="fa-solid fa-shuffle mr-2"></i>Recibirás una selección variada de nuestros modelos disponibles.</p>`
+          : `<p class="text-gray-500 mb-6 text-sm"><i class="fa-solid fa-shuffle mr-2"></i>Recibirás una selección variada de nuestros modelos disponibles.</p>`
       }
 
-      <button id="add-bundle-to-cart" class="bg-brand-blue-dark text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-brand-blue shadow-lg">
-        <i class="fa-solid fa-cart-plus mr-2"></i> Agregar Paquete al Carrito
+      <button id="add-bundle-to-cart" class="bg-gray-900 hover:bg-brand-mexican text-white font-semibold h-12 rounded transition-colors mt-auto">
+        <i class="fa-solid fa-cart-plus mr-2"></i> Añadir Paquete al Carrito
       </button>
     `;
   }
