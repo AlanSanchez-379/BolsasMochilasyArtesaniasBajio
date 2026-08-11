@@ -1,0 +1,13 @@
+# El sitio es JS "vanilla" sin bundler: main.js importa ~30 archivos más (router.js,
+# vistas, componentes) por su propia URL relativa, sin parámetro de versión. Ponerle
+# solo a main.js un "?v=" no sirve de nada porque esos imports internos igual se
+# quedarían con la copia vieja en caché. La forma correcta de arreglarlo de raíz (y sin
+# tener que acordarse de subir un número en cada deploy) es decirle al navegador/CDN
+# que siempre revalide el JS y el CSS contra el servidor antes de reusar la copia
+# guardada — usando el ETag/Last-Modified, así que si el archivo no cambió sigue
+# siendo rápido (304), y si cambió, se nota al instante.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
