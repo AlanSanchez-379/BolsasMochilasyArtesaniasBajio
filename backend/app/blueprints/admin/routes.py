@@ -11,6 +11,10 @@ from app.models import (
     User,
     UserRole,
     Order,
+    OrderItem,
+    OrderStatus,
+    OrderChannel,
+    PaymentMethod,
     Setting,
     SUBCATEGORIES,
     BUNDLE_SUBCATEGORIES,
@@ -18,7 +22,7 @@ from app.models import (
     PENDING_ORDER_STATUSES,
 )
 from app.utils.decorators import role_required
-from app.utils.serializers import serialize_product
+from app.utils.serializers import serialize_product, serialize_order
 from app.utils.slugify import unique_slug
 from app.utils.supabase_client import get_supabase_admin
 
@@ -176,15 +180,148 @@ def stats():
     successful = Order.query.filter(Order.status.in_(SUCCESSFUL_ORDER_STATUSES))
     total_earnings = successful.with_entities(db.func.coalesce(db.func.sum(Order.total), 0)).scalar()
     total_sales = successful.count()
-    pending_orders = Order.query.filter(Order.status.in_(PENDING_ORDER_STATUSES)).count()
+
+    online_q = successful.filter(Order.channel == OrderChannel.ONLINE)
+    in_store_q = successful.filter(Order.channel == OrderChannel.IN_STORE)
+    online_earnings = online_q.with_entities(db.func.coalesce(db.func.sum(Order.total), 0)).scalar()
+    in_store_earnings = in_store_q.with_entities(db.func.coalesce(db.func.sum(Order.total), 0)).scalar()
+
+    pending_orders = Order.query.filter(Order.status.in_(PENDING_ORDER_STATUSES)).order_by(Order.created_at.asc()).all()
+
+    # Alertas de inventario: variantes en o por debajo de su umbral de stock bajo,
+    # las más urgentes (menos stock) primero.
+    low_stock_variants = (
+        ProductVariant.query.join(Product)
+        .filter(ProductVariant.stock <= ProductVariant.low_stock_threshold)
+        .order_by(ProductVariant.stock.asc())
+        .limit(15)
+        .all()
+    )
+
+    recent_orders = Order.query.order_by(Order.created_at.desc()).limit(8).all()
 
     return jsonify(
         {
             "total_earnings": float(total_earnings),
             "total_sales": total_sales,
-            "pending_orders": pending_orders,
+            "pending_orders": len(pending_orders),
+            "online": {"earnings": float(online_earnings), "sales": online_q.count()},
+            "in_store": {"earnings": float(in_store_earnings), "sales": in_store_q.count()},
+            "low_stock": [
+                {
+                    "variant_id": str(v.id),
+                    "product_name": v.product.name,
+                    "color": v.color,
+                    "sku": v.sku,
+                    "stock": v.stock,
+                    "low_stock_threshold": v.low_stock_threshold,
+                }
+                for v in low_stock_variants
+            ],
+            "pending_validation_orders": [
+                {
+                    "id": str(o.id),
+                    "order_number": o.order_number,
+                    "customer_name": o.shipping_full_name,
+                    "total": float(o.total),
+                    "payment_method": o.payment_method.value,
+                    "status": o.status.value,
+                    "created_at": o.created_at.isoformat(),
+                    "spei_payment_deadline": o.spei_payment_deadline.isoformat() if o.spei_payment_deadline else None,
+                }
+                for o in pending_orders
+            ],
+            "recent_orders": [
+                {
+                    "id": str(o.id),
+                    "order_number": o.order_number,
+                    "channel": o.channel.value,
+                    "customer_name": o.shipping_full_name or "Venta en mostrador",
+                    "total": float(o.total),
+                    "status": o.status.value,
+                    "created_at": o.created_at.isoformat(),
+                }
+                for o in recent_orders
+            ],
         }
     )
+
+
+@admin_bp.post("/pos/sale")
+@role_required(*STORE_ROLES)
+def pos_sale():
+    """Punto de Venta: venta de mostrador en tienda física. Sin envío, sin cuenta de
+    cliente; el stock se descuenta al instante y el pedido nace como 'Entregado'."""
+    data = request.get_json() or {}
+    items_payload = data.get("items") or []
+    payment_method = data.get("payment_method")
+    customer_name = (data.get("customer_name") or "").strip() or None
+
+    if payment_method not in (PaymentMethod.CARD.value, PaymentMethod.CASH.value):
+        return jsonify({"message": "Método de pago inválido. Usa 'cash' o 'card'."}), 400
+    if not items_payload:
+        return jsonify({"message": "Agrega al menos un producto a la venta."}), 400
+
+    variant_ids = [item.get("variant_id") for item in items_payload if item.get("variant_id")]
+    variants = {
+        str(v.id): v
+        for v in ProductVariant.query.filter(ProductVariant.id.in_(variant_ids)).with_for_update().all()
+    }
+
+    # Mayoreo combinado: igual que en la web, el precio por volumen se decide sumando
+    # las piezas de productos normales en esta venta. Los paquetes tienen precio fijo
+    # (igual que "Surtido al azar" en la web) y no participan en esa suma.
+    combined_qty = sum(
+        int(item.get("quantity") or 0)
+        for item in items_payload
+        if (v := variants.get(item.get("variant_id"))) and not v.product.is_bundle
+    )
+
+    order_items = []
+    subtotal = 0.0
+    for item in items_payload:
+        variant = variants.get(item.get("variant_id"))
+        quantity = int(item.get("quantity") or 0)
+        if variant is None:
+            return jsonify({"message": "Uno de los productos seleccionados ya no existe."}), 400
+        if quantity < 1:
+            return jsonify({"message": f"Cantidad inválida para {variant.product.name}."}), 400
+        if variant.stock < quantity:
+            return jsonify(
+                {
+                    "message": f"Stock insuficiente para {variant.product.name} ({variant.color}). "
+                    f"Disponible: {variant.stock}."
+                }
+            ), 400
+
+        if variant.product.is_bundle:
+            unit_price = float(variant.product.price_for_quantity(1))
+        else:
+            unit_price = float(variant.product.price_for_quantity(combined_qty))
+        variant.stock -= quantity
+        order_items.append(
+            OrderItem(product_id=variant.product_id, variant_id=variant.id, quantity=quantity, unit_price=unit_price)
+        )
+        subtotal += unit_price * quantity
+
+    order = Order(
+        user_id=None,
+        channel=OrderChannel.IN_STORE,
+        shipping_full_name=customer_name,
+        payment_method=PaymentMethod(payment_method),
+        status=OrderStatus.DELIVERED,
+        subtotal=subtotal,
+        total=subtotal,
+        items=order_items,
+    )
+    db.session.add(order)
+    try:
+        db.session.commit()
+    except IntegrityError as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error al registrar la venta: {e.orig}"}), 400
+
+    return jsonify({"order": serialize_order(order)}), 201
 
 PRODUCT_FIELDS = [
     "name",

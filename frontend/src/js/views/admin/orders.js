@@ -57,12 +57,19 @@ function orderDetailHtml(o) {
         </ul>
       </div>
       <div>
-        <h4 class="font-bold text-sm text-gray-900 mb-3 uppercase tracking-wide">Datos de envío</h4>
-        <p class="text-sm text-gray-800 font-semibold">${o.shipping.full_name}</p>
-        <p class="text-sm text-gray-600">${o.shipping.phone}</p>
-        <p class="text-sm text-gray-600">${o.shipping.street}, ${o.shipping.city}, ${o.shipping.state}</p>
-        <p class="text-sm text-gray-600">CP ${o.shipping.postal_code}</p>
-        <p class="text-sm text-gray-500 uppercase mt-2">${o.shipping.carrier || "-"} · $${o.shipping.cost}</p>
+        <h4 class="font-bold text-sm text-gray-900 mb-3 uppercase tracking-wide">
+          ${o.channel === "in_store" ? "Venta en Tienda Física" : "Datos de envío"}
+        </h4>
+        ${
+          o.channel === "in_store"
+            ? `<p class="text-sm text-gray-800 font-semibold">${o.shipping.full_name || "Cliente de mostrador"}</p>
+               <p class="text-sm text-gray-600 mt-1"><i class="fa-solid fa-store mr-1"></i>Comprado y entregado en tienda física, sin envío.</p>`
+            : `<p class="text-sm text-gray-800 font-semibold">${o.shipping.full_name}</p>
+               <p class="text-sm text-gray-600">${o.shipping.phone}</p>
+               <p class="text-sm text-gray-600">${o.shipping.street}, ${o.shipping.city}, ${o.shipping.state}</p>
+               <p class="text-sm text-gray-600">CP ${o.shipping.postal_code}</p>
+               <p class="text-sm text-gray-500 uppercase mt-2">${o.shipping.carrier || "-"} · $${o.shipping.cost}</p>`
+        }
       </div>
     </div>
   `;
@@ -112,9 +119,12 @@ export async function renderOrdersTab(container, isCurrentTab = () => true) {
               <tr class="border-t border-gray-100" data-row="${o.id}">
                 <td class="px-4 py-3 font-semibold">
                   ${o.order_number}
+                  <span class="block text-[10px] font-bold uppercase mt-0.5 ${o.channel === "in_store" ? "text-orange-600" : "text-gray-400"}">
+                    <i class="fa-solid ${o.channel === "in_store" ? "fa-store" : "fa-globe"} mr-1"></i>${o.channel === "in_store" ? "Tienda Física" : "Online"}
+                  </span>
                   ${hasCustomBundle ? `<span class="block text-[10px] font-bold text-brand-salmon uppercase mt-0.5">Paquete personalizado</span>` : ""}
                 </td>
-                <td class="px-4 py-3 text-sm">${o.shipping.full_name}</td>
+                <td class="px-4 py-3 text-sm">${o.shipping.full_name || "Cliente de mostrador"}</td>
                 <td class="px-4 py-3 text-sm text-gray-500">${new Date(o.created_at).toLocaleDateString("es-MX")}</td>
                 <td class="px-4 py-3 text-sm uppercase">${o.payment_method}</td>
                 <td class="px-4 py-3 font-bold">$${o.total}</td>

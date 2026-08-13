@@ -6,16 +6,17 @@ import { getCategories } from "../catalogCache.js";
 
 const SPECIAL_CATEGORIES = { Paquetes: "Paquetes Emprendedores", Nuevos: "Nuevos Productos" };
 
-function applyFilters(products, { search, subcategory, color }) {
+function applyFilters(products, { search, subcategory, color, maxPrice }) {
   return products.filter((p) => {
     const matchesSubcategory = subcategory === "Todas" || p.subcategory === subcategory;
     const matchesColor = color === "Todos" || p.variants.some((v) => v.color === color);
+    const matchesPrice = maxPrice == null || Number(p.price_normal) <= maxPrice;
     const term = search.trim().toLowerCase();
     const matchesSearch =
       !term ||
       p.name.toLowerCase().includes(term) ||
       p.variants.some((v) => v.sku.toLowerCase().includes(term) || v.color.toLowerCase().includes(term));
-    return matchesSubcategory && matchesColor && matchesSearch;
+    return matchesSubcategory && matchesColor && matchesPrice && matchesSearch;
   });
 }
 
@@ -88,9 +89,17 @@ function categoryShell(categories, activeCategory) {
               <label class="block font-semibold text-sm text-gray-900 mb-2">Tipo / Estampado</label>
               <select id="filter-subcategory" class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink"></select>
             </div>
-            <div class="mb-2">
+            <div class="mb-4">
               <label class="block font-semibold text-sm text-gray-900 mb-2">Color disponible</label>
               <select id="filter-color" class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink"></select>
+            </div>
+            <div class="mb-2">
+              <label class="block font-semibold text-sm text-gray-900 mb-2">Precio máximo</label>
+              <input id="filter-price" type="range" min="0" max="0" step="50" class="w-full accent-brand-mexican" />
+              <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>$0</span>
+                <span id="filter-price-value" class="font-bold text-gray-900">$0</span>
+              </div>
             </div>
           </div>
         </div>
@@ -147,6 +156,8 @@ export async function renderCategory(container, categoryName) {
   const searchInput = container.querySelector("#filter-search");
   const subcategorySelect = container.querySelector("#filter-subcategory");
   const colorSelect = container.querySelector("#filter-color");
+  const priceInput = container.querySelector("#filter-price");
+  const priceValueLabel = container.querySelector("#filter-price-value");
   const gridEl = container.querySelector("#product-grid");
   const countEl = container.querySelector("#result-count");
 
@@ -171,11 +182,18 @@ export async function renderCategory(container, categoryName) {
   subcategorySelect.innerHTML = availableSubcategories.map((s) => `<option value="${s}">${s}</option>`).join("");
   colorSelect.innerHTML = availableColors.map((c) => `<option value="${c}">${c}</option>`).join("");
 
+  const highestPrice = categoryProducts.reduce((max, p) => Math.max(max, Number(p.price_normal)), 0);
+  const priceCeiling = Math.max(Math.ceil(highestPrice / 50) * 50, 50);
+  priceInput.max = priceCeiling;
+  priceInput.value = priceCeiling;
+  priceValueLabel.textContent = `$${priceCeiling}`;
+
   function refresh() {
     const filtered = applyFilters(categoryProducts, {
       search: searchInput.value,
       subcategory: subcategorySelect.value,
       color: colorSelect.value,
+      maxPrice: Number(priceInput.value),
     });
     renderGrid(gridEl, countEl, filtered);
   }
@@ -183,6 +201,10 @@ export async function renderCategory(container, categoryName) {
   searchInput.addEventListener("input", refresh);
   subcategorySelect.addEventListener("change", refresh);
   colorSelect.addEventListener("change", refresh);
+  priceInput.addEventListener("input", () => {
+    priceValueLabel.textContent = `$${priceInput.value}`;
+    refresh();
+  });
 
   refresh();
 }

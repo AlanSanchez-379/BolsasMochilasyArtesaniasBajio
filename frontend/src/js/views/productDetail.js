@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { addToCart, state as appState, combinedNonBundleQty } from "../state.js";
+import { addToCart, combinedNonBundleQty, isAdmin } from "../state.js";
 import { productCardHtml } from "../components/productCard.js";
 import { bindNavLinks } from "../dom.js";
 import { navigate, currentRenderToken } from "../router.js";
@@ -29,6 +29,74 @@ function pricingTiersHtml(product, totalProposedQty) {
           <p class="text-sm font-bold">${product.super_wholesale_min_qty}+ pz</p>
           <p class="text-xl text-gray-900 font-bold">$${product.price_super_wholesale}</p>
         </div>
+      </div>
+    </div>
+  `;
+}
+
+function adminQuickEditHtml(view, product) {
+  if (!isAdmin()) return "";
+  const open = view.adminEditOpen;
+  return `
+    <div class="mt-12 border-2 border-dashed border-brand-mexican rounded-lg p-4 bg-brand-peach-light bg-opacity-20">
+      <button id="admin-edit-toggle" type="button" class="flex items-center justify-between w-full text-left font-bold text-sm text-brand-mexican uppercase tracking-wide">
+        <span><i class="fa-solid fa-screwdriver-wrench mr-2"></i>Edición rápida (Admin)</span>
+        <i class="fa-solid ${open ? "fa-chevron-up" : "fa-chevron-down"}"></i>
+      </button>
+      ${open ? adminQuickEditFormHtml(product) : ""}
+    </div>
+  `;
+}
+
+function adminQuickEditFormHtml(product) {
+  return `
+    <div class="mt-4 space-y-4">
+      ${
+        product.is_bundle
+          ? `<div>
+              <label class="block text-xs font-bold text-gray-600 mb-1">Precio del paquete</label>
+              <input type="number" step="0.01" id="admin-price-normal" value="${product.price_normal}" class="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded text-sm" />
+            </div>`
+          : `<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Precio Normal</label>
+                <input type="number" step="0.01" id="admin-price-normal" value="${product.price_normal}" class="w-full px-3 py-2 border border-gray-300 rounded text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Precio Mayoreo</label>
+                <input type="number" step="0.01" id="admin-price-wholesale" value="${product.price_wholesale}" class="w-full px-3 py-2 border border-gray-300 rounded text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Precio Súper Mayoreo</label>
+                <input type="number" step="0.01" id="admin-price-super" value="${product.price_super_wholesale}" class="w-full px-3 py-2 border border-gray-300 rounded text-sm" />
+              </div>
+            </div>`
+      }
+
+      <div>
+        <label class="block text-xs font-bold text-gray-600 mb-2">Stock por variante</label>
+        <div class="space-y-2">
+          ${product.variants
+            .map(
+              (v) => `
+            <div class="flex items-center gap-3">
+              <span class="text-sm text-gray-700 w-24 truncate">${v.color}</span>
+              <input type="number" min="0" data-admin-stock="${v.id}" value="${v.stock}" class="w-24 px-2 py-1 border border-gray-300 rounded text-sm" />
+            </div>`
+            )
+            .join("")}
+        </div>
+      </div>
+
+      <p id="admin-edit-error" class="text-red-500 text-sm hidden"></p>
+
+      <div class="flex items-center gap-4 pt-2">
+        <button id="admin-edit-save" type="button" class="bg-brand-mexican hover:opacity-90 text-white px-5 py-2 rounded-full font-semibold text-sm transition-opacity">
+          Guardar cambios
+        </button>
+        <button id="admin-edit-full" type="button" class="text-sm font-semibold text-gray-500 hover:text-gray-900">
+          Editar todo en el panel completo <i class="fa-solid fa-arrow-right ml-1"></i>
+        </button>
       </div>
     </div>
   `;
@@ -68,6 +136,7 @@ export async function renderProductDetail(container, slug) {
     bundleMode: "surtido", // 'surtido' | 'personalizado'
     customSelections: {}, // variantId -> qty
     expandedProducts: new Set(), // ids de modelos con el acordeón abierto
+    adminEditOpen: false, // panel de edición rápida (solo admin_store/admin_tech)
   };
 
   function customTotal() {
@@ -158,6 +227,8 @@ export async function renderProductDetail(container, slug) {
             }
           </div>
         </div>
+
+        ${adminQuickEditHtml(view, product)}
 
         ${
           relatedProducts.length
@@ -301,6 +372,57 @@ export async function renderProductDetail(container, slug) {
     bindNavLinks(container);
 
     container.querySelector("#back-btn").addEventListener("click", () => navigate(`/categoria/${encodeURIComponent(product.category)}`));
+
+    const adminToggle = container.querySelector("#admin-edit-toggle");
+    if (adminToggle) {
+      adminToggle.addEventListener("click", () => {
+        view.adminEditOpen = !view.adminEditOpen;
+        render();
+      });
+    }
+
+    const adminSaveBtn = container.querySelector("#admin-edit-save");
+    if (adminSaveBtn) {
+      adminSaveBtn.addEventListener("click", async () => {
+        const errorEl = container.querySelector("#admin-edit-error");
+        errorEl.classList.add("hidden");
+        adminSaveBtn.disabled = true;
+        adminSaveBtn.textContent = "Guardando...";
+
+        try {
+          const priceNormal = parseFloat(container.querySelector("#admin-price-normal").value);
+          const pricePayload = product.is_bundle
+            ? { price_normal: priceNormal, price_wholesale: priceNormal, price_super_wholesale: priceNormal }
+            : {
+                price_normal: priceNormal,
+                price_wholesale: parseFloat(container.querySelector("#admin-price-wholesale").value),
+                price_super_wholesale: parseFloat(container.querySelector("#admin-price-super").value),
+              };
+          await api.adminUpdateProduct(product.id, pricePayload);
+
+          const stockUpdates = [...container.querySelectorAll("[data-admin-stock]")].map((input) =>
+            api.adminUpdateVariant(input.dataset.adminStock, { stock: parseInt(input.value, 10) || 0 })
+          );
+          await Promise.all(stockUpdates);
+
+          const { product: fresh } = await api.getProduct(slug);
+          Object.assign(product, fresh);
+          view.selectedVariant = product.variants.find((v) => v.id === view.selectedVariant.id) || product.variants[0];
+          view.adminEditOpen = false;
+          render();
+        } catch (err) {
+          errorEl.textContent = err.message;
+          errorEl.classList.remove("hidden");
+          adminSaveBtn.disabled = false;
+          adminSaveBtn.textContent = "Guardar cambios";
+        }
+      });
+    }
+
+    const adminFullBtn = container.querySelector("#admin-edit-full");
+    if (adminFullBtn) {
+      adminFullBtn.addEventListener("click", () => navigate("/admin"));
+    }
 
     container.querySelectorAll(".variant-swatch").forEach((el) => {
       el.addEventListener("click", () => {

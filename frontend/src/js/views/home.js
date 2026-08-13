@@ -44,6 +44,20 @@ function paint(container, { categories, bundles, bestsellers, settings }) {
 
       <hr class="border-gray-200 mb-16" />
 
+      <div class="border-t border-b border-gray-200 py-10 mb-20 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <h3 class="text-2xl font-bold text-gray-900">Suscríbete al Boletín</h3>
+          <p class="text-sm text-gray-500 mt-1">Recibe promociones de mayoreo y nuevos paquetes emprendedor directamente en tu correo.</p>
+        </div>
+        <form id="newsletter-form" class="flex w-full md:w-auto">
+          <input type="email" required placeholder="Tu correo electrónico"
+            class="border border-gray-300 rounded-l px-4 py-3 outline-none focus:border-brand-pink w-full md:w-72 text-sm" />
+          <button type="submit" class="bg-gray-900 hover:bg-brand-mexican text-white font-semibold px-6 py-3 rounded-r transition-colors text-sm uppercase tracking-wider whitespace-nowrap">
+            Suscribir
+          </button>
+        </form>
+      </div>
+
       <div class="mb-20">
         <h2 class="text-3xl font-semibold text-center text-gray-900 mb-10">¿Qué buscas hoy?</h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -90,6 +104,12 @@ function paint(container, { categories, bundles, bestsellers, settings }) {
   `;
 
   bindNavLinks(container);
+
+  const newsletterForm = container.querySelector("#newsletter-form");
+  newsletterForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    newsletterForm.innerHTML = `<p class="text-brand-mexican font-semibold text-sm"><i class="fa-solid fa-circle-check mr-2"></i>¡Gracias! Pronto tendrás noticias nuestras.</p>`;
+  });
 }
 
 async function loadHomeData() {

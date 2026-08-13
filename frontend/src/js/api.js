@@ -73,6 +73,7 @@ export const api = {
     request(`/orders/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
 
   adminStats: () => request("/admin/stats"),
+  adminPosSale: (payload) => request("/admin/pos/sale", { method: "POST", body: JSON.stringify(payload) }),
   adminListProducts: () => request("/admin/products"),
   adminCreateProduct: (payload) => request("/admin/products", { method: "POST", body: JSON.stringify(payload) }),
   adminUpdateProduct: (id, payload) =>

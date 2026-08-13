@@ -33,6 +33,12 @@ PENDING_ORDER_STATUSES = (OrderStatus.PENDING_PAYMENT, OrderStatus.PAYMENT_IN_VA
 class PaymentMethod(str, enum.Enum):
     CARD = "card"
     SPEI = "spei"
+    CASH = "cash"  # Solo Punto de Venta (tienda física)
+
+
+class OrderChannel(str, enum.Enum):
+    ONLINE = "online"
+    IN_STORE = "in_store"  # Punto de Venta (caja registradora)
 
 
 class ShippingCarrier(str, enum.Enum):
@@ -49,15 +55,19 @@ class Order(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "orders"
 
     order_number = db.Column(db.String(20), unique=True, nullable=False, default=_generate_order_number)
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("users.id"), nullable=False)
+    # Nulo en ventas de Punto de Venta: no hay cuenta de cliente asociada (venta de mostrador).
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("users.id"), nullable=True)
+    channel = db.Column(db.Enum(OrderChannel, name="order_channel"), nullable=False, default=OrderChannel.ONLINE)
 
-    # Información de envío (Documento de Requerimientos secc. 5)
-    shipping_full_name = db.Column(db.String(255), nullable=False)
-    shipping_phone = db.Column(db.String(20), nullable=False)
-    shipping_street = db.Column(db.String(255), nullable=False)
-    shipping_city = db.Column(db.String(100), nullable=False)
-    shipping_state = db.Column(db.String(100), nullable=False)
-    shipping_postal_code = db.Column(db.String(10), nullable=False)
+    # Información de envío (Documento de Requerimientos secc. 5). Nula en ventas de
+    # Punto de Venta (venta física, sin envío); shipping_full_name puede usarse ahí
+    # como nombre opcional del cliente de mostrador.
+    shipping_full_name = db.Column(db.String(255), nullable=True)
+    shipping_phone = db.Column(db.String(20), nullable=True)
+    shipping_street = db.Column(db.String(255), nullable=True)
+    shipping_city = db.Column(db.String(100), nullable=True)
+    shipping_state = db.Column(db.String(100), nullable=True)
+    shipping_postal_code = db.Column(db.String(10), nullable=True)
     shipping_carrier = db.Column(db.Enum(ShippingCarrier, name="shipping_carrier"))
     shipping_cost = db.Column(db.Numeric(10, 2), default=0)
 

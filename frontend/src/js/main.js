@@ -1,4 +1,4 @@
-import { route, initRouter } from "./router.js";
+import { route, initRouter, onRouteChange } from "./router.js";
 import { renderNavbar } from "./components/navbar.js";
 import { renderFooter } from "./components/footer.js";
 import { renderWhatsappFloat } from "./components/whatsappFloat.js";
@@ -40,6 +40,11 @@ getSettings();
 renderNavbar(navbarSlot);
 renderFooter(footerSlot);
 subscribe(() => renderNavbar(navbarSlot));
+
+// El checkout no debe llevar footer (evita distracciones durante el pago).
+onRouteChange((path) => {
+  footerSlot.style.display = path === "/checkout" ? "none" : "";
+});
 
 route("/", () => renderHome(view));
 route("/categoria/:name", ({ params }) => renderCategory(view, params.name));

@@ -49,6 +49,7 @@ def serialize_order(order):
     return {
         "id": str(order.id),
         "order_number": order.order_number,
+        "channel": order.channel.value,
         "status": order.status.value,
         "payment_method": order.payment_method.value,
         "spei_payment_deadline": order.spei_payment_deadline.isoformat() if order.spei_payment_deadline else None,

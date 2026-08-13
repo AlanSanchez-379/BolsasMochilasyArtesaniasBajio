@@ -8,6 +8,14 @@ export function currentRenderToken() {
   return renderToken;
 }
 
+// Permite que componentes globales (ej. el footer) reaccionen a cambios de ruta sin
+// que router.js tenga que conocerlos directamente.
+const routeChangeListeners = [];
+
+export function onRouteChange(fn) {
+  routeChangeListeners.push(fn);
+}
+
 export function route(pattern, handler) {
   const paramNames = [];
   const regexBody = pattern
@@ -38,6 +46,7 @@ async function resolve() {
   const path = currentPath();
   const query = currentQuery();
   renderToken += 1;
+  routeChangeListeners.forEach((fn) => fn(path));
 
   for (const r of routes) {
     const match = path.match(r.regex);
