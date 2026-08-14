@@ -1,6 +1,6 @@
 from .user import User, UserRole
 from .category import Category, SUBCATEGORIES, BUNDLE_SUBCATEGORIES
-from .product import Product, ProductVariant
+from .product import Product, ProductVariant, MAX_VARIANT_IMAGES
 from .setting import Setting
 from .order import (
     Order,
@@ -21,6 +21,7 @@ __all__ = [
     "BUNDLE_SUBCATEGORIES",
     "Product",
     "ProductVariant",
+    "MAX_VARIANT_IMAGES",
     "Setting",
     "Order",
     "OrderItem",

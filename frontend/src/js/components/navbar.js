@@ -6,6 +6,7 @@ import { getSettings } from "../settingsCache.js";
 const NAV_LINKS = [
   { label: "Inicio", href: "/" },
   { label: "Tienda", href: "/categoria/Todos" },
+  { label: "Ofertas", href: "/categoria/Ofertas" },
   { label: "Paquetes", href: "/categoria/Paquetes" },
   { label: "Nuevos Productos", href: "/categoria/Nuevos" },
 ];

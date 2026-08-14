@@ -71,10 +71,10 @@ export async function renderProductsTab(container, isCurrentTab = () => true) {
                 const stock = p.variants.reduce((sum, v) => sum + v.stock, 0);
                 return `
                 <tr class="border-t border-gray-100">
-                  <td class="px-4 py-3 font-semibold">${p.name}</td>
+                  <td class="px-4 py-3 font-semibold">${p.name}${p.is_on_sale ? ' <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded ml-1">OFERTA</span>' : ""}</td>
                   <td class="px-4 py-3 text-sm">${p.category}</td>
                   <td class="px-4 py-3 text-sm">${p.subcategory}</td>
-                  <td class="px-4 py-3">$${p.price_normal}</td>
+                  <td class="px-4 py-3">${p.is_on_sale ? `<span class="line-through text-gray-400">$${p.price_normal}</span> <span class="text-red-500 font-bold">$${p.sale_price}</span>` : `$${p.price_normal}`}</td>
                   <td class="px-4 py-3">${stock === 0 ? '<span class="text-red-500 font-bold">AGOTADO</span>' : stock}</td>
                   <td class="px-4 py-3 text-right">
                     <button data-edit="${p.id}" class="text-brand-blue-dark font-semibold hover:underline mr-3">Editar</button>
@@ -198,6 +198,17 @@ export async function renderProductsTab(container, isCurrentTab = () => true) {
           <input type="number" name="super_wholesale_min_qty" required value="${product?.super_wholesale_min_qty ?? 50}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
         </div>
 
+        <div class="sm:col-span-2 border-t pt-4 mt-2">
+          <label class="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer">
+            <input type="checkbox" id="is-on-sale-checkbox" ${product?.is_on_sale ? "checked" : ""} class="w-4 h-4" />
+            Este producto está en oferta
+          </label>
+          <div id="sale-price-field" class="${product?.is_on_sale ? "" : "hidden"} mt-2">
+            <label class="block text-sm font-bold text-gray-700 mb-1">Precio de oferta</label>
+            <input type="number" step="0.01" name="sale_price" value="${product?.sale_price ?? ""}" class="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-lg" />
+          </div>
+        </div>
+
         ${
           isNew
             ? `<div class="sm:col-span-2 border-t pt-4 mt-2">
@@ -229,6 +240,10 @@ export async function renderProductsTab(container, isCurrentTab = () => true) {
       renderNewVariantsBuilder(el.querySelector("#new-variants-builder"), newVariants);
     }
 
+    el.querySelector("#is-on-sale-checkbox").addEventListener("change", (e) => {
+      el.querySelector("#sale-price-field").classList.toggle("hidden", !e.target.checked);
+    });
+
     const form = el.querySelector("#product-form");
     const errorEl = el.querySelector("#form-error");
 
@@ -247,6 +262,8 @@ export async function renderProductsTab(container, isCurrentTab = () => true) {
         price_super_wholesale: parseFloat(fd.get("price_super_wholesale")),
         wholesale_min_qty: parseInt(fd.get("wholesale_min_qty"), 10),
         super_wholesale_min_qty: parseInt(fd.get("super_wholesale_min_qty"), 10),
+        is_on_sale: el.querySelector("#is-on-sale-checkbox").checked,
+        sale_price: fd.get("sale_price") ? parseFloat(fd.get("sale_price")) : null,
         is_bundle: false,
       };
 
@@ -257,11 +274,11 @@ export async function renderProductsTab(container, isCurrentTab = () => true) {
           errorEl.classList.remove("hidden");
           return;
         }
-        payload.variants = newVariants.map(({ color, sku, stock, image_url }) => ({
+        payload.variants = newVariants.map(({ color, sku, stock, image_urls }) => ({
           color,
           sku,
           stock: parseInt(stock, 10) || 0,
-          image_url,
+          image_urls,
         }));
       }
 

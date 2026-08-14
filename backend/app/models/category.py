@@ -3,9 +3,7 @@ from .mixins import UUIDPrimaryKeyMixin
 
 # Fijas y compartidas por todas las categorías (Documento de Requerimientos secc. 2)
 SUBCATEGORIES = [
-    "Lisas",
     "Estampado animado",
-    "Estampado animado 3D",
     "Estampado en yute",
     "Tricombo",
 ]

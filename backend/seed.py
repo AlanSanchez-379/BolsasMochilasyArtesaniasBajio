@@ -35,7 +35,7 @@ def make_variants(sku_prefix, stocks):
             color=color,
             sku=f"{sku_prefix}-{color[:3].upper()}",
             stock=stock,
-            image_path=variant_image(color, COLOR_HEX.get(color, "9BCEC1")),
+            image_paths=[variant_image(color, COLOR_HEX.get(color, "9BCEC1"))],
         )
         for color, stock in stocks.items()
     ]
@@ -68,7 +68,7 @@ def run():
             ),
             Product(
                 category=categories["Mochilas"],
-                subcategory="Estampado animado 3D",
+                subcategory="Estampado animado",
                 name="Mochila 3D Kids",
                 slug="mochila-3d-kids",
                 description="Mochila escolar con divertidos diseños en 3D.",
@@ -81,7 +81,7 @@ def run():
             ),
             Product(
                 category=categories["Carteras"],
-                subcategory="Lisas",
+                subcategory="Estampado en yute",
                 name="Cartera Clásica",
                 slug="cartera-clasica",
                 description="Cartera elegante y espaciosa.",

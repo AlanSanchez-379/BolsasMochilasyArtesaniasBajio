@@ -18,6 +18,7 @@ from app.models import (
     Setting,
     SUBCATEGORIES,
     BUNDLE_SUBCATEGORIES,
+    MAX_VARIANT_IMAGES,
     SUCCESSFUL_ORDER_STATUSES,
     PENDING_ORDER_STATUSES,
 )
@@ -333,6 +334,8 @@ PRODUCT_FIELDS = [
     "price_super_wholesale",
     "wholesale_min_qty",
     "super_wholesale_min_qty",
+    "is_on_sale",
+    "sale_price",
     "is_bundle",
 ]
 
@@ -350,6 +353,34 @@ def _apply_product_fields(product, data):
         product.bundle_limit = sum(limits.values()) if limits else data.get("bundle_limit")
     elif "bundle_limit" in data:
         product.bundle_limit = data["bundle_limit"]
+
+
+def _clean_image_urls(raw):
+    """Normaliza la lista de fotos de una variante: descarta vacíos y aplica el
+    máximo de MAX_VARIANT_IMAGES."""
+    urls = [u for u in (raw or []) if u]
+    return urls[:MAX_VARIANT_IMAGES]
+
+
+def _validate_sale_price(data, product=None):
+    """La oferta solo aplica a productos normales (no paquetes) y su precio debe
+    ser positivo y menor al precio normal vigente."""
+    is_on_sale = data.get("is_on_sale", product.is_on_sale if product else False)
+    if not is_on_sale:
+        return None
+
+    is_bundle = data.get("is_bundle", product.is_bundle if product else False)
+    if is_bundle:
+        return "Un paquete no puede marcarse en oferta."
+
+    sale_price = data.get("sale_price", float(product.sale_price) if product and product.sale_price else None)
+    if sale_price is None:
+        return "Falta el precio de oferta."
+
+    price_normal = data.get("price_normal", float(product.price_normal) if product else None)
+    if price_normal is not None and not (0 < float(sale_price) < float(price_normal)):
+        return "El precio de oferta debe ser mayor a 0 y menor al precio normal."
+    return None
 
 
 def _validate_subcategory(data):
@@ -388,6 +419,10 @@ def create_product():
     if subcategory_error:
         return jsonify({"message": subcategory_error}), 400
 
+    sale_price_error = _validate_sale_price(data)
+    if sale_price_error:
+        return jsonify({"message": sale_price_error}), 400
+
     product = Product(slug=unique_slug(Product, data["name"]))
     _apply_product_fields(product, data)
 
@@ -397,7 +432,7 @@ def create_product():
                 color=variant_data["color"],
                 sku=variant_data["sku"],
                 stock=variant_data.get("stock", 0),
-                image_path=variant_data.get("image_url"),
+                image_paths=_clean_image_urls(variant_data.get("image_urls")),
             )
         )
 
@@ -423,6 +458,10 @@ def update_product(product_id):
     subcategory_error = _validate_subcategory({**data, "is_bundle": data.get("is_bundle", product.is_bundle)})
     if subcategory_error:
         return jsonify({"message": subcategory_error}), 400
+
+    sale_price_error = _validate_sale_price(data, product=product)
+    if sale_price_error:
+        return jsonify({"message": sale_price_error}), 400
 
     _apply_product_fields(product, data)
 
@@ -462,7 +501,7 @@ def create_variant(product_id):
         sku=data["sku"],
         stock=data.get("stock", 0),
         low_stock_threshold=data.get("low_stock_threshold", 5),
-        image_path=data.get("image_url"),
+        image_paths=_clean_image_urls(data.get("image_urls")),
     )
     db.session.add(variant)
     try:
@@ -482,8 +521,8 @@ def update_variant(variant_id):
     for field in ["color", "sku", "stock", "low_stock_threshold"]:
         if field in data:
             setattr(variant, field, data[field])
-    if "image_url" in data:
-        variant.image_path = data["image_url"]
+    if "image_urls" in data:
+        variant.image_paths = _clean_image_urls(data["image_urls"])
 
     try:
         db.session.commit()
@@ -499,11 +538,15 @@ def update_variant(variant_id):
 def upload_variant_image(variant_id):
     variant = ProductVariant.query.get_or_404(variant_id)
 
+    existing = variant.image_paths or []
+    if len(existing) >= MAX_VARIANT_IMAGES:
+        return jsonify({"message": f"Esta variante ya tiene el máximo de {MAX_VARIANT_IMAGES} fotos."}), 400
+
     public_url, error = _upload_image_file(request.files.get("file"), PRODUCT_IMAGES_FOLDER)
     if error:
         return error
 
-    variant.image_path = public_url
+    variant.image_paths = existing + [public_url]
     db.session.commit()
     return jsonify({"product": serialize_product(variant.product)})
 

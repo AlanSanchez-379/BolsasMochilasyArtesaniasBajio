@@ -4,7 +4,17 @@ import { bindNavLinks } from "../dom.js";
 import { currentRenderToken } from "../router.js";
 import { getCategories } from "../catalogCache.js";
 
-const SPECIAL_CATEGORIES = { Paquetes: "Paquetes Emprendedores", Nuevos: "Nuevos Productos" };
+const SPECIAL_CATEGORIES = { Ofertas: "Ofertas", Paquetes: "Paquetes Emprendedores", Nuevos: "Nuevos Productos" };
+
+// Subcategorías vigentes por categoría (Bolsas/Mochilas admiten Tricombo, el resto no).
+// Para categorías fuera de este mapa (p. ej. "Todos") se derivan de los productos cargados.
+const SUBCATEGORY_OPTIONS_BY_CATEGORY = {
+  Bolsas: ["Estampado animado", "Estampado en yute", "Tricombo"],
+  Mochilas: ["Estampado animado", "Estampado en yute", "Tricombo"],
+  Carteras: ["Estampado animado", "Estampado en yute"],
+  Cosmetiqueras: ["Estampado animado", "Estampado en yute"],
+  Monederos: ["Estampado animado", "Estampado en yute"],
+};
 
 function applyFilters(products, { search, subcategory, color, maxPrice }) {
   return products.filter((p) => {
@@ -162,7 +172,9 @@ export async function renderCategory(container, categoryName) {
   const countEl = container.querySelector("#result-count");
 
   let categoryProducts;
-  if (activeCategory === "Paquetes") {
+  if (activeCategory === "Ofertas") {
+    ({ products: categoryProducts } = await api.getProducts({ on_sale: "true" }));
+  } else if (activeCategory === "Paquetes") {
     ({ products: categoryProducts } = await api.getProducts({ is_bundle: "true" }));
   } else if (activeCategory === "Nuevos") {
     const { products } = await api.getProducts({ is_bundle: "false" });
@@ -176,7 +188,10 @@ export async function renderCategory(container, categoryName) {
   }
   if (token !== currentRenderToken()) return;
 
-  const availableSubcategories = ["Todas", ...new Set(categoryProducts.map((p) => p.subcategory))];
+  const availableSubcategories = [
+    "Todas",
+    ...(SUBCATEGORY_OPTIONS_BY_CATEGORY[activeCategory] || [...new Set(categoryProducts.map((p) => p.subcategory))]),
+  ];
   const availableColors = ["Todos", ...new Set(categoryProducts.flatMap((p) => p.variants.map((v) => v.color)))];
 
   subcategorySelect.innerHTML = availableSubcategories.map((s) => `<option value="${s}">${s}</option>`).join("");

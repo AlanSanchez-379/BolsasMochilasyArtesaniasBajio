@@ -15,7 +15,12 @@ function pricingTiersHtml(product, totalProposedQty) {
         <div class="p-3 rounded ${tierClass(totalProposedQty < product.wholesale_min_qty)}">
           <p class="text-xs text-gray-500">Menudeo</p>
           <p class="text-sm font-bold">1-${product.wholesale_min_qty - 1} pz</p>
-          <p class="text-xl text-gray-900 font-bold">$${product.price_normal}</p>
+          ${
+            product.is_on_sale
+              ? `<p class="text-xs text-gray-400 line-through">$${product.price_normal}</p>
+                 <p class="text-xl text-red-500 font-bold">$${product.sale_price}</p>`
+              : `<p class="text-xl text-gray-900 font-bold">$${product.price_normal}</p>`
+          }
         </div>
         <div class="p-3 rounded ${tierClass(
           totalProposedQty >= product.wholesale_min_qty && totalProposedQty < product.super_wholesale_min_qty
@@ -202,7 +207,10 @@ export async function renderProductDetail(container, slug) {
             <nav class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
               ${product.category} / ${product.subcategory}
             </nav>
-            <h1 class="text-3xl font-bold text-gray-900 mb-4">${product.name}</h1>
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">
+              ${product.name}
+              ${product.is_on_sale ? '<span class="ml-2 align-middle bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">OFERTA</span>' : ""}
+            </h1>
             <p class="text-gray-600 mb-8 leading-relaxed">${product.description || ""}</p>
 
             ${

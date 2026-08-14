@@ -254,11 +254,11 @@ export async function renderBundlesTab(container, isCurrentTab = () => true) {
           errorEl.classList.remove("hidden");
           return;
         }
-        payload.variants = newVariants.map(({ color, sku, stock, image_url }) => ({
+        payload.variants = newVariants.map(({ color, sku, stock, image_urls }) => ({
           color,
           sku,
           stock: parseInt(stock, 10) || 0,
-          image_url,
+          image_urls,
         }));
       }
 

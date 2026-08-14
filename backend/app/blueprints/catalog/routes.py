@@ -51,6 +51,10 @@ def list_products():
     if is_bundle is not None:
         query = query.filter(Product.is_bundle == (is_bundle.lower() == "true"))
 
+    on_sale = request.args.get("on_sale")
+    if on_sale is not None and on_sale.lower() == "true":
+        query = query.filter(Product.is_on_sale.is_(True))
+
     color = request.args.get("color")
     if color and color != "Todos":
         query = query.join(ProductVariant).filter(ProductVariant.color == color)

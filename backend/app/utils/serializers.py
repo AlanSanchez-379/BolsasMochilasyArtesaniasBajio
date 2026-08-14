@@ -1,11 +1,13 @@
 def serialize_variant(variant):
+    image_urls = variant.image_paths or []
     return {
         "id": str(variant.id),
         "color": variant.color,
         "sku": variant.sku,
         "stock": variant.stock,
         "low_stock_threshold": variant.low_stock_threshold,
-        "image_url": variant.image_path,
+        "image_url": image_urls[0] if image_urls else None,
+        "image_urls": image_urls,
     }
 
 
@@ -23,6 +25,8 @@ def serialize_product(product):
         "price_super_wholesale": float(product.price_super_wholesale),
         "wholesale_min_qty": product.wholesale_min_qty,
         "super_wholesale_min_qty": product.super_wholesale_min_qty,
+        "is_on_sale": product.is_on_sale,
+        "sale_price": float(product.sale_price) if product.sale_price is not None else None,
         "is_bundle": product.is_bundle,
         "bundle_limit": product.bundle_limit,
         "bundle_category_limits": product.bundle_category_limits,
