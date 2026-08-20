@@ -45,7 +45,7 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     # Límite exacto de piezas por categoría, ej. {"Bolsas": 5, "Mochilas": 2}. Solo categorías > 0.
     bundle_category_limits = db.Column(JSONB, nullable=True)
 
-    category = db.relationship("Category", back_populates="products")
+    category = db.relationship("Category", back_populates="products", lazy="selectin")
     variants = db.relationship(
         "ProductVariant", back_populates="product", cascade="all, delete-orphan", lazy="selectin"
     )
