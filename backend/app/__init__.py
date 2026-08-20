@@ -1,4 +1,5 @@
 from flask import Flask
+import stripe
 
 from .config import Config
 from .extensions import db, migrate, cors
@@ -12,6 +13,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     cors.init_app(app, resources={r"/api/*": {"origins": app.config["FRONTEND_ORIGINS"]}}, supports_credentials=True)
+    stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 
     from .blueprints.catalog import catalog_bp
     from .blueprints.auth import auth_bp

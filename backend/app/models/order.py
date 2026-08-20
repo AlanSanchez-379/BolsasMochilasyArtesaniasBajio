@@ -75,6 +75,10 @@ class Order(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     # Regla de negocio SPEI: ventana de 2h para depositar antes de liberar inventario
     spei_payment_deadline = db.Column(db.DateTime(timezone=True), nullable=True)
 
+    # Stripe: ID del PaymentIntent creado al momento del checkout (payment_method=card).
+    # Se usa para relacionar los eventos del webhook con el pedido.
+    stripe_payment_intent_id = db.Column(db.String(255), unique=True, nullable=True)
+
     status = db.Column(db.Enum(OrderStatus, name="order_status"), nullable=False, default=OrderStatus.PENDING_PAYMENT)
 
     subtotal = db.Column(db.Numeric(10, 2), nullable=False)

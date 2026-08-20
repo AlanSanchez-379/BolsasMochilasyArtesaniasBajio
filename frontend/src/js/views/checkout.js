@@ -8,6 +8,7 @@ import {
   clearCart,
 } from "../state.js";
 import { navigate } from "../router.js";
+import { STRIPE_PUBLISHABLE_KEY } from "../config.js";
 
 const STEPS = ["Carrito", "Envío", "Pago"];
 
@@ -60,6 +61,10 @@ export function renderCheckout(container) {
     quoteOptions: null,
     selectedCarrier: null,
     paymentMethod: "card",
+    order: null,
+    clientSecret: null,
+    stripe: null,
+    elements: null,
   };
 
   function render() {
@@ -224,6 +229,11 @@ export function renderCheckout(container) {
   }
 
   function renderStep3(el) {
+    if (flow.paymentMethod === "card" && flow.order) {
+      renderCardPaymentStep(el);
+      return;
+    }
+
     const selectedOption = flow.quoteOptions.find((o) => o.carrier === flow.selectedCarrier);
     const total = cartTotal() + selectedOption.cost;
 
@@ -248,7 +258,7 @@ export function renderCheckout(container) {
                 realizar el depósito SPEI o el inventario se liberará automáticamente.
               </div>`
             : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-4 mb-6 text-sm text-gray-700">
-                Tu pedido quedará como <strong>Pago en validación</strong> mientras confirmamos el cargo.
+                En el siguiente paso vas a ingresar los datos de tu tarjeta. El cargo se procesa de forma segura con Stripe.
               </div>`
         }
 
@@ -288,11 +298,19 @@ export function renderCheckout(container) {
       errorEl.classList.add("hidden");
 
       try {
-        const { order } = await api.createOrder({
+        const { order, client_secret } = await api.createOrder({
           items: buildCheckoutItems(),
           shipping: { ...flow.shipping, carrier: flow.selectedCarrier },
           payment_method: flow.paymentMethod,
         });
+
+        if (flow.paymentMethod === "card") {
+          flow.order = order;
+          flow.clientSecret = client_secret;
+          renderCardPaymentStep(el);
+          return;
+        }
+
         clearCart();
         renderSuccess(container, order);
       } catch (err) {
@@ -300,6 +318,61 @@ export function renderCheckout(container) {
         errorEl.classList.remove("hidden");
         btn.disabled = false;
         btn.textContent = "Confirmar Pedido";
+      }
+    });
+  }
+
+  function renderCardPaymentStep(el) {
+    el.innerHTML = `
+      <div class="border border-gray-200 rounded-lg p-6 mb-8 bg-white">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Pago con tarjeta</h2>
+        <p class="text-sm text-gray-500 mb-4">Pedido <strong>${flow.order.order_number}</strong> · Total: <strong>$${flow.order.total}</strong></p>
+        <div id="payment-element" class="mb-4"></div>
+        <p id="payment-element-errors" class="text-red-500 text-sm mb-4 hidden"></p>
+        <button id="confirm-payment" class="w-full bg-brand-mexican hover:opacity-90 text-white px-8 py-4 rounded text-lg font-bold transition-opacity">
+          Pagar $${flow.order.total}
+        </button>
+      </div>
+    `;
+
+    flow.stripe = flow.stripe || Stripe(STRIPE_PUBLISHABLE_KEY);
+    flow.elements = flow.stripe.elements({ clientSecret: flow.clientSecret });
+    flow.elements.create("payment").mount("#payment-element");
+
+    el.querySelector("#confirm-payment").addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      btn.textContent = "Procesando...";
+      const errorEl = el.querySelector("#payment-element-errors");
+      errorEl.classList.add("hidden");
+
+      const { error: submitError } = await flow.elements.submit();
+      if (submitError) {
+        errorEl.textContent = submitError.message || "Revisa los datos de tu tarjeta.";
+        errorEl.classList.remove("hidden");
+        btn.disabled = false;
+        btn.textContent = `Pagar $${flow.order.total}`;
+        return;
+      }
+
+      const { error, paymentIntent } = await flow.stripe.confirmPayment({
+        elements: flow.elements,
+        clientSecret: flow.clientSecret,
+        redirect: "if_required",
+        confirmParams: { return_url: window.location.href },
+      });
+
+      if (error) {
+        errorEl.textContent = error.message || "No se pudo procesar el pago. Intenta de nuevo.";
+        errorEl.classList.remove("hidden");
+        btn.disabled = false;
+        btn.textContent = `Pagar $${flow.order.total}`;
+        return;
+      }
+
+      if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")) {
+        clearCart();
+        renderSuccess(container, flow.order);
       }
     });
   }
@@ -322,7 +395,7 @@ function renderSuccess(container, order) {
               <p class="text-lg text-orange-800">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
             </div>`
           : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-5 mb-8 text-left">
-              <p>Tu pago está <strong>en validación</strong>. Te notificaremos cuando se confirme.</p>
+              <p><i class="fa-solid fa-circle-check mr-2 text-brand-mexican"></i>¡Tu pago fue aprobado! Estamos preparando tu pedido.</p>
             </div>`
       }
 

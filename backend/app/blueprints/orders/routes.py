@@ -1,23 +1,12 @@
 from flask import jsonify, request, g
 
 from app.extensions import db
-from app.models import Order, OrderStatus, UserRole, ProductVariant
+from app.models import Order, OrderStatus, UserRole
 from app.utils.decorators import login_required, role_required
 from app.utils.serializers import serialize_order
+from app.utils.stock import adjust_stock
 
 from . import orders_bp
-
-
-def _adjust_stock(order, sign):
-    """sign=+1 repone inventario (al cancelar), sign=-1 lo vuelve a descontar (al reactivar)."""
-    variant_ids = [item.variant_id for item in order.items]
-    variants = {
-        v.id: v for v in ProductVariant.query.filter(ProductVariant.id.in_(variant_ids)).with_for_update().all()
-    }
-    for item in order.items:
-        variant = variants.get(item.variant_id)
-        if variant is not None:
-            variant.stock = max(0, variant.stock + sign * item.quantity)
 
 
 @orders_bp.get("")
@@ -69,9 +58,9 @@ def update_status(order_id):
     will_be_cancelled = new_status == OrderStatus.CANCELLED
 
     if will_be_cancelled and not was_cancelled:
-        _adjust_stock(order, sign=1)  # libera inventario reservado
+        adjust_stock(order, sign=1)  # libera inventario reservado
     elif was_cancelled and not will_be_cancelled:
-        _adjust_stock(order, sign=-1)  # se reactiva el pedido, se vuelve a comprometer el stock
+        adjust_stock(order, sign=-1)  # se reactiva el pedido, se vuelve a comprometer el stock
 
     order.status = new_status
     db.session.commit()

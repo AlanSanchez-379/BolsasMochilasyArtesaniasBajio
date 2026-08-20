@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
+import stripe
 from flask import jsonify, request, g, current_app
 
 from app.extensions import db
 from app.models import Product, ProductVariant, Order, OrderItem, OrderStatus, PaymentMethod, ShippingCarrier
 from app.utils.decorators import login_required
 from app.utils.serializers import serialize_order
+from app.utils.stock import adjust_stock
 
 from . import checkout_bp
 
@@ -251,8 +253,25 @@ def _build_order(items_payload, shipping, payment_method):
         order.spei_payment_deadline = datetime.now(timezone.utc) + timedelta(hours=window)
 
     db.session.add(order)
+    db.session.flush()  # asigna order.id / order_number antes de crear el PaymentIntent
+
+    client_secret = None
+    if payment_method == PaymentMethod.CARD.value:
+        try:
+            intent = stripe.PaymentIntent.create(
+                amount=int(round(total * 100)),
+                currency="mxn",
+                payment_method_types=["card"],
+                metadata={"order_id": str(order.id), "order_number": order.order_number},
+            )
+        except stripe.StripeError:
+            db.session.rollback()
+            raise CheckoutError("No se pudo iniciar el pago con tarjeta. Intenta de nuevo.")
+        order.stripe_payment_intent_id = intent.id
+        client_secret = intent.client_secret
+
     db.session.commit()
-    return order
+    return order, client_secret
 
 
 @checkout_bp.post("")
@@ -272,9 +291,33 @@ def create_order():
         return jsonify({"message": f"Faltan datos de envío: {', '.join(missing)}"}), 400
 
     try:
-        order = _build_order(items_payload, shipping, payment_method)
+        order, client_secret = _build_order(items_payload, shipping, payment_method)
     except CheckoutError as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
 
-    return jsonify({"order": serialize_order(order)}), 201
+    return jsonify({"order": serialize_order(order), "client_secret": client_secret}), 201
+
+
+@checkout_bp.post("/webhook")
+def stripe_webhook():
+    payload = request.get_data()
+    sig_header = request.headers.get("Stripe-Signature", "")
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, current_app.config["STRIPE_WEBHOOK_SECRET"])
+    except (ValueError, stripe.SignatureVerificationError):
+        return jsonify({"message": "Firma inválida."}), 400
+
+    intent = event["data"]["object"]
+    order = Order.query.filter_by(stripe_payment_intent_id=intent.id).first()
+
+    if order and order.status == OrderStatus.PAYMENT_IN_VALIDATION:
+        if event["type"] == "payment_intent.succeeded":
+            order.status = OrderStatus.PAYMENT_CONFIRMED
+            db.session.commit()
+        elif event["type"] == "payment_intent.payment_failed":
+            adjust_stock(order, sign=1)  # libera inventario reservado
+            order.status = OrderStatus.CANCELLED
+            db.session.commit()
+
+    return jsonify({"received": True}), 200

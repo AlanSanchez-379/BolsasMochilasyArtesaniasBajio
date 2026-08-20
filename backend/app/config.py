@@ -12,6 +12,10 @@ class Config:
     SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
     SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
+    STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
+    STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
+    STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
+
     # localhost y 127.0.0.1 son orígenes distintos para CORS; se permiten ambos en dev.
     # En prod, FRONTEND_ORIGIN puede traer varios orígenes separados por coma
     # (ej. "https://bolsasdelbajio.com,https://www.bolsasdelbajio.com").
