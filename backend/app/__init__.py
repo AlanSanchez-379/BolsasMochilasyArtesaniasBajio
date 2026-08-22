@@ -21,6 +21,7 @@ def create_app(config_class=Config):
     from .blueprints.checkout import checkout_bp
     from .blueprints.orders import orders_bp
     from .blueprints.admin import admin_bp
+    from .blueprints.pos_access import pos_access_bp
 
     app.register_blueprint(catalog_bp)
     app.register_blueprint(auth_bp)
@@ -28,6 +29,7 @@ def create_app(config_class=Config):
     app.register_blueprint(checkout_bp)
     app.register_blueprint(orders_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(pos_access_bp)
 
     @app.get("/api/health")
     def health():

@@ -73,6 +73,25 @@ function shippingSettingsCardHtml(shippingSettings, categories) {
   `;
 }
 
+function posAccessCardHtml(posAccessSettings) {
+  return `
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-xl font-bold mb-1">PIN de Venta Local</h3>
+      <p class="text-sm text-gray-500 mb-4">
+        PIN compartido para entrar a <code>/venta-local</code> sin necesitar una cuenta —
+        ${posAccessSettings.pin_configured ? "ya hay uno configurado." : "todavía no hay uno configurado."}
+      </p>
+      <label class="block text-xs font-semibold text-gray-600 mb-1">Nuevo PIN (mínimo 4 caracteres)</label>
+      <input type="text" id="pos-pin-input" class="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2" />
+      <p data-pos-pin-error class="text-red-500 text-sm mb-2 hidden"></p>
+      <p data-pos-pin-success class="text-green-600 text-sm mb-2 hidden">PIN actualizado.</p>
+      <button data-save-pos-pin class="bg-brand-blue-dark text-white px-5 py-2 rounded-full font-semibold hover:bg-brand-blue">
+        <i class="fa-solid fa-key mr-2"></i>Guardar PIN
+      </button>
+    </div>
+  `;
+}
+
 function uploadCardHtml(type, label, currentUrl, hint) {
   return `
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -107,12 +126,13 @@ function uploadCardHtml(type, label, currentUrl, hint) {
 export async function renderSettingsTab(container, isCurrentTab = () => true) {
   container.innerHTML = `<div class="text-center py-12 text-gray-400">Cargando ajustes...</div>`;
 
-  let settings, shippingSettings, categories;
+  let settings, shippingSettings, categories, posAccessSettings;
   try {
-    [settings, shippingSettings, { categories }] = await Promise.all([
+    [settings, shippingSettings, { categories }, posAccessSettings] = await Promise.all([
       api.adminGetSettings(),
       api.adminGetShippingSettings(),
       getCategories(),
+      api.adminGetPosAccessSettings(),
     ]);
   } catch (err) {
     if (!isCurrentTab()) return;
@@ -126,9 +146,34 @@ export async function renderSettingsTab(container, isCurrentTab = () => true) {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         ${uploadCardHtml("logo", "Logotipo", settings.logo_url, "Se muestra en la barra de navegación. Recomendado: PNG con fondo transparente.")}
         ${uploadCardHtml("banner", "Banner Principal", settings.banner_url, "Se muestra en el banner del Home. Recomendado: JPG horizontal, ancho.")}
+        ${posAccessCardHtml(posAccessSettings)}
         ${shippingSettingsCardHtml(shippingSettings, categories)}
       </div>
     `;
+
+    container.querySelector("[data-save-pos-pin]").addEventListener("click", async () => {
+      const btn = container.querySelector("[data-save-pos-pin]");
+      const input = container.querySelector("#pos-pin-input");
+      const errorEl = container.querySelector("[data-pos-pin-error]");
+      const successEl = container.querySelector("[data-pos-pin-success]");
+      errorEl.classList.add("hidden");
+      successEl.classList.add("hidden");
+
+      btn.disabled = true;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>Guardando...`;
+      try {
+        posAccessSettings = await api.adminUpdatePosAccessSettings(input.value);
+        input.value = "";
+        successEl.classList.remove("hidden");
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    });
 
     container.querySelector("[data-save-shipping-settings]").addEventListener("click", async () => {
       const btn = container.querySelector("[data-save-shipping-settings]");

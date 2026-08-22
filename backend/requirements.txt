@@ -9,3 +9,4 @@ PyJWT==2.13.0
 gunicorn==23.0.0
 stripe==15.5.1
 requests==2.34.2
+itsdangerous==2.2.0

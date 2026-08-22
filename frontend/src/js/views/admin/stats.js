@@ -40,8 +40,9 @@ export async function renderStatsTab(container, isCurrentTab = () => true) {
 
   function render() {
     container.innerHTML = `
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         ${statCard("fa-sack-dollar", "Ganancias Totales", money(stats.total_earnings), `${stats.total_sales} ventas exitosas`, "bg-brand-teal bg-opacity-30 text-teal-700")}
+        ${statCard("fa-chart-line", "Utilidad Estimada", money(stats.total_profit), "ingresos − costo de productos vendidos", "bg-brand-teal bg-opacity-30 text-teal-700")}
         ${statCard("fa-globe", "Ventas Online", money(stats.online.earnings), `${stats.online.sales} pedidos`, "bg-brand-blue bg-opacity-30 text-brand-blue-dark")}
         ${statCard("fa-store", "Ventas Tienda Física", money(stats.in_store.earnings), `${stats.in_store.sales} ventas en mostrador`, "bg-brand-cream text-orange-700")}
         ${statCard("fa-hourglass-half", "Por Validar", pendingOrders.length, "pagos pendientes de confirmar", "bg-brand-salmon bg-opacity-30 text-orange-700")}

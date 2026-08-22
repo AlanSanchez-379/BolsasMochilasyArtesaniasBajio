@@ -122,6 +122,9 @@ class OrderItem(db.Model, UUIDPrimaryKeyMixin):
 
     quantity = db.Column(db.Integer, nullable=False)
     unit_price = db.Column(db.Numeric(10, 2), nullable=False)  # precio congelado al momento de la compra
+    # Costo congelado al momento de la compra (para margen histórico estable aunque el
+    # costo del producto cambie después). Nulo en ventas de antes de esta funcionalidad.
+    cost_price = db.Column(db.Numeric(10, 2), nullable=True)
 
     # Paquete Emprendedor "Elegir mis diseños": las piezas elegidas se guardan como
     # OrderItem hijos, agrupados bajo la línea del paquete (bundle_parent_item_id).

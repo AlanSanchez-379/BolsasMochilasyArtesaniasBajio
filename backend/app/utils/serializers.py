@@ -25,6 +25,7 @@ def serialize_product(product):
         "price_super_wholesale": float(product.price_super_wholesale),
         "wholesale_min_qty": product.wholesale_min_qty,
         "super_wholesale_min_qty": product.super_wholesale_min_qty,
+        "cost_price": float(product.cost_price) if product.cost_price is not None else None,
         "is_on_sale": product.is_on_sale,
         "sale_price": float(product.sale_price) if product.sale_price is not None else None,
         "is_bundle": product.is_bundle,
@@ -45,6 +46,7 @@ def serialize_order_item(item):
         "variant_color": item.variant.color if item.variant else None,
         "quantity": item.quantity,
         "unit_price": float(item.unit_price),
+        "cost_price": float(item.cost_price) if item.cost_price is not None else None,
         "bundle_parent_item_id": str(item.bundle_parent_item_id) if item.bundle_parent_item_id else None,
     }
 

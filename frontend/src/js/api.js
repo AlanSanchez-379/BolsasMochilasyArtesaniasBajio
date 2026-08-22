@@ -118,4 +118,34 @@ export const api = {
   adminGetShippingSettings: () => request("/admin/shipping-settings"),
   adminUpdateShippingSettings: (payload) =>
     request("/admin/shipping-settings", { method: "PATCH", body: JSON.stringify(payload) }),
+
+  adminGetPosAccessSettings: () => request("/admin/pos-access-settings"),
+  adminUpdatePosAccessSettings: (pin) =>
+    request("/admin/pos-access-settings", { method: "PATCH", body: JSON.stringify({ pin }) }),
+};
+
+// Liga de venta local (/venta-local): PIN compartido, sin cuenta de Supabase. No usa
+// request()/handleUnauthorized() porque un 401 aquí debe regresar al prompt de PIN,
+// no mandar al login de clientes.
+async function posAccessFetch(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(body.message || `Error ${res.status} en ${path}`);
+    err.status = res.status;
+    throw err;
+  }
+  return body;
+}
+
+export const posAccessApi = {
+  login: (password) => posAccessFetch("/pos-access/login", { method: "POST", body: JSON.stringify({ password }) }),
+  logout: () => posAccessFetch("/pos-access/logout", { method: "POST" }),
+  me: () => posAccessFetch("/pos-access/me"),
+  listProducts: () => posAccessFetch("/pos-access/products"),
+  sale: (payload) => posAccessFetch("/pos-access/sale", { method: "POST", body: JSON.stringify(payload) }),
 };

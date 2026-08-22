@@ -35,6 +35,9 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     wholesale_min_qty = db.Column(db.Integer, nullable=False, default=6)
     super_wholesale_min_qty = db.Column(db.Integer, nullable=False, default=50)
 
+    # Cuánto le costó a la tienda adquirir el producto (para calcular margen/ganancia).
+    cost_price = db.Column(db.Numeric(10, 2), nullable=True)
+
     # Página de Ofertas (etiqueta de descuento manual del dueño de la tienda).
     is_on_sale = db.Column(db.Boolean, nullable=False, default=False)
     sale_price = db.Column(db.Numeric(10, 2), nullable=True)

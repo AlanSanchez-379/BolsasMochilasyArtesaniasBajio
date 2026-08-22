@@ -30,6 +30,10 @@ def _valid_postal_code(postal_code):
     return bool(postal_code) and postal_code.isdigit() and len(postal_code) == 5
 
 
+def _cost_price(product):
+    return float(product.cost_price) if product.cost_price is not None else None
+
+
 def _estimate_cart_weight_kg(items_payload):
     """Estima el peso del carrito sumando quantity * peso-por-categoría, resolviendo
     también las piezas elegidas dentro de paquetes "Elegir mis diseños"."""
@@ -197,7 +201,13 @@ def _build_order(items_payload, shipping, payment_method):
             unit_price = float(product.price_for_quantity(combined_qty))
             variant.stock -= quantity
             order_items.append(
-                OrderItem(product_id=product.id, variant_id=variant.id, quantity=quantity, unit_price=unit_price)
+                OrderItem(
+                    product_id=product.id,
+                    variant_id=variant.id,
+                    quantity=quantity,
+                    unit_price=unit_price,
+                    cost_price=_cost_price(product),
+                )
             )
             subtotal += unit_price * quantity
 
@@ -214,7 +224,11 @@ def _build_order(items_payload, shipping, payment_method):
             bundle_variant.stock -= quantity
             order_items.append(
                 OrderItem(
-                    product_id=product.id, variant_id=bundle_variant.id, quantity=quantity, unit_price=unit_price
+                    product_id=product.id,
+                    variant_id=bundle_variant.id,
+                    quantity=quantity,
+                    unit_price=unit_price,
+                    cost_price=_cost_price(product),
                 )
             )
             subtotal += unit_price * quantity
@@ -275,7 +289,13 @@ def _build_order(items_payload, shipping, payment_method):
 
             unit_price = float(product.price_for_quantity(1))
             bundle_variant.stock -= 1
-            parent_item = OrderItem(product_id=product.id, variant_id=bundle_variant.id, quantity=1, unit_price=unit_price)
+            parent_item = OrderItem(
+                product_id=product.id,
+                variant_id=bundle_variant.id,
+                quantity=1,
+                unit_price=unit_price,
+                cost_price=_cost_price(product),
+            )
             order_items.append(parent_item)
             subtotal += unit_price
 
@@ -287,6 +307,7 @@ def _build_order(items_payload, shipping, payment_method):
                         variant_id=variant.id,
                         quantity=sel_qty,
                         unit_price=0,
+                        cost_price=_cost_price(variant.product),
                         bundle_parent=parent_item,
                     )
                 )

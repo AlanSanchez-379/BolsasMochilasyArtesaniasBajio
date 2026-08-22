@@ -12,6 +12,7 @@ import { renderRegister } from "./views/register.js";
 import { renderAuthCallback } from "./views/authCallback.js";
 import { renderMyOrders } from "./views/myOrders.js";
 import { renderAdmin } from "./views/admin/index.js";
+import { renderPosAccess } from "./views/posAccess.js";
 import { subscribe, setCurrentUser } from "./state.js";
 import { api } from "./api.js";
 import { getCategories } from "./catalogCache.js";
@@ -41,9 +42,11 @@ renderNavbar(navbarSlot);
 renderFooter(footerSlot);
 subscribe(() => renderNavbar(navbarSlot));
 
-// El checkout no debe llevar footer (evita distracciones durante el pago).
+// El checkout no debe llevar footer (evita distracciones durante el pago). La liga de
+// venta local es una pantalla de terminal aparte: sin navbar ni footer del sitio público.
 onRouteChange((path) => {
-  footerSlot.style.display = path === "/checkout" ? "none" : "";
+  footerSlot.style.display = path === "/checkout" || path === "/venta-local" ? "none" : "";
+  navbarSlot.style.display = path === "/venta-local" ? "none" : "";
 });
 
 route("/", () => renderHome(view));
@@ -56,6 +59,7 @@ route("/registro", () => renderRegister(view));
 route("/auth/callback", ({ query }) => renderAuthCallback(view, query));
 route("/mis-pedidos", () => renderMyOrders(view));
 route("/admin", () => renderAdmin(view));
+route("/venta-local", () => renderPosAccess(view));
 
 // Antes de resolver la ruta inicial hay que saber si ya hay sesión (cookie), porque
 // rutas como /admin o /checkout deciden qué mostrar según currentUser. Si el router

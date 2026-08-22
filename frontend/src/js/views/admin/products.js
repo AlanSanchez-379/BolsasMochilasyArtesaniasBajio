@@ -188,7 +188,11 @@ export async function renderProductsTab(container, isCurrentTab = () => true) {
           <label class="block text-sm font-bold text-gray-700 mb-1">Precio Súper Mayoreo</label>
           <input type="number" step="0.01" name="price_super_wholesale" required value="${product?.price_super_wholesale ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
         </div>
-        <div></div>
+        <div>
+          <label class="block text-sm font-bold text-gray-700 mb-1">Costo (compra)</label>
+          <input type="number" step="0.01" name="cost_price" value="${product?.cost_price ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+          <p id="margin-preview" class="text-xs text-gray-500 mt-1"></p>
+        </div>
         <div>
           <label class="block text-sm font-bold text-gray-700 mb-1">Mín. piezas Mayoreo</label>
           <input type="number" name="wholesale_min_qty" required value="${product?.wholesale_min_qty ?? 6}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
@@ -247,6 +251,21 @@ export async function renderProductsTab(container, isCurrentTab = () => true) {
     const form = el.querySelector("#product-form");
     const errorEl = el.querySelector("#form-error");
 
+    function updateMarginPreview() {
+      const price = parseFloat(form.querySelector('[name="price_normal"]').value);
+      const cost = parseFloat(form.querySelector('[name="cost_price"]').value);
+      const preview = el.querySelector("#margin-preview");
+      if (!isNaN(price) && !isNaN(cost) && price > 0) {
+        const margin = price - cost;
+        preview.textContent = `Margen: $${margin.toFixed(2)} (${((margin / price) * 100).toFixed(0)}%)`;
+      } else {
+        preview.textContent = "";
+      }
+    }
+    form.querySelector('[name="price_normal"]').addEventListener("input", updateMarginPreview);
+    form.querySelector('[name="cost_price"]').addEventListener("input", updateMarginPreview);
+    updateMarginPreview();
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       errorEl.classList.add("hidden");
@@ -260,6 +279,7 @@ export async function renderProductsTab(container, isCurrentTab = () => true) {
         price_normal: parseFloat(fd.get("price_normal")),
         price_wholesale: parseFloat(fd.get("price_wholesale")),
         price_super_wholesale: parseFloat(fd.get("price_super_wholesale")),
+        cost_price: fd.get("cost_price") ? parseFloat(fd.get("cost_price")) : null,
         wholesale_min_qty: parseInt(fd.get("wholesale_min_qty"), 10),
         super_wholesale_min_qty: parseInt(fd.get("super_wholesale_min_qty"), 10),
         is_on_sale: el.querySelector("#is-on-sale-checkbox").checked,
