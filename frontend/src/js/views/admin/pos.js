@@ -35,14 +35,12 @@ function pricingTiersHtml(product, totalProposedQty) {
   `;
 }
 
-export async function renderPosTab(container, isCurrentTab = () => true, deps = {}) {
-  const { listProducts = api.adminListProducts, submitSale = api.adminPosSale, onUnauthorized = null } = deps;
-
+export async function renderPosTab(container, isCurrentTab = () => true) {
   container.innerHTML = `<div class="text-center py-12 text-gray-400">Cargando catálogo...</div>`;
 
   let categories, allProducts;
   try {
-    const [{ categories: cats }, { products }] = await Promise.all([getCategories(), listProducts()]);
+    const [{ categories: cats }, { products }] = await Promise.all([getCategories(), api.adminListProducts()]);
     categories = cats;
     allProducts = products;
   } catch (err) {
@@ -391,19 +389,15 @@ export async function renderPosTab(container, isCurrentTab = () => true, deps = 
         completeBtn.textContent = "Procesando...";
 
         try {
-          const { order } = await submitSale({
+          const { order } = await api.adminPosSale({
             items: cart.map((item) => ({ variant_id: item.variant.id, quantity: item.quantity })),
             payment_method: paymentMethod,
             customer_name: container.querySelector("#pos-customer-name").value,
           });
           cart = [];
-          ({ products: allProducts } = await listProducts());
+          ({ products: allProducts } = await api.adminListProducts());
           renderSuccess(order);
         } catch (err) {
-          if (err.status === 401 && onUnauthorized) {
-            onUnauthorized();
-            return;
-          }
           errorEl.textContent = err.message;
           errorEl.classList.remove("hidden");
           completeBtn.disabled = false;

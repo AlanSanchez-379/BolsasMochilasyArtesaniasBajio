@@ -3,7 +3,7 @@ import time
 from flask import jsonify, request, make_response, current_app
 from werkzeug.security import check_password_hash
 
-from app.models import Setting, Product
+from app.models import Setting, Product, Order, OrderStatus, OrderChannel
 from app.utils.decorators import (
     pos_access_required,
     issue_pos_access_token,
@@ -12,6 +12,8 @@ from app.utils.decorators import (
 )
 from app.utils.serializers import serialize_product, serialize_order
 from app.utils.pos_sale import execute_pos_sale, PosSaleError
+from app.utils.stats import get_admin_stats_data
+from app.utils.stock import set_order_status
 
 from . import pos_access_bp
 
@@ -86,12 +88,44 @@ def list_products():
     return jsonify({"products": [serialize_product(p) for p in products]})
 
 
+@pos_access_bp.get("/stats")
+@pos_access_required
+def stats():
+    return jsonify(get_admin_stats_data())
+
+
+@pos_access_bp.patch("/orders/<order_id>/status")
+@pos_access_required
+def update_order_status(order_id):
+    """Confirmar/cancelar una venta de mostrador propia (ej. una transferencia SPEI que
+    ya se vio reflejada). Solo pedidos de canal in_store -- no toca pedidos online, eso
+    se queda exclusivo del panel de admin completo con cuenta real."""
+    order = Order.query.get_or_404(order_id)
+    if order.channel != OrderChannel.IN_STORE:
+        return jsonify({"message": "Solo puedes actualizar ventas de mostrador."}), 403
+
+    data = request.get_json() or {}
+    try:
+        new_status = OrderStatus(data.get("status"))
+    except ValueError:
+        return jsonify({"message": "Estatus inválido."}), 400
+
+    set_order_status(order, new_status)
+    return jsonify({"order": serialize_order(order)})
+
+
 @pos_access_bp.post("/sale")
 @pos_access_required
 def sale():
     data = request.get_json() or {}
     try:
-        order = execute_pos_sale(data.get("items") or [], data.get("payment_method"), data.get("customer_name"))
+        order = execute_pos_sale(
+            data.get("items") or [],
+            data.get("payment_method"),
+            data.get("customer_name"),
+            shipping=data.get("shipping"),
+            shipping_cost=data.get("shipping_cost"),
+        )
     except PosSaleError as e:
         return jsonify({"message": str(e)}), 400
     return jsonify({"order": serialize_order(order)}), 201

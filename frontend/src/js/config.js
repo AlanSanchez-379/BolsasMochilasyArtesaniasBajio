@@ -11,4 +11,7 @@ const isLocalDev = ["localhost", "127.0.0.1"].includes(window.location.hostname)
 
 const PRODUCTION_API_BASE = "https://bolsasmochilasyartesaniasbajio.onrender.com/api";
 
-export const API_BASE = isLocalDev ? "http://127.0.0.1:5000/api" : PRODUCTION_API_BASE;
+// localhost y 127.0.0.1 son orígenes distintos para las cookies (SameSite=Lax no viaja
+// entre ellos aunque sea la misma máquina) — usar el mismo hostname con el que se cargó
+// el frontend evita que la sesión "se pierda" según por cuál entraste al navegador.
+export const API_BASE = isLocalDev ? `http://${window.location.hostname}:5000/api` : PRODUCTION_API_BASE;

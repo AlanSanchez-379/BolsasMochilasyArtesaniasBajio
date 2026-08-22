@@ -1,22 +1,44 @@
+from datetime import datetime, timedelta, timezone
+
+from flask import current_app
+from sqlalchemy.exc import IntegrityError
+
 from app.extensions import db
 from app.models import Order, OrderItem, OrderChannel, OrderStatus, PaymentMethod, ProductVariant
-from sqlalchemy.exc import IntegrityError
 
 
 class PosSaleError(Exception):
     pass
 
 
-def execute_pos_sale(items_payload, payment_method, customer_name):
-    """Punto de Venta: venta de mostrador en tienda física. Sin envío, sin cuenta de
-    cliente; el stock se descuenta al instante y el pedido nace como 'Entregado'.
-    Compartido entre el POS del admin completo y la liga con PIN de venta local."""
-    customer_name = (customer_name or "").strip() or None
+def execute_pos_sale(items_payload, payment_method, customer_name, shipping=None, shipping_cost=None):
+    """Punto de Venta: venta de mostrador en tienda física. El stock se descuenta al
+    instante. Compartido entre el POS del admin completo y la liga con PIN de venta
+    local (/venta-local).
 
-    if payment_method not in (PaymentMethod.CARD.value, PaymentMethod.CASH.value):
-        raise PosSaleError("Método de pago inválido. Usa 'cash' o 'card'.")
+    shipping/shipping_cost son opcionales: si se da shipping_cost, el pedido necesita
+    enviarse (costo y dirección tecleados a mano por el cajero, sin cotizar con
+    Skydropx) en vez de entregarse ahí mismo en el mostrador.
+    """
+    customer_name = (customer_name or "").strip() or None
+    shipping = shipping or {}
+    needs_shipping = shipping_cost is not None
+
+    if payment_method not in (PaymentMethod.CARD.value, PaymentMethod.CASH.value, PaymentMethod.SPEI.value):
+        raise PosSaleError("Método de pago inválido.")
     if not items_payload:
         raise PosSaleError("Agrega al menos un producto a la venta.")
+    if needs_shipping:
+        try:
+            shipping_cost = float(shipping_cost)
+        except (TypeError, ValueError):
+            raise PosSaleError("Costo de envío inválido.")
+        if shipping_cost < 0:
+            raise PosSaleError("Costo de envío inválido.")
+        if not shipping.get("street"):
+            raise PosSaleError("Captura al menos la calle del envío.")
+    else:
+        shipping_cost = 0.0
 
     variant_ids = [item.get("variant_id") for item in items_payload if item.get("variant_id")]
     variants = {
@@ -65,16 +87,41 @@ def execute_pos_sale(items_payload, payment_method, customer_name):
         )
         subtotal += unit_price * quantity
 
+    total = subtotal + shipping_cost
+
+    # Transferencia (SPEI) queda pendiente hasta confirmar el depósito, igual que en la
+    # web. Pagos ya recibidos (efectivo/tarjeta): se cierran de inmediato si el cliente
+    # se lleva el producto ahí mismo, o quedan "Pago confirmado" (listo para preparar/
+    # enviar) si el pedido todavía necesita envío.
+    if payment_method == PaymentMethod.SPEI.value:
+        status = OrderStatus.PENDING_PAYMENT
+    elif needs_shipping:
+        status = OrderStatus.PAYMENT_CONFIRMED
+    else:
+        status = OrderStatus.DELIVERED
+
     order = Order(
         user_id=None,
         channel=OrderChannel.IN_STORE,
-        shipping_full_name=customer_name,
+        shipping_full_name=shipping.get("full_name") or customer_name,
+        shipping_phone=shipping.get("phone"),
+        shipping_street=shipping.get("street"),
+        shipping_colonia=shipping.get("colonia"),
+        shipping_city=shipping.get("city"),
+        shipping_state=shipping.get("state"),
+        shipping_postal_code=shipping.get("postal_code"),
+        shipping_carrier=(shipping.get("carrier") or "Envío") if needs_shipping else None,
+        shipping_cost=shipping_cost,
         payment_method=PaymentMethod(payment_method),
-        status=OrderStatus.DELIVERED,
+        status=status,
         subtotal=subtotal,
-        total=subtotal,
+        total=total,
         items=order_items,
     )
+    if payment_method == PaymentMethod.SPEI.value:
+        window = current_app.config["SPEI_PAYMENT_WINDOW_HOURS"]
+        order.spei_payment_deadline = datetime.now(timezone.utc) + timedelta(hours=window)
+
     db.session.add(order)
     try:
         db.session.commit()

@@ -4,7 +4,7 @@ from app.extensions import db
 from app.models import Order, OrderStatus, UserRole
 from app.utils.decorators import login_required, role_required
 from app.utils.serializers import serialize_order
-from app.utils.stock import adjust_stock
+from app.utils.stock import set_order_status
 from app.utils.shipping_estimate import get_shipping_settings_dict, get_origin_address
 from app.utils.skydropx_client import get_rates, purchase_label, SkydropxError
 
@@ -56,16 +56,7 @@ def update_status(order_id):
         valid = [s.value for s in OrderStatus]
         return jsonify({"message": f"Estatus inválido. Válidos: {valid}"}), 400
 
-    was_cancelled = order.status == OrderStatus.CANCELLED
-    will_be_cancelled = new_status == OrderStatus.CANCELLED
-
-    if will_be_cancelled and not was_cancelled:
-        adjust_stock(order, sign=1)  # libera inventario reservado
-    elif was_cancelled and not will_be_cancelled:
-        adjust_stock(order, sign=-1)  # se reactiva el pedido, se vuelve a comprometer el stock
-
-    order.status = new_status
-    db.session.commit()
+    set_order_status(order, new_status)
     return jsonify({"order": serialize_order(order)})
 
 
