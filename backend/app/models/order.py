@@ -41,10 +41,11 @@ class OrderChannel(str, enum.Enum):
     IN_STORE = "in_store"  # Punto de Venta (caja registradora)
 
 
-class ShippingCarrier(str, enum.Enum):
-    DHL = "dhl"
-    ESTAFETA = "estafeta"
-    TRES_GUERRAS = "3guerras"
+# Código interno fijo para la opción de envío manual/fuera de Skydropx (Tres Guerras).
+# shipping_carrier ya no es un enum de Postgres: Skydropx cotiza combinaciones
+# dinámicas de paquetería/nivel de servicio, así que se guarda como texto libre
+# ("3guerras" para el manual, o "skydropx:<rate_id>" para lo cotizado por Skydropx).
+TRES_GUERRAS_CARRIER_CODE = "3guerras"
 
 
 def _generate_order_number():
@@ -65,10 +66,12 @@ class Order(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     shipping_full_name = db.Column(db.String(255), nullable=True)
     shipping_phone = db.Column(db.String(20), nullable=True)
     shipping_street = db.Column(db.String(255), nullable=True)
+    # Colonia: la exige Skydropx (area_level3) para cotizar/generar guías reales.
+    shipping_colonia = db.Column(db.String(100), nullable=True)
     shipping_city = db.Column(db.String(100), nullable=True)
     shipping_state = db.Column(db.String(100), nullable=True)
     shipping_postal_code = db.Column(db.String(10), nullable=True)
-    shipping_carrier = db.Column(db.Enum(ShippingCarrier, name="shipping_carrier"))
+    shipping_carrier = db.Column(db.String(50))
     shipping_cost = db.Column(db.Numeric(10, 2), default=0)
 
     payment_method = db.Column(db.Enum(PaymentMethod, name="payment_method"), nullable=False)
@@ -78,6 +81,25 @@ class Order(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     # Stripe: ID del PaymentIntent creado al momento del checkout (payment_method=card).
     # Se usa para relacionar los eventos del webhook con el pedido.
     stripe_payment_intent_id = db.Column(db.String(255), unique=True, nullable=True)
+
+    # Skydropx: peso/dimensiones REALES capturados por el admin al empacar (kg, cm),
+    # y el resultado de comprar la guía. shipping_cost/shipping_carrier arriba siguen
+    # siendo el ESTIMADO que vio y pagó el cliente en el checkout.
+    package_weight_kg = db.Column(db.Numeric(6, 2), nullable=True)
+    package_length_cm = db.Column(db.Numeric(6, 2), nullable=True)
+    package_width_cm = db.Column(db.Numeric(6, 2), nullable=True)
+    package_height_cm = db.Column(db.Numeric(6, 2), nullable=True)
+
+    skydropx_real_cost = db.Column(db.Numeric(10, 2), nullable=True)
+    skydropx_carrier_name = db.Column(db.String(100), nullable=True)
+    skydropx_service_level = db.Column(db.String(100), nullable=True)
+    skydropx_quotation_id = db.Column(db.String(100), nullable=True)
+    skydropx_rate_id = db.Column(db.String(100), nullable=True)
+    skydropx_shipment_id = db.Column(db.String(100), nullable=True)
+
+    tracking_number = db.Column(db.String(100), nullable=True)
+    label_url = db.Column(db.String(500), nullable=True)
+    tracking_url_provider = db.Column(db.String(500), nullable=True)
 
     status = db.Column(db.Enum(OrderStatus, name="order_status"), nullable=False, default=OrderStatus.PENDING_PAYMENT)
 

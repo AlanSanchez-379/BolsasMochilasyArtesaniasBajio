@@ -62,8 +62,8 @@ export const api = {
   logout: () => request("/auth/logout", { method: "POST" }),
   me: () => request("/auth/me"),
 
-  checkoutQuote: (postalCode) =>
-    request("/checkout/quote", { method: "POST", body: JSON.stringify({ postal_code: postalCode }) }),
+  checkoutQuote: (shipping, items) =>
+    request("/checkout/quote", { method: "POST", body: JSON.stringify({ ...shipping, items }) }),
   createOrder: (payload) => request("/checkout", { method: "POST", body: JSON.stringify(payload) }),
 
   myOrders: () => request("/orders"),
@@ -71,6 +71,10 @@ export const api = {
   adminListOrders: (status) => request(`/orders/admin/all${status ? `?status=${encodeURIComponent(status)}` : ""}`),
   adminUpdateOrderStatus: (id, status) =>
     request(`/orders/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  adminGetShipmentRates: (orderId, payload) =>
+    request(`/orders/${orderId}/shipment/rates`, { method: "POST", body: JSON.stringify(payload) }),
+  adminPurchaseShipmentLabel: (orderId, payload) =>
+    request(`/orders/${orderId}/shipment/purchase`, { method: "POST", body: JSON.stringify(payload) }),
 
   adminStats: () => request("/admin/stats"),
   adminPosSale: (payload) => request("/admin/pos/sale", { method: "POST", body: JSON.stringify(payload) }),
@@ -110,4 +114,8 @@ export const api = {
   adminSettingsHistory: (type) => request(`/admin/settings/history?type=${encodeURIComponent(type)}`),
   adminSetSetting: (key, value) =>
     request("/admin/settings", { method: "PATCH", body: JSON.stringify({ key, value }) }),
+
+  adminGetShippingSettings: () => request("/admin/shipping-settings"),
+  adminUpdateShippingSettings: (payload) =>
+    request("/admin/shipping-settings", { method: "PATCH", body: JSON.stringify(payload) }),
 };

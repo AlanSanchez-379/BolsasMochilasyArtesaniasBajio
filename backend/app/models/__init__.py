@@ -8,7 +8,7 @@ from .order import (
     OrderStatus,
     OrderChannel,
     PaymentMethod,
-    ShippingCarrier,
+    TRES_GUERRAS_CARRIER_CODE,
     SUCCESSFUL_ORDER_STATUSES,
     PENDING_ORDER_STATUSES,
 )
@@ -28,7 +28,7 @@ __all__ = [
     "OrderStatus",
     "OrderChannel",
     "PaymentMethod",
-    "ShippingCarrier",
+    "TRES_GUERRAS_CARRIER_CODE",
     "SUCCESSFUL_ORDER_STATUSES",
     "PENDING_ORDER_STATUSES",
 ]

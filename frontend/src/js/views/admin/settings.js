@@ -1,7 +1,77 @@
 import { api } from "../../api.js";
 import { invalidateSettingsCache } from "../../settingsCache.js";
+import { getCategories } from "../../catalogCache.js";
 
 const SETTING_KEYS = { logo: "logo_url", banner: "banner_url" };
+
+function numberFieldHtml(key, label, value, step = "0.01") {
+  return `
+    <div>
+      <label class="block text-xs font-semibold text-gray-600 mb-1">${label}</label>
+      <input type="number" step="${step}" min="0" data-shipping-key="${key}" value="${value ?? ""}"
+        class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink" />
+    </div>
+  `;
+}
+
+function textFieldHtml(key, label, value) {
+  return `
+    <div>
+      <label class="block text-xs font-semibold text-gray-600 mb-1">${label}</label>
+      <input type="text" data-shipping-key="${key}" value="${value ?? ""}"
+        class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink" />
+    </div>
+  `;
+}
+
+function shippingSettingsCardHtml(shippingSettings, categories) {
+  let weightPerCategory = {};
+  try {
+    weightPerCategory = JSON.parse(shippingSettings.shipping_weight_per_category_kg || "{}");
+  } catch {
+    weightPerCategory = {};
+  }
+
+  return `
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:col-span-2">
+      <h3 class="text-xl font-bold mb-1">Envíos (Skydropx)</h3>
+      <p class="text-sm text-gray-500 mb-4">
+        Pesos usados para estimar el envío en el checkout, dirección desde donde sale el paquete,
+        y el costo fijo de la opción manual (Tres Guerras). Ajústalos cuando quieras — no requieren tocar código.
+      </p>
+
+      <h4 class="text-sm font-bold text-gray-700 mb-2">Peso aproximado por categoría (kg/pieza)</h4>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+        ${categories
+          .map((cat) => numberFieldHtml(`category:${cat.name}`, cat.name, weightPerCategory[cat.name]))
+          .join("")}
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+        ${numberFieldHtml("shipping_default_weight_per_piece_kg", "Peso por defecto (categoría sin dato)", shippingSettings.shipping_default_weight_per_piece_kg)}
+        ${numberFieldHtml("shipping_packaging_weight_kg", "Peso de empaque (una vez por pedido)", shippingSettings.shipping_packaging_weight_kg)}
+        ${numberFieldHtml("shipping_tres_guerras_fixed_cost", "Costo fijo Tres Guerras ($)", shippingSettings.shipping_tres_guerras_fixed_cost)}
+      </div>
+
+      <h4 class="text-sm font-bold text-gray-700 mb-2">Dirección de origen</h4>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        ${textFieldHtml("shipping_origin_name", "Nombre / empresa", shippingSettings.shipping_origin_name)}
+        ${textFieldHtml("shipping_origin_phone", "Teléfono de contacto", shippingSettings.shipping_origin_phone)}
+        ${textFieldHtml("shipping_origin_street", "Calle y número", shippingSettings.shipping_origin_street)}
+        ${textFieldHtml("shipping_origin_colonia", "Colonia", shippingSettings.shipping_origin_colonia)}
+        ${textFieldHtml("shipping_origin_city", "Ciudad", shippingSettings.shipping_origin_city)}
+        ${textFieldHtml("shipping_origin_state", "Estado", shippingSettings.shipping_origin_state)}
+        ${textFieldHtml("shipping_origin_postal_code", "Código postal", shippingSettings.shipping_origin_postal_code)}
+      </div>
+
+      <p data-shipping-error class="text-red-500 text-sm mb-2 hidden"></p>
+      <p data-shipping-success class="text-green-600 text-sm mb-2 hidden">Guardado.</p>
+      <button data-save-shipping-settings class="bg-brand-blue-dark text-white px-5 py-2 rounded-full font-semibold hover:bg-brand-blue">
+        <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar ajustes de envío
+      </button>
+    </div>
+  `;
+}
 
 function uploadCardHtml(type, label, currentUrl, hint) {
   return `
@@ -37,9 +107,13 @@ function uploadCardHtml(type, label, currentUrl, hint) {
 export async function renderSettingsTab(container, isCurrentTab = () => true) {
   container.innerHTML = `<div class="text-center py-12 text-gray-400">Cargando ajustes...</div>`;
 
-  let settings;
+  let settings, shippingSettings, categories;
   try {
-    settings = await api.adminGetSettings();
+    [settings, shippingSettings, { categories }] = await Promise.all([
+      api.adminGetSettings(),
+      api.adminGetShippingSettings(),
+      getCategories(),
+    ]);
   } catch (err) {
     if (!isCurrentTab()) return;
     container.innerHTML = `<p class="text-red-500 text-center py-12">${err.message}</p>`;
@@ -52,8 +126,45 @@ export async function renderSettingsTab(container, isCurrentTab = () => true) {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         ${uploadCardHtml("logo", "Logotipo", settings.logo_url, "Se muestra en la barra de navegación. Recomendado: PNG con fondo transparente.")}
         ${uploadCardHtml("banner", "Banner Principal", settings.banner_url, "Se muestra en el banner del Home. Recomendado: JPG horizontal, ancho.")}
+        ${shippingSettingsCardHtml(shippingSettings, categories)}
       </div>
     `;
+
+    container.querySelector("[data-save-shipping-settings]").addEventListener("click", async () => {
+      const btn = container.querySelector("[data-save-shipping-settings]");
+      const errorEl = container.querySelector("[data-shipping-error]");
+      const successEl = container.querySelector("[data-shipping-success]");
+      errorEl.classList.add("hidden");
+      successEl.classList.add("hidden");
+
+      const payload = {};
+      const weightPerCategory = {};
+      container.querySelectorAll("[data-shipping-key]").forEach((input) => {
+        const key = input.dataset.shippingKey;
+        const value = input.value.trim();
+        if (!value) return;
+        if (key.startsWith("category:")) {
+          weightPerCategory[key.slice("category:".length)] = Number(value);
+        } else {
+          payload[key] = value;
+        }
+      });
+      payload.shipping_weight_per_category_kg = JSON.stringify(weightPerCategory);
+
+      btn.disabled = true;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>Guardando...`;
+      try {
+        shippingSettings = { ...shippingSettings, ...(await api.adminUpdateShippingSettings(payload)) };
+        successEl.classList.remove("hidden");
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    });
 
     container.querySelectorAll("[data-upload-btn]").forEach((btn) => {
       btn.addEventListener("click", async () => {

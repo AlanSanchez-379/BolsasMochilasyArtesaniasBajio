@@ -4,62 +4,134 @@ import stripe
 from flask import jsonify, request, g, current_app
 
 from app.extensions import db
-from app.models import Product, ProductVariant, Order, OrderItem, OrderStatus, PaymentMethod, ShippingCarrier
+from app.models import (
+    Product,
+    ProductVariant,
+    Order,
+    OrderItem,
+    OrderStatus,
+    PaymentMethod,
+    TRES_GUERRAS_CARRIER_CODE,
+)
 from app.utils.decorators import login_required
 from app.utils.serializers import serialize_order
 from app.utils.stock import adjust_stock
+from app.utils.shipping_estimate import get_shipping_settings_dict, estimate_package_weight_kg, get_origin_address
+from app.utils.skydropx_client import get_rates, SkydropxError
 
 from . import checkout_bp
-
-CARRIER_BASE_COST = {
-    ShippingCarrier.DHL: 180,
-    ShippingCarrier.ESTAFETA: 140,
-    ShippingCarrier.TRES_GUERRAS: 110,
-}
-CARRIER_LABELS = {
-    ShippingCarrier.DHL: "DHL",
-    ShippingCarrier.ESTAFETA: "Estafeta",
-    ShippingCarrier.TRES_GUERRAS: "Tres Guerras",
-}
-CARRIER_ETA = {
-    ShippingCarrier.DHL: "1-2 días hábiles",
-    ShippingCarrier.ESTAFETA: "2-4 días hábiles",
-    ShippingCarrier.TRES_GUERRAS: "3-5 días hábiles",
-}
 
 
 class CheckoutError(Exception):
     pass
 
 
-def _simulated_cost(base, postal_code):
-    """Cotización simulada y determinista por CP (mismo CP -> mismo costo).
-    Sustituible en el futuro por una Edge Function que llame las APIs reales."""
-    digit_sum = sum(int(d) for d in postal_code if d.isdigit())
-    return round(base + (digit_sum % 12) * 5, 2)
-
-
 def _valid_postal_code(postal_code):
     return bool(postal_code) and postal_code.isdigit() and len(postal_code) == 5
+
+
+def _estimate_cart_weight_kg(items_payload):
+    """Estima el peso del carrito sumando quantity * peso-por-categoría, resolviendo
+    también las piezas elegidas dentro de paquetes "Elegir mis diseños"."""
+    product_ids = set()
+    variant_ids = set()
+    for item in items_payload:
+        if item.get("product_id"):
+            product_ids.add(item["product_id"])
+        if item.get("type") == "bundle_custom":
+            for sel in item.get("selections", []):
+                if sel.get("variant_id"):
+                    variant_ids.add(sel["variant_id"])
+
+    variants = {str(v.id): v for v in ProductVariant.query.filter(ProductVariant.id.in_(variant_ids)).all()}
+    product_ids.update(str(v.product_id) for v in variants.values())
+    products = {str(p.id): p for p in Product.query.filter(Product.id.in_(product_ids)).all()}
+
+    cart_items = []
+    for item in items_payload:
+        item_type = item.get("type")
+        if item_type == "simple":
+            cart_items.append({"product_id": item.get("product_id"), "quantity": item.get("quantity")})
+        elif item_type == "bundle_random":
+            cart_items.append({"product_id": item.get("product_id"), "quantity": item.get("quantity") or 1})
+        elif item_type == "bundle_custom":
+            for sel in item.get("selections", []):
+                variant = variants.get(sel.get("variant_id"))
+                if variant is not None:
+                    cart_items.append({"product_id": str(variant.product_id), "quantity": sel.get("quantity")})
+
+    return estimate_package_weight_kg(cart_items, products)
+
+
+def _tres_guerras_option(settings=None):
+    settings = settings or get_shipping_settings_dict()
+    return {
+        "carrier": TRES_GUERRAS_CARRIER_CODE,
+        "label": "Tres Guerras",
+        "cost": settings["tres_guerras_fixed_cost"],
+        "eta": "3-5 días hábiles",
+    }
+
+
+def _destination_address(shipping):
+    """Arma el dict de dirección {name, phone, street, colonia, city, state,
+    postal_code} que espera skydropx_client a partir del payload de envío (mismos
+    nombres de campo que llenó el cliente en el formulario de checkout)."""
+    return {
+        "name": shipping.get("full_name"),
+        "phone": shipping.get("phone"),
+        "street": shipping.get("street"),
+        "colonia": shipping.get("colonia"),
+        "city": shipping.get("city"),
+        "state": shipping.get("state"),
+        "postal_code": shipping.get("postal_code"),
+    }
+
+
+def _skydropx_options(items_payload, shipping, settings):
+    """Cotiza con Skydropx usando un peso estimado del carrito. Si falta la dirección
+    de origen/destino o la llamada falla, degrada devolviendo lista vacía en vez de
+    tronar la cotización completa (Tres Guerras sigue disponible como respaldo)."""
+    try:
+        origin = get_origin_address(settings)
+    except ValueError:
+        return [], True
+
+    destination = _destination_address(shipping)
+    if not all(destination.get(f) for f in ("street", "colonia", "city", "state", "postal_code")):
+        return [], True
+
+    weight_kg = _estimate_cart_weight_kg(items_payload)
+    try:
+        rates = get_rates(origin, destination, weight_kg)
+    except SkydropxError:
+        return [], True
+
+    return [
+        {
+            "carrier": f"skydropx:{rate['rate_id']}",
+            "label": f"{rate['carrier_name']} · {rate['service_level']}",
+            "cost": rate["cost"],
+            "eta": f"{rate['eta_days']} días hábiles" if rate.get("eta_days") else "Tiempo estimado por confirmar",
+            "rate_id": rate["rate_id"],
+            "quotation_id": rate["quotation_id"],
+        }
+        for rate in rates
+    ], False
 
 
 @checkout_bp.post("/quote")
 def quote():
     data = request.get_json() or {}
     postal_code = (data.get("postal_code") or "").strip()
+    items_payload = data.get("items") or []
     if not _valid_postal_code(postal_code):
         return jsonify({"message": "Código postal inválido. Debe tener 5 dígitos."}), 400
 
-    options = [
-        {
-            "carrier": carrier.value,
-            "label": CARRIER_LABELS[carrier],
-            "cost": _simulated_cost(base, postal_code),
-            "eta": CARRIER_ETA[carrier],
-        }
-        for carrier, base in CARRIER_BASE_COST.items()
-    ]
-    return jsonify({"options": options})
+    settings = get_shipping_settings_dict()
+    skydropx_options, skydropx_unavailable = _skydropx_options(items_payload, data, settings)
+    options = skydropx_options + [_tres_guerras_option(settings)]
+    return jsonify({"options": options, "skydropx_unavailable": skydropx_unavailable})
 
 
 def _build_order(items_payload, shipping, payment_method):
@@ -222,14 +294,29 @@ def _build_order(items_payload, shipping, payment_method):
     if not order_items:
         raise CheckoutError("El carrito está vacío.")
 
-    try:
-        carrier = ShippingCarrier(shipping["carrier"])
-    except ValueError:
-        raise CheckoutError("Paquetería inválida.")
+    carrier_code = shipping.get("carrier") or ""
     if not _valid_postal_code(shipping.get("postal_code", "")):
         raise CheckoutError("Código postal inválido.")
 
-    shipping_cost = _simulated_cost(CARRIER_BASE_COST[carrier], shipping["postal_code"])
+    settings = get_shipping_settings_dict()
+    if carrier_code == TRES_GUERRAS_CARRIER_CODE:
+        shipping_cost = settings["tres_guerras_fixed_cost"]
+    elif carrier_code.startswith("skydropx:"):
+        # Nunca confiar en un precio mandado por el cliente: se vuelve a cotizar en el
+        # servidor con el mismo rate_id antes de cobrar/crear la orden.
+        rate_id = carrier_code.split(":", 1)[1]
+        try:
+            origin = get_origin_address(settings)
+            rates = get_rates(origin, _destination_address(shipping), _estimate_cart_weight_kg(items_payload))
+        except (ValueError, SkydropxError):
+            raise CheckoutError("No se pudo confirmar el costo de envío. Cotiza de nuevo.")
+        matching_rate = next((r for r in rates if r["rate_id"] == rate_id), None)
+        if matching_rate is None:
+            raise CheckoutError("La tarifa de envío elegida ya no está disponible. Cotiza de nuevo.")
+        shipping_cost = matching_rate["cost"]
+    else:
+        raise CheckoutError("Paquetería inválida.")
+
     total = subtotal + shipping_cost
 
     order = Order(
@@ -237,10 +324,11 @@ def _build_order(items_payload, shipping, payment_method):
         shipping_full_name=shipping["full_name"],
         shipping_phone=shipping["phone"],
         shipping_street=shipping["street"],
+        shipping_colonia=shipping.get("colonia"),
         shipping_city=shipping["city"],
         shipping_state=shipping["state"],
         shipping_postal_code=shipping["postal_code"],
-        shipping_carrier=carrier,
+        shipping_carrier=carrier_code,
         shipping_cost=shipping_cost,
         payment_method=PaymentMethod(payment_method),
         status=OrderStatus.PENDING_PAYMENT if payment_method == PaymentMethod.SPEI.value else OrderStatus.PAYMENT_IN_VALIDATION,

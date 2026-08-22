@@ -16,6 +16,15 @@ class Config:
     STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
     STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
+    # Skydropx Pro (cotización y guías de envío), OAuth2 client_credentials. Producción
+    # = pro.skydropx.com, sandbox = sb-pro.skydropx.com (ver app/utils/skydropx_client.py
+    # para el detalle de campos que todavía falta confirmar). Mientras SKYDROPX_MOCK_MODE
+    # sea true, no se hace ninguna llamada HTTP real (ni se gasta saldo de la cuenta).
+    SKYDROPX_API_BASE_URL = os.environ.get("SKYDROPX_API_BASE_URL", "https://pro.skydropx.com")
+    SKYDROPX_CLIENT_ID = os.environ.get("SKYDROPX_CLIENT_ID")
+    SKYDROPX_CLIENT_SECRET = os.environ.get("SKYDROPX_CLIENT_SECRET")
+    SKYDROPX_MOCK_MODE = os.environ.get("SKYDROPX_MOCK_MODE", "true").lower() == "true"
+
     # localhost y 127.0.0.1 son orígenes distintos para CORS; se permiten ambos en dev.
     # En prod, FRONTEND_ORIGIN puede traer varios orígenes separados por coma
     # (ej. "https://bolsasdelbajio.com,https://www.bolsasdelbajio.com").

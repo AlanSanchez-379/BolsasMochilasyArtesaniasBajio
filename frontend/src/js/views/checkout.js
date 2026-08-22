@@ -57,7 +57,7 @@ export function renderCheckout(container) {
 
   const flow = {
     step: 1,
-    shipping: { full_name: appState.currentUser.full_name || "", phone: "", street: "", city: "", state: "", postal_code: "" },
+    shipping: { full_name: appState.currentUser.full_name || "", phone: "", street: "", colonia: "", city: "", state: "", postal_code: "" },
     quoteOptions: null,
     selectedCarrier: null,
     paymentMethod: "card",
@@ -138,6 +138,10 @@ export function renderCheckout(container) {
             <label class="block text-sm font-semibold text-gray-700 mb-1">Calle y número</label>
             <input name="street" required value="${s.street}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
           </div>
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Colonia</label>
+            <input name="colonia" required value="${s.colonia}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
+          </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Ciudad</label>
             <input name="city" required value="${s.city}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
@@ -153,6 +157,7 @@ export function renderCheckout(container) {
         <p id="quote-error" class="text-red-500 text-sm mt-2 hidden"></p>
 
         <div id="quote-options" class="mt-6 space-y-3"></div>
+        <p class="text-xs text-gray-400 mt-3">Costo de envío estimado; puede ajustarse una vez que se pese el paquete real.</p>
       </div>
       <div class="flex justify-between">
         <button id="back-2" class="text-sm font-semibold text-gray-500 hover:text-gray-900">Atrás</button>
@@ -204,7 +209,7 @@ export function renderCheckout(container) {
       if (!form.reportValidity()) return;
 
       try {
-        const { options } = await api.checkoutQuote(flow.shipping.postal_code);
+        const { options } = await api.checkoutQuote(flow.shipping, buildCheckoutItems());
         flow.quoteOptions = options;
         flow.selectedCarrier = null;
         nextBtn.disabled = true;

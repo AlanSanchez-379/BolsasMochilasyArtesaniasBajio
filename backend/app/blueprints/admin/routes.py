@@ -1,3 +1,4 @@
+import json
 import uuid
 
 from flask import jsonify, request
@@ -26,6 +27,7 @@ from app.utils.decorators import role_required
 from app.utils.serializers import serialize_product, serialize_order
 from app.utils.slugify import unique_slug
 from app.utils.supabase_client import get_supabase_admin
+from app.utils.shipping_estimate import SHIPPING_SETTING_KEYS
 
 from . import admin_bp
 
@@ -148,6 +150,44 @@ def set_setting_value():
     db.session.add(setting)
     db.session.commit()
     return jsonify({"key": key, "value": value})
+
+
+@admin_bp.get("/shipping-settings")
+@role_required(UserRole.ADMIN_TECH.value)
+def get_shipping_settings():
+    rows = Setting.query.filter(Setting.key.in_(SHIPPING_SETTING_KEYS)).all()
+    return jsonify({s.key: s.value for s in rows})
+
+
+@admin_bp.patch("/shipping-settings")
+@role_required(UserRole.ADMIN_TECH.value)
+def update_shipping_settings():
+    """Body: { <key>: <value>, ... } — uno o varios de SHIPPING_SETTING_KEYS a la vez.
+    Guarda pesos por categoría, peso de empaque, dirección de origen y el costo fijo de
+    Tres Guerras, usados para estimar/cotizar envíos con Skydropx."""
+    data = request.get_json() or {}
+    invalid = set(data) - SHIPPING_SETTING_KEYS
+    if invalid:
+        return jsonify({"message": f"Claves inválidas: {', '.join(invalid)}"}), 400
+
+    if "shipping_weight_per_category_kg" in data:
+        raw = data["shipping_weight_per_category_kg"]
+        try:
+            parsed = json.loads(raw) if isinstance(raw, str) else raw
+            if not isinstance(parsed, dict):
+                raise ValueError
+        except (TypeError, ValueError):
+            return jsonify({"message": "shipping_weight_per_category_kg debe ser un objeto JSON."}), 400
+        data["shipping_weight_per_category_kg"] = json.dumps(parsed)
+
+    for key, value in data.items():
+        setting = Setting.query.get(key) or Setting(key=key)
+        setting.value = str(value) if value is not None else None
+        db.session.add(setting)
+    db.session.commit()
+
+    rows = Setting.query.filter(Setting.key.in_(data.keys())).all()
+    return jsonify({s.key: s.value for s in rows})
 
 
 @admin_bp.get("/products/image-history")

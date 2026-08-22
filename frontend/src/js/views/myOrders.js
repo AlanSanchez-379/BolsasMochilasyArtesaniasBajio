@@ -13,6 +13,13 @@ const STATUS_COLORS = {
   "Cancelado / Reembolsado": "bg-red-100 text-red-700",
 };
 
+function carrierLabel(carrier) {
+  if (!carrier) return "-";
+  if (carrier === "3guerras") return "Tres Guerras";
+  if (carrier.startsWith("skydropx:")) return "Paquetería (cotizado)";
+  return carrier.toUpperCase();
+}
+
 function orderCardHtml(order) {
   const badge = STATUS_COLORS[order.status] || "bg-gray-100 text-gray-700";
   return `
@@ -31,13 +38,21 @@ function orderCardHtml(order) {
           .join("")}
       </div>
       <div class="flex justify-between items-center border-t pt-4">
-        <span class="text-gray-500">Envío: ${order.shipping.carrier?.toUpperCase() || "-"}</span>
+        <span class="text-gray-500">Envío: ${carrierLabel(order.shipping.carrier)}</span>
         <span class="text-xl font-bold text-brand-blue-dark">$${order.total}</span>
       </div>
       ${
         order.status === "Pendiente de pago" && order.spei_payment_deadline
           ? `<p class="text-sm text-brand-salmon font-semibold mt-2">
               <i class="fa-solid fa-clock mr-1"></i> Deposita antes de ${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}
+            </p>`
+          : ""
+      }
+      ${
+        order.shipping.tracking_number
+          ? `<p class="text-sm text-gray-600 mt-2">
+              <i class="fa-solid fa-truck mr-1"></i>Guía: <strong>${order.shipping.tracking_number}</strong>
+              ${order.shipping.tracking_url_provider ? ` — <a href="${order.shipping.tracking_url_provider}" target="_blank" class="text-brand-blue-dark underline">Rastrear</a>` : ""}
             </p>`
           : ""
       }
