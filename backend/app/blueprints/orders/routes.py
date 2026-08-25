@@ -2,7 +2,7 @@ from flask import jsonify, request, g
 
 from app.extensions import db
 from app.models import Order, OrderStatus, UserRole
-from app.utils.decorators import login_required, role_required
+from app.utils.decorators import login_required, pos_access_required
 from app.utils.serializers import serialize_order
 from app.utils.stock import set_order_status
 from app.utils.shipping_estimate import get_shipping_settings_dict, get_origin_address
@@ -32,7 +32,7 @@ def get_order(order_id):
 
 
 @orders_bp.get("/admin/all")
-@role_required(UserRole.ADMIN_STORE.value, UserRole.ADMIN_TECH.value)
+@pos_access_required
 def list_all_orders():
     status = request.args.get("status")
     query = Order.query
@@ -46,7 +46,7 @@ def list_all_orders():
 
 
 @orders_bp.patch("/<order_id>/status")
-@role_required(UserRole.ADMIN_STORE.value, UserRole.ADMIN_TECH.value)
+@pos_access_required
 def update_status(order_id):
     order = Order.query.get_or_404(order_id)
     data = request.get_json() or {}
@@ -61,7 +61,7 @@ def update_status(order_id):
 
 
 @orders_bp.post("/<order_id>/shipment/rates")
-@role_required(UserRole.ADMIN_STORE.value, UserRole.ADMIN_TECH.value)
+@pos_access_required
 def get_shipment_rates(order_id):
     """Recibe peso/dimensiones REALES ya empacado el pedido, los guarda, y devuelve
     cotizaciones reales de Skydropx para que el admin elija cuál comprar."""
@@ -104,7 +104,7 @@ def get_shipment_rates(order_id):
 
 
 @orders_bp.post("/<order_id>/shipment/purchase")
-@role_required(UserRole.ADMIN_STORE.value, UserRole.ADMIN_TECH.value)
+@pos_access_required
 def purchase_shipment_label(order_id):
     """Compra la guía real con la tarifa que eligió el admin y la persiste en el pedido."""
     order = Order.query.get_or_404(order_id)

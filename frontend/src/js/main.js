@@ -11,8 +11,7 @@ import { renderLogin } from "./views/login.js";
 import { renderRegister } from "./views/register.js";
 import { renderAuthCallback } from "./views/authCallback.js";
 import { renderMyOrders } from "./views/myOrders.js";
-import { renderAdmin } from "./views/admin/index.js";
-import { renderPosAccess } from "./views/posAccess.js";
+import { renderPosAccess } from "./views/posAccess/index.js";
 import { subscribe, setCurrentUser } from "./state.js";
 import { api } from "./api.js";
 import { getCategories } from "./catalogCache.js";
@@ -58,13 +57,11 @@ route("/login", () => renderLogin(view));
 route("/registro", () => renderRegister(view));
 route("/auth/callback", ({ query }) => renderAuthCallback(view, query));
 route("/mis-pedidos", () => renderMyOrders(view));
-route("/admin", () => renderAdmin(view));
 route("/venta-local", () => renderPosAccess(view));
 
-// Antes de resolver la ruta inicial hay que saber si ya hay sesión (cookie), porque
-// rutas como /admin o /checkout deciden qué mostrar según currentUser. Si el router
-// arrancara primero, una recarga en una ruta protegida mostraría "Acceso restringido"
-// aunque la sesión sí sea válida.
+// Antes de resolver la ruta inicial hay que saber si ya hay sesión de cliente (cookie),
+// porque el navbar y /mis-pedidos deciden qué mostrar según currentUser. /venta-local usa
+// su propia sesión de PIN, independiente de esto.
 api
   .me()
   .then(({ user }) => setCurrentUser(user))

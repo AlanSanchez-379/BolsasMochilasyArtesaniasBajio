@@ -76,62 +76,32 @@ export const api = {
   adminPurchaseShipmentLabel: (orderId, payload) =>
     request(`/orders/${orderId}/shipment/purchase`, { method: "POST", body: JSON.stringify(payload) }),
 
-  adminStats: () => request("/admin/stats"),
-  adminPosSale: (payload) => request("/admin/pos/sale", { method: "POST", body: JSON.stringify(payload) }),
-  adminListProducts: () => request("/admin/products"),
-  adminCreateProduct: (payload) => request("/admin/products", { method: "POST", body: JSON.stringify(payload) }),
-  adminUpdateProduct: (id, payload) =>
-    request(`/admin/products/${id}`, { method: "PATCH", body: JSON.stringify(payload) }),
-  adminDeleteProduct: (id) => request(`/admin/products/${id}`, { method: "DELETE" }),
-  adminCreateVariant: (productId, payload) =>
-    request(`/admin/products/${productId}/variants`, { method: "POST", body: JSON.stringify(payload) }),
-  adminUpdateVariant: (variantId, payload) =>
-    request(`/admin/variants/${variantId}`, { method: "PATCH", body: JSON.stringify(payload) }),
-  adminDeleteVariant: (variantId) => request(`/admin/variants/${variantId}`, { method: "DELETE" }),
-  adminUploadImage: (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    return upload("/admin/upload-image", formData);
-  },
-  adminUploadVariantImage: (variantId, file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    return upload(`/admin/variants/${variantId}/image`, formData);
-  },
-  adminProductImageHistory: () => request("/admin/products/image-history"),
-
-  adminListUsers: () => request("/admin/users"),
-  adminUpdateUserRole: (userId, role) =>
-    request(`/admin/users/${userId}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),
-
-  adminGetSettings: () => request("/admin/settings"),
-  adminUploadSettingImage: (type, file) => {
-    const formData = new FormData();
-    formData.append("type", type);
-    formData.append("file", file);
-    return upload("/admin/settings/upload", formData);
-  },
-  adminSettingsHistory: (type) => request(`/admin/settings/history?type=${encodeURIComponent(type)}`),
-  adminSetSetting: (key, value) =>
-    request("/admin/settings", { method: "PATCH", body: JSON.stringify({ key, value }) }),
-
-  adminGetShippingSettings: () => request("/admin/shipping-settings"),
-  adminUpdateShippingSettings: (payload) =>
-    request("/admin/shipping-settings", { method: "PATCH", body: JSON.stringify(payload) }),
-
-  adminGetPosAccessSettings: () => request("/admin/pos-access-settings"),
-  adminUpdatePosAccessSettings: (pin) =>
-    request("/admin/pos-access-settings", { method: "PATCH", body: JSON.stringify({ pin }) }),
 };
 
-// Liga de venta local (/venta-local): PIN compartido, sin cuenta de Supabase. No usa
-// request()/handleUnauthorized() porque un 401 aquí debe regresar al prompt de PIN,
-// no mandar al login de clientes.
+// Liga de venta local (/venta-local): PIN compartido, sin cuenta de Supabase. Es la
+// ÚNICA superficie administrativa del sitio (el panel /admin con cuentas de Supabase
+// se retiró por completo). No usa request()/handleUnauthorized() porque un 401 aquí
+// debe regresar al prompt de PIN, no mandar al login de clientes.
 async function posAccessFetch(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     ...options,
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(body.message || `Error ${res.status} en ${path}`);
+    err.status = res.status;
+    throw err;
+  }
+  return body;
+}
+
+async function posAccessUpload(path, formData) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    credentials: "include",
+    body: formData, // sin Content-Type manual: el navegador arma el boundary del multipart
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -150,5 +120,52 @@ export const posAccessApi = {
   sale: (payload) => posAccessFetch("/pos-access/sale", { method: "POST", body: JSON.stringify(payload) }),
   stats: () => posAccessFetch("/pos-access/stats"),
   updateOrderStatus: (id, status) =>
-    posAccessFetch(`/pos-access/orders/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+    posAccessFetch(`/orders/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+
+  // Catálogo (productos y paquetes comparten estos mismos endpoints, is_bundle decide cuál es cuál)
+  createProduct: (payload) => posAccessFetch("/admin/products", { method: "POST", body: JSON.stringify(payload) }),
+  updateProduct: (id, payload) =>
+    posAccessFetch(`/admin/products/${id}`, { method: "PATCH", body: JSON.stringify(payload) }),
+  deleteProduct: (id) => posAccessFetch(`/admin/products/${id}`, { method: "DELETE" }),
+  createVariant: (productId, payload) =>
+    posAccessFetch(`/admin/products/${productId}/variants`, { method: "POST", body: JSON.stringify(payload) }),
+  updateVariant: (variantId, payload) =>
+    posAccessFetch(`/admin/variants/${variantId}`, { method: "PATCH", body: JSON.stringify(payload) }),
+  deleteVariant: (variantId) => posAccessFetch(`/admin/variants/${variantId}`, { method: "DELETE" }),
+  uploadImage: (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return posAccessUpload("/admin/upload-image", formData);
+  },
+  uploadVariantImage: (variantId, file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return posAccessUpload(`/admin/variants/${variantId}/image`, formData);
+  },
+  productImageHistory: () => posAccessFetch("/admin/products/image-history"),
+
+  // Pedidos (todos los canales)
+  listOrders: () => posAccessFetch("/orders/admin/all"),
+  getShipmentRates: (orderId, payload) =>
+    posAccessFetch(`/orders/${orderId}/shipment/rates`, { method: "POST", body: JSON.stringify(payload) }),
+  purchaseShipmentLabel: (orderId, payload) =>
+    posAccessFetch(`/orders/${orderId}/shipment/purchase`, { method: "POST", body: JSON.stringify(payload) }),
+
+  // Ajustes (branding, envío, PIN de esta misma terminal)
+  getAdminSettings: () => posAccessFetch("/admin/settings"),
+  uploadSettingImage: (type, file) => {
+    const formData = new FormData();
+    formData.append("type", type);
+    formData.append("file", file);
+    return posAccessUpload("/admin/settings/upload", formData);
+  },
+  settingsHistory: (type) => posAccessFetch(`/admin/settings/history?type=${encodeURIComponent(type)}`),
+  setSetting: (key, value) =>
+    posAccessFetch("/admin/settings", { method: "PATCH", body: JSON.stringify({ key, value }) }),
+  getShippingSettings: () => posAccessFetch("/admin/shipping-settings"),
+  updateShippingSettings: (payload) =>
+    posAccessFetch("/admin/shipping-settings", { method: "PATCH", body: JSON.stringify(payload) }),
+  getPosAccessSettings: () => posAccessFetch("/admin/pos-access-settings"),
+  updatePosAccessSettings: (pin) =>
+    posAccessFetch("/admin/pos-access-settings", { method: "PATCH", body: JSON.stringify({ pin }) }),
 };

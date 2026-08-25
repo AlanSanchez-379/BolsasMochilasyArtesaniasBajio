@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { state, cartItemsCount, setCurrentUser, isAdmin } from "../state.js";
+import { state, cartItemsCount, setCurrentUser } from "../state.js";
 import { navigate } from "../router.js";
 import { getSettings } from "../settingsCache.js";
 
@@ -22,16 +22,8 @@ function userMenuHtml() {
     <div class="px-4 py-3 border-b border-gray-100 mb-1">
       <p class="text-xs text-gray-400">Sesión actual</p>
       <p class="text-sm font-bold text-gray-900 truncate">${state.currentUser.full_name || state.currentUser.email}</p>
-      ${isAdmin() ? `<span class="block text-brand-mexican font-bold text-xs uppercase mt-1">${state.currentUser.role}</span>` : ""}
     </div>
     <button data-nav="/mis-pedidos" class="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-brand-mexican">Mis Pedidos</button>
-    ${
-      isAdmin()
-        ? `<button data-nav="/admin" class="block w-full text-left px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-100 mt-1">
-            <i class="fa-solid fa-gauge mr-2"></i> Panel Admin
-          </button>`
-        : ""
-    }
     <div class="border-t border-gray-100 mt-1"></div>
     <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-red-500">
       Cerrar Sesión
@@ -80,7 +72,7 @@ export async function renderNavbar(container) {
               <button id="user-menu-btn" class="flex items-center gap-2 text-gray-600 hover:text-brand-mexican">
                 <i class="fa-regular fa-user text-xl"></i>
                 <span class="hidden sm:inline text-sm font-medium">
-                  ${state.currentUser ? (isAdmin() ? '<span class="text-brand-mexican font-bold">Admin</span>' : "Mi Cuenta") : "Invitado"}
+                  ${state.currentUser ? "Mi Cuenta" : "Invitado"}
                 </span>
               </button>
               <div id="user-menu" class="hidden absolute right-0 mt-4 w-56 bg-white border border-gray-200 rounded shadow-lg py-1 z-50 fade-in">

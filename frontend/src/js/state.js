@@ -117,7 +117,3 @@ export function setCurrentUser(user) {
   state.currentUser = user;
   notify();
 }
-
-export function isAdmin() {
-  return state.currentUser && state.currentUser.role !== "client";
-}

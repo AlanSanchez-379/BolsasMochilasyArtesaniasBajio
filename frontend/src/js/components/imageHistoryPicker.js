@@ -1,9 +1,9 @@
-import { api } from "../api.js";
+import { posAccessApi } from "../api.js";
 
 let historyPromise = null;
 
 function getHistory() {
-  if (!historyPromise) historyPromise = api.adminProductImageHistory();
+  if (!historyPromise) historyPromise = posAccessApi.productImageHistory();
   return historyPromise;
 }
 

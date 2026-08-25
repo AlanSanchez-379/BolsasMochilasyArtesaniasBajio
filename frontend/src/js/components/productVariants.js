@@ -1,4 +1,4 @@
-import { api } from "../api.js";
+import { posAccessApi } from "../api.js";
 import { showConfirmModal } from "./confirmModal.js";
 import { renderImageHistoryPicker, invalidateProductImageHistory } from "./imageHistoryPicker.js";
 
@@ -92,7 +92,7 @@ export function renderVariantsSection(el, product) {
           stock: parseInt(row.querySelector('[data-field="stock"]').value, 10),
         };
         try {
-          const { product: updated } = await api.adminUpdateVariant(btn.dataset.saveVariant, payload);
+          const { product: updated } = await posAccessApi.updateVariant(btn.dataset.saveVariant, payload);
           Object.assign(product, updated);
           renderList();
         } catch (err) {
@@ -115,7 +115,7 @@ export function renderVariantsSection(el, product) {
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
         try {
-          const { product: updated } = await api.adminUploadVariantImage(variantId, file);
+          const { product: updated } = await posAccessApi.uploadVariantImage(variantId, file);
           invalidateProductImageHistory();
           Object.assign(product, updated);
           renderList();
@@ -133,7 +133,7 @@ export function renderVariantsSection(el, product) {
         const v = product.variants.find((pv) => pv.id === variantId);
         const nextUrls = (v.image_urls || []).filter((_, i) => i !== parseInt(indexStr, 10));
         try {
-          const { product: updated } = await api.adminUpdateVariant(variantId, { image_urls: nextUrls });
+          const { product: updated } = await posAccessApi.updateVariant(variantId, { image_urls: nextUrls });
           Object.assign(product, updated);
           renderList();
         } catch (err) {
@@ -159,7 +159,7 @@ export function renderVariantsSection(el, product) {
                 return;
               }
               try {
-                const { product: updated } = await api.adminUpdateVariant(variantId, {
+                const { product: updated } = await posAccessApi.updateVariant(variantId, {
                   image_urls: [...current, url],
                 });
                 Object.assign(product, updated);
@@ -180,7 +180,7 @@ export function renderVariantsSection(el, product) {
           message: "Esta acción no se puede deshacer.",
           onConfirm: async () => {
             try {
-              const { product: updated } = await api.adminDeleteVariant(btn.dataset.deleteVariant);
+              const { product: updated } = await posAccessApi.deleteVariant(btn.dataset.deleteVariant);
               Object.assign(product, updated);
               renderList();
             } catch (err) {
@@ -196,7 +196,7 @@ export function renderVariantsSection(el, product) {
 
   el.querySelector("#add-variant-btn").addEventListener("click", async () => {
     try {
-      const { product: updated } = await api.adminCreateVariant(product.id, {
+      const { product: updated } = await posAccessApi.createVariant(product.id, {
         color: "Nuevo",
         sku: `SKU-${Date.now()}`,
         stock: 0,
@@ -291,7 +291,7 @@ export function renderNewVariantsBuilder(el, variants) {
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
         try {
-          const { url } = await api.adminUploadImage(file);
+          const { url } = await posAccessApi.uploadImage(file);
           invalidateProductImageHistory();
           v.image_urls = [...(v.image_urls || []), url];
           renderList();
