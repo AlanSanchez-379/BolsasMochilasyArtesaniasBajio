@@ -30,6 +30,43 @@ DEFAULT_WEIGHT_PER_PIECE_KG = 0.3
 DEFAULT_PACKAGING_WEIGHT_KG = 0.5
 DEFAULT_TRES_GUERRAS_COST = 110.0
 
+# Paquetes que superan este peso cobran un precio fijo por paquetería al cliente, sin
+# importar si Skydropx cotiza un poco más caro (la diferencia la absorbe la tienda).
+HEAVY_SHIPMENT_WEIGHT_THRESHOLD_KG = 2.0
+HEAVY_SHIPMENT_TRES_GUERRAS_COST = 350.0
+HEAVY_SHIPMENT_CARRIER_COSTS = {
+    "estafeta": 380.0,
+    "dhl": 380.0,
+}
+
+
+def tres_guerras_cost_for_weight(settings, weight_kg):
+    """Costo de Tres Guerras: fijo configurado en Ajustes, o el precio fijo de paquete
+    pesado si el envío supera HEAVY_SHIPMENT_WEIGHT_THRESHOLD_KG."""
+    if weight_kg is not None and weight_kg > HEAVY_SHIPMENT_WEIGHT_THRESHOLD_KG:
+        return HEAVY_SHIPMENT_TRES_GUERRAS_COST
+    return settings["tres_guerras_fixed_cost"]
+
+
+def override_heavy_shipment_cost(carrier_name, cost, weight_kg):
+    """Para cotizaciones reales de Skydropx: si el paquete supera el umbral de peso y
+    la paquetería es Estafeta o DHL, se cobra el precio fijo en vez del cotizado."""
+    if weight_kg is None or weight_kg <= HEAVY_SHIPMENT_WEIGHT_THRESHOLD_KG:
+        return cost
+    name = (carrier_name or "").lower()
+    for key, fixed_cost in HEAVY_SHIPMENT_CARRIER_COSTS.items():
+        if key in name:
+            return fixed_cost
+    return cost
+
+
+def carrier_is_allowed(carrier_name):
+    """La dueña solo quiere gestionar Tres Guerras/Estafeta/DHL -- cualquier otra
+    paquetería que Skydropx llegue a cotizar (FedEx, Redpack, Paquetexpress, etc.) se
+    descarta de las opciones que ve el cliente en el checkout."""
+    name = (carrier_name or "").lower()
+    return any(key in name for key in HEAVY_SHIPMENT_CARRIER_COSTS)
+
 
 def get_shipping_settings_dict():
     """Lee y parsea todas las SHIPPING_SETTING_KEYS de una vez, con defaults sanos."""

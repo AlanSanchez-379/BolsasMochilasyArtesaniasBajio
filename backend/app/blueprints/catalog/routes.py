@@ -71,17 +71,20 @@ def list_products():
         )
 
     products = query.distinct().all()
-    return jsonify({"products": [serialize_product(p) for p in products]})
+    return jsonify({"products": [serialize_product(p, apply_online_pricing=True) for p in products]})
 
 
 @catalog_bp.get("/products/<slug>")
 def get_product(slug):
     product = Product.query.filter_by(slug=slug).first_or_404()
-    return jsonify({"product": serialize_product(product)})
+    return jsonify({"product": serialize_product(product, apply_online_pricing=True)})
 
 
 @catalog_bp.get("/products/bestsellers")
 def bestsellers():
+    # /venta-local reusa este mismo endpoint para su "Top 5 Más Vendido" y pide
+    # ?raw=true para ver los precios base, sin el impuesto fantasma en línea.
+    apply_online_pricing = request.args.get("raw", "").lower() != "true"
     limit = min(int(request.args.get("limit", 4)), 20)
 
     ranked = (
@@ -108,4 +111,4 @@ def bestsellers():
         )
         products += fallback
 
-    return jsonify({"products": [serialize_product(p) for p in products]})
+    return jsonify({"products": [serialize_product(p, apply_online_pricing=apply_online_pricing) for p in products]})

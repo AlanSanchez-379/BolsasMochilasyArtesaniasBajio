@@ -55,7 +55,7 @@ route("/carrito", () => renderCart(view));
 route("/checkout", () => renderCheckout(view));
 route("/login", () => renderLogin(view));
 route("/registro", () => renderRegister(view));
-route("/auth/callback", ({ query }) => renderAuthCallback(view, query));
+route("/auth/callback", () => renderAuthCallback(view));
 route("/mis-pedidos", () => renderMyOrders(view));
 route("/venta-local", () => renderPosAccess(view));
 

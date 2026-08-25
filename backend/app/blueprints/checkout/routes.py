@@ -16,8 +16,16 @@ from app.models import (
 from app.utils.decorators import login_required
 from app.utils.serializers import serialize_order
 from app.utils.stock import adjust_stock
-from app.utils.shipping_estimate import get_shipping_settings_dict, estimate_package_weight_kg, get_origin_address
+from app.utils.shipping_estimate import (
+    get_shipping_settings_dict,
+    estimate_package_weight_kg,
+    get_origin_address,
+    tres_guerras_cost_for_weight,
+    override_heavy_shipment_cost,
+    carrier_is_allowed,
+)
 from app.utils.skydropx_client import get_rates, SkydropxError
+from app.utils.online_pricing import apply_online_markup
 
 from . import checkout_bp
 
@@ -67,12 +75,12 @@ def _estimate_cart_weight_kg(items_payload):
     return estimate_package_weight_kg(cart_items, products)
 
 
-def _tres_guerras_option(settings=None):
+def _tres_guerras_option(settings=None, weight_kg=None):
     settings = settings or get_shipping_settings_dict()
     return {
         "carrier": TRES_GUERRAS_CARRIER_CODE,
         "label": "Tres Guerras",
-        "cost": settings["tres_guerras_fixed_cost"],
+        "cost": tres_guerras_cost_for_weight(settings, weight_kg),
         "eta": "3-5 días hábiles",
     }
 
@@ -92,7 +100,7 @@ def _destination_address(shipping):
     }
 
 
-def _skydropx_options(items_payload, shipping, settings):
+def _skydropx_options(items_payload, shipping, settings, weight_kg):
     """Cotiza con Skydropx usando un peso estimado del carrito. Si falta la dirección
     de origen/destino o la llamada falla, degrada devolviendo lista vacía en vez de
     tronar la cotización completa (Tres Guerras sigue disponible como respaldo)."""
@@ -105,17 +113,20 @@ def _skydropx_options(items_payload, shipping, settings):
     if not all(destination.get(f) for f in ("street", "colonia", "city", "state", "postal_code")):
         return [], True
 
-    weight_kg = _estimate_cart_weight_kg(items_payload)
     try:
         rates = get_rates(origin, destination, weight_kg)
     except SkydropxError:
         return [], True
 
+    # Solo se gestionan Estafeta y DHL (Tres Guerras es la opción fija aparte) --
+    # cualquier otra paquetería que Skydropx cotice se descarta.
+    rates = [r for r in rates if carrier_is_allowed(r["carrier_name"])]
+
     return [
         {
             "carrier": f"skydropx:{rate['rate_id']}",
             "label": f"{rate['carrier_name']} · {rate['service_level']}",
-            "cost": rate["cost"],
+            "cost": override_heavy_shipment_cost(rate["carrier_name"], rate["cost"], weight_kg),
             "eta": f"{rate['eta_days']} días hábiles" if rate.get("eta_days") else "Tiempo estimado por confirmar",
             "rate_id": rate["rate_id"],
             "quotation_id": rate["quotation_id"],
@@ -133,8 +144,9 @@ def quote():
         return jsonify({"message": "Código postal inválido. Debe tener 5 dígitos."}), 400
 
     settings = get_shipping_settings_dict()
-    skydropx_options, skydropx_unavailable = _skydropx_options(items_payload, data, settings)
-    options = skydropx_options + [_tres_guerras_option(settings)]
+    weight_kg = _estimate_cart_weight_kg(items_payload)
+    skydropx_options, skydropx_unavailable = _skydropx_options(items_payload, data, settings, weight_kg)
+    options = skydropx_options + [_tres_guerras_option(settings, weight_kg)]
     return jsonify({"options": options, "skydropx_unavailable": skydropx_unavailable})
 
 
@@ -198,7 +210,7 @@ def _build_order(items_payload, shipping, payment_method):
                 raise CheckoutError(
                     f"Stock insuficiente para {product.name} ({variant.color}). Disponible: {variant.stock}."
                 )
-            unit_price = float(product.price_for_quantity(combined_qty))
+            unit_price = apply_online_markup(float(product.price_for_quantity(combined_qty)))
             variant.stock -= quantity
             order_items.append(
                 OrderItem(
@@ -220,7 +232,7 @@ def _build_order(items_payload, shipping, payment_method):
                 raise CheckoutError(f"Paquete sin variante configurada: {product.name}.")
             if bundle_variant.stock < quantity:
                 raise CheckoutError(f"No hay suficientes paquetes disponibles de {product.name}.")
-            unit_price = float(product.price_for_quantity(1))
+            unit_price = apply_online_markup(float(product.price_for_quantity(1)))
             bundle_variant.stock -= quantity
             order_items.append(
                 OrderItem(
@@ -287,7 +299,7 @@ def _build_order(items_payload, shipping, payment_method):
             if bundle_variant.stock < 1:
                 raise CheckoutError(f"No hay más paquetes disponibles de {product.name}.")
 
-            unit_price = float(product.price_for_quantity(1))
+            unit_price = apply_online_markup(float(product.price_for_quantity(1)))
             bundle_variant.stock -= 1
             parent_item = OrderItem(
                 product_id=product.id,
@@ -320,21 +332,22 @@ def _build_order(items_payload, shipping, payment_method):
         raise CheckoutError("Código postal inválido.")
 
     settings = get_shipping_settings_dict()
+    weight_kg = _estimate_cart_weight_kg(items_payload)
     if carrier_code == TRES_GUERRAS_CARRIER_CODE:
-        shipping_cost = settings["tres_guerras_fixed_cost"]
+        shipping_cost = tres_guerras_cost_for_weight(settings, weight_kg)
     elif carrier_code.startswith("skydropx:"):
         # Nunca confiar en un precio mandado por el cliente: se vuelve a cotizar en el
         # servidor con el mismo rate_id antes de cobrar/crear la orden.
         rate_id = carrier_code.split(":", 1)[1]
         try:
             origin = get_origin_address(settings)
-            rates = get_rates(origin, _destination_address(shipping), _estimate_cart_weight_kg(items_payload))
+            rates = get_rates(origin, _destination_address(shipping), weight_kg)
         except (ValueError, SkydropxError):
             raise CheckoutError("No se pudo confirmar el costo de envío. Cotiza de nuevo.")
         matching_rate = next((r for r in rates if r["rate_id"] == rate_id), None)
-        if matching_rate is None:
+        if matching_rate is None or not carrier_is_allowed(matching_rate["carrier_name"]):
             raise CheckoutError("La tarifa de envío elegida ya no está disponible. Cotiza de nuevo.")
-        shipping_cost = matching_rate["cost"]
+        shipping_cost = override_heavy_shipment_cost(matching_rate["carrier_name"], matching_rate["cost"], weight_kg)
     else:
         raise CheckoutError("Paquetería inválida.")
 

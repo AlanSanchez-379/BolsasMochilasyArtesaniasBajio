@@ -51,7 +51,9 @@ export const api = {
     return request(`/products${qs ? `?${qs}` : ""}`);
   },
   getProduct: (slug) => request(`/products/${slug}`),
-  getBestsellers: (limit = 4) => request(`/products/bestsellers?limit=${limit}`),
+  // raw=true pide los precios base (sin el impuesto fantasma de Stripe+IVA de la
+  // tienda en línea) -- lo usa /venta-local para su "Top 5 Más Vendido".
+  getBestsellers: (limit = 4, raw = false) => request(`/products/bestsellers?limit=${limit}${raw ? "&raw=true" : ""}`),
 
   register: (email, password, fullName) =>
     request("/auth/register", { method: "POST", body: JSON.stringify({ email, password, full_name: fullName }) }),

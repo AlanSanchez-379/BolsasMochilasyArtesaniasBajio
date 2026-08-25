@@ -108,7 +108,7 @@ export function createSaleSection(onUnauthorized) {
   }
 
   async function loadTopSellers() {
-    ({ products: topSellers } = await api.getBestsellers(5));
+    ({ products: topSellers } = await api.getBestsellers(5, true));
   }
 
   function shippingFieldsHtml() {

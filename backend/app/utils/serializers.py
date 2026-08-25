@@ -1,3 +1,6 @@
+from app.utils.online_pricing import apply_online_markup
+
+
 def serialize_variant(variant):
     image_urls = variant.image_paths or []
     return {
@@ -11,7 +14,23 @@ def serialize_variant(variant):
     }
 
 
-def serialize_product(product):
+def serialize_product(product, apply_online_pricing=False):
+    """apply_online_pricing=True agrega el "impuesto fantasma" de Stripe+IVA a los 3
+    niveles de precio (usado solo por el catálogo público en línea) y oculta cost_price
+    (dato interno, nunca debe llegar a un cliente). Con False (default -- admin,
+    /venta-local, y cualquier otro consumidor interno) los precios son los que se
+    dieron de alta, tal cual."""
+    price_normal = float(product.price_normal)
+    price_wholesale = float(product.price_wholesale)
+    price_super_wholesale = float(product.price_super_wholesale)
+    sale_price = float(product.sale_price) if product.sale_price is not None else None
+
+    if apply_online_pricing:
+        price_normal = apply_online_markup(price_normal)
+        price_wholesale = apply_online_markup(price_wholesale)
+        price_super_wholesale = apply_online_markup(price_super_wholesale)
+        sale_price = apply_online_markup(sale_price)
+
     data = {
         "id": str(product.id),
         "name": product.name,
@@ -20,20 +39,21 @@ def serialize_product(product):
         "category": product.category.name,
         "category_id": str(product.category_id),
         "subcategory": product.subcategory,
-        "price_normal": float(product.price_normal),
-        "price_wholesale": float(product.price_wholesale),
-        "price_super_wholesale": float(product.price_super_wholesale),
+        "price_normal": price_normal,
+        "price_wholesale": price_wholesale,
+        "price_super_wholesale": price_super_wholesale,
         "wholesale_min_qty": product.wholesale_min_qty,
         "super_wholesale_min_qty": product.super_wholesale_min_qty,
-        "cost_price": float(product.cost_price) if product.cost_price is not None else None,
         "is_on_sale": product.is_on_sale,
-        "sale_price": float(product.sale_price) if product.sale_price is not None else None,
+        "sale_price": sale_price,
         "is_bundle": product.is_bundle,
         "bundle_limit": product.bundle_limit,
         "bundle_category_limits": product.bundle_category_limits,
         "created_at": product.created_at.isoformat(),
         "variants": [serialize_variant(v) for v in product.variants],
     }
+    if not apply_online_pricing:
+        data["cost_price"] = float(product.cost_price) if product.cost_price is not None else None
     return data
 
 
