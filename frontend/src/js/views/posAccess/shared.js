@@ -21,3 +21,27 @@ export function marginHtml(product) {
   const colorClass = margin >= 0 ? "text-green-600" : "text-red-600";
   return `<span class="${colorClass} font-semibold">${money(margin)} (${pct.toFixed(0)}%)</span>`;
 }
+
+// Modal genérico para formularios largos (crear/editar producto o paquete) -- antes
+// estos formularios se insertaban en un panel debajo de la tabla, lo que con muchas
+// filas quedaba fuera de la vista y parecía que el botón "no hacía nada". Se cierra
+// con el botón X, la tecla Escape, o programáticamente vía `close()`; a propósito NO
+// se cierra al hacer clic fuera, para no perder un formulario largo por accidente.
+export function openFormModal() {
+  const overlay = document.createElement("div");
+  overlay.className = "fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center p-3 sm:p-6 fade-in overflow-y-auto";
+  overlay.style.zIndex = "9999";
+  overlay.innerHTML = `<div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl my-auto"></div>`;
+  document.body.appendChild(overlay);
+
+  const close = () => {
+    document.removeEventListener("keydown", onKeydown);
+    overlay.remove();
+  };
+  function onKeydown(e) {
+    if (e.key === "Escape") close();
+  }
+  document.addEventListener("keydown", onKeydown);
+
+  return { body: overlay.firstElementChild, close };
+}

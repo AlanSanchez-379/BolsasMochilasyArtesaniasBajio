@@ -11,6 +11,16 @@ class PosSaleError(Exception):
     pass
 
 
+# Niveles de precio que el cajero puede fijar a mano por línea, en vez de dejar que se
+# calcule automático por cantidad combinada -- ej. dar precio de mayoreo a alguien que
+# solo lleva 2 piezas, a criterio del cajero.
+PRICE_TIER_FIELDS = {
+    "normal": "price_normal",
+    "wholesale": "price_wholesale",
+    "super_wholesale": "price_super_wholesale",
+}
+
+
 def execute_pos_sale(items_payload, payment_method, customer_name, shipping=None, shipping_cost=None):
     """Punto de Venta: venta de mostrador en tienda física. El stock se descuenta al
     instante. Compartido entre el POS del admin completo y la liga con PIN de venta
@@ -70,8 +80,11 @@ def execute_pos_sale(items_payload, payment_method, customer_name, shipping=None
                 f"Disponible: {variant.stock}."
             )
 
+        price_tier = item.get("price_tier")
         if variant.product.is_bundle:
             unit_price = float(variant.product.price_for_quantity(1))
+        elif price_tier in PRICE_TIER_FIELDS:
+            unit_price = float(getattr(variant.product, PRICE_TIER_FIELDS[price_tier]))
         else:
             unit_price = float(variant.product.price_for_quantity(combined_qty))
         cost_price = float(variant.product.cost_price) if variant.product.cost_price is not None else None

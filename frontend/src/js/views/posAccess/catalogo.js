@@ -2,7 +2,7 @@ import { posAccessApi } from "../../api.js";
 import { showConfirmModal } from "../../components/confirmModal.js";
 import { getCategories } from "../../catalogCache.js";
 import { renderVariantsSection, renderNewVariantsBuilder } from "../../components/productVariants.js";
-import { money, marginHtml } from "./shared.js";
+import { money, marginHtml, openFormModal } from "./shared.js";
 
 // --- Sección "Catálogo": CRUD completo de productos (no paquetes), con costo/margen
 // visibles en la tabla -- absorbe lo que antes era la tabla de solo lectura "Inventario". ---
@@ -27,7 +27,6 @@ export function createCatalogoSection(onUnauthorized) {
         return;
       }
 
-      let selectedId = null; // null | 'new' | product.id
       let filterCategory = "Todas";
       let filterSubcategory = "Todas";
 
@@ -54,7 +53,7 @@ export function createCatalogoSection(onUnauthorized) {
                 ${subcategories.map((s) => `<option value="${s}" ${filterSubcategory === s ? "selected" : ""}>${s}</option>`).join("")}
               </select>
             </div>
-            <button id="new-product-btn" class="bg-rose-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-rose-700">
+            <button id="new-product-btn" class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
               <i class="fa-solid fa-plus mr-2"></i>Nuevo Producto
             </button>
           </div>
@@ -88,7 +87,7 @@ export function createCatalogoSection(onUnauthorized) {
                       <td class="px-4 py-3">${marginHtml(p)}</td>
                       <td class="px-4 py-3">${stock === 0 ? '<span class="text-red-500 font-bold">AGOTADO</span>' : stock}</td>
                       <td class="px-4 py-3 text-right">
-                        <button data-edit="${p.id}" class="text-rose-600 font-semibold hover:underline mr-3">Editar</button>
+                        <button data-edit="${p.id}" class="text-brand-mexican font-semibold hover:underline mr-3">Editar</button>
                         <button data-delete="${p.id}" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash-can"></i></button>
                       </td>
                     </tr>`;
@@ -97,8 +96,6 @@ export function createCatalogoSection(onUnauthorized) {
               </tbody>
             </table>
           </div>
-
-          <div id="detail-panel"></div>
         `;
 
         container.querySelector("#filter-category").addEventListener("change", (e) => {
@@ -111,13 +108,12 @@ export function createCatalogoSection(onUnauthorized) {
         });
 
         container.querySelector("#new-product-btn").addEventListener("click", () => {
-          selectedId = "new";
-          renderDetail();
+          openProductModal(null);
         });
         container.querySelectorAll("[data-edit]").forEach((btn) => {
           btn.addEventListener("click", () => {
-            selectedId = btn.dataset.edit;
-            renderDetail();
+            const product = products.find((p) => p.id === btn.dataset.edit);
+            openProductModal(product);
           });
         });
         container.querySelectorAll("[data-delete]").forEach((btn) => {
@@ -144,116 +140,106 @@ export function createCatalogoSection(onUnauthorized) {
             });
           });
         });
-
-        renderDetail();
       }
 
-      function renderDetail() {
-        const panel = container.querySelector("#detail-panel");
-        if (!panel) return;
-        if (selectedId === null) {
-          panel.innerHTML = "";
-          return;
-        }
-        const product = selectedId === "new" ? null : products.find((p) => p.id === selectedId);
-        panel.innerHTML = `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"><div id="product-form-slot"></div></div>`;
-        renderProductForm(panel.querySelector("#product-form-slot"), product);
+      function openProductModal(product) {
+        const modal = openFormModal();
+        renderProductForm(modal.body, product, modal);
       }
 
-      function renderProductForm(el, product) {
+      function renderProductForm(el, product, modal) {
         const isNew = !product;
         const newVariants = []; // { tempId, color, sku, stock, image_url } — solo para isNew
 
         el.innerHTML = `
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold">${isNew ? "Nuevo Producto" : product.name}</h3>
-            <button id="close-detail" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-2xl"></i></button>
-          </div>
-
-          <form id="product-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="sm:col-span-2">
-              <label class="block text-sm font-bold text-gray-700 mb-1">Nombre</label>
-              <input name="name" required value="${product?.name || ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Categoría</label>
-              <select name="category_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                ${categories.map((c) => `<option value="${c.id}" ${product?.category_id === c.id ? "selected" : ""}>${c.name}</option>`).join("")}
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Subcategoría</label>
-              <select name="subcategory" required class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                ${subcategories.map((s) => `<option value="${s}" ${product?.subcategory === s ? "selected" : ""}>${s}</option>`).join("")}
-              </select>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
-              <textarea name="description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg">${product?.description || ""}</textarea>
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Precio Normal</label>
-              <input type="number" step="0.01" name="price_normal" required value="${product?.price_normal ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Precio Mayoreo</label>
-              <input type="number" step="0.01" name="price_wholesale" required value="${product?.price_wholesale ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Precio Súper Mayoreo</label>
-              <input type="number" step="0.01" name="price_super_wholesale" required value="${product?.price_super_wholesale ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Costo (compra)</label>
-              <input type="number" step="0.01" name="cost_price" value="${product?.cost_price ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
-              <p id="margin-preview" class="text-xs text-gray-500 mt-1"></p>
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Mín. piezas Mayoreo</label>
-              <input type="number" name="wholesale_min_qty" required value="${product?.wholesale_min_qty ?? 6}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
-            </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-1">Mín. piezas Súper Mayoreo</label>
-              <input type="number" name="super_wholesale_min_qty" required value="${product?.super_wholesale_min_qty ?? 50}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+          <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-2xl font-bold">${isNew ? "Nuevo Producto" : product.name}</h3>
+              <button id="close-detail" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-2xl"></i></button>
             </div>
 
-            <div class="sm:col-span-2 border-t pt-4 mt-2">
-              <label class="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer">
-                <input type="checkbox" id="is-on-sale-checkbox" ${product?.is_on_sale ? "checked" : ""} class="w-4 h-4" />
-                Este producto está en oferta
-              </label>
-              <div id="sale-price-field" class="${product?.is_on_sale ? "" : "hidden"} mt-2">
-                <label class="block text-sm font-bold text-gray-700 mb-1">Precio de oferta</label>
-                <input type="number" step="0.01" name="sale_price" value="${product?.sale_price ?? ""}" class="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-lg" />
+            <form id="product-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Nombre</label>
+                <input name="name" required value="${product?.name || ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
               </div>
-            </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Categoría</label>
+                <select name="category_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                  ${categories.map((c) => `<option value="${c.id}" ${product?.category_id === c.id ? "selected" : ""}>${c.name}</option>`).join("")}
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Subcategoría</label>
+                <select name="subcategory" required class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                  ${subcategories.map((s) => `<option value="${s}" ${product?.subcategory === s ? "selected" : ""}>${s}</option>`).join("")}
+                </select>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
+                <textarea name="description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg">${product?.description || ""}</textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Normal</label>
+                <input type="number" step="0.01" name="price_normal" required value="${product?.price_normal ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Mayoreo</label>
+                <input type="number" step="0.01" name="price_wholesale" required value="${product?.price_wholesale ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Súper Mayoreo</label>
+                <input type="number" step="0.01" name="price_super_wholesale" required value="${product?.price_super_wholesale ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Costo (compra)</label>
+                <input type="number" step="0.01" name="cost_price" value="${product?.cost_price ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+                <p id="margin-preview" class="text-xs text-gray-500 mt-1"></p>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Mín. piezas Mayoreo</label>
+                <input type="number" name="wholesale_min_qty" required value="${product?.wholesale_min_qty ?? 6}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Mín. piezas Súper Mayoreo</label>
+                <input type="number" name="super_wholesale_min_qty" required value="${product?.super_wholesale_min_qty ?? 50}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              </div>
 
-            ${
-              isNew
-                ? `<div class="sm:col-span-2 border-t pt-4 mt-2">
-                    <h4 class="font-bold text-lg mb-1">Variantes iniciales</h4>
-                    <p class="text-sm text-gray-500 mb-3">Opcional: agrega colores/diseños con su imagen. También puedes hacerlo después de crear el producto.</p>
-                    <div id="new-variants-builder"></div>
-                  </div>`
-                : ""
-            }
+              <div class="sm:col-span-2 border-t pt-4 mt-2">
+                <label class="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer">
+                  <input type="checkbox" id="is-on-sale-checkbox" ${product?.is_on_sale ? "checked" : ""} class="w-4 h-4" />
+                  Este producto está en oferta
+                </label>
+                <div id="sale-price-field" class="${product?.is_on_sale ? "" : "hidden"} mt-2">
+                  <label class="block text-sm font-bold text-gray-700 mb-1">Precio de oferta</label>
+                  <input type="number" step="0.01" name="sale_price" value="${product?.sale_price ?? ""}" class="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-lg" />
+                </div>
+              </div>
 
-            <p id="form-error" class="sm:col-span-2 text-red-500 text-sm hidden"></p>
+              ${
+                isNew
+                  ? `<div class="sm:col-span-2 border-t pt-4 mt-2">
+                      <h4 class="font-bold text-lg mb-1">Variantes iniciales</h4>
+                      <p class="text-sm text-gray-500 mb-3">Opcional: agrega colores/diseños con su imagen. También puedes hacerlo después de crear el producto.</p>
+                      <div id="new-variants-builder"></div>
+                    </div>`
+                  : ""
+              }
 
-            <div class="sm:col-span-2 flex justify-end">
-              <button type="submit" class="bg-rose-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-rose-700">
-                ${isNew ? "Crear Producto" : "Guardar Cambios"}
-              </button>
-            </div>
-          </form>
+              <p id="form-error" class="sm:col-span-2 text-red-500 text-sm hidden"></p>
 
-          ${isNew ? "" : `<div id="variants-section" class="mt-8 border-t pt-6"></div>`}
+              <div class="sm:col-span-2 flex justify-end">
+                <button type="submit" class="bg-brand-mexican text-white px-6 py-3 rounded-full font-semibold hover:opacity-90">
+                  ${isNew ? "Crear Producto" : "Guardar Cambios"}
+                </button>
+              </div>
+            </form>
+
+            ${isNew ? "" : `<div id="variants-section" class="mt-8 border-t pt-6"></div>`}
+          </div>
         `;
 
-        el.querySelector("#close-detail").addEventListener("click", () => {
-          selectedId = null;
-          renderDetail();
-        });
+        el.querySelector("#close-detail").addEventListener("click", () => modal.close());
 
         if (isNew) {
           renderNewVariantsBuilder(el.querySelector("#new-variants-builder"), newVariants);
@@ -321,12 +307,16 @@ export function createCatalogoSection(onUnauthorized) {
             if (isNew) {
               const { product: created } = await posAccessApi.createProduct(payload);
               products.push(created);
-              selectedId = created.id;
+              render();
+              modal.close();
+              // Reabre en modo edición para que se puedan agregar variantes/fotos de inmediato.
+              openProductModal(created);
             } else {
               const { product: updated } = await posAccessApi.updateProduct(product.id, payload);
               Object.assign(product, updated);
+              render();
+              modal.close();
             }
-            render();
           } catch (err) {
             if (err.status === 401 && onUnauthorized) {
               onUnauthorized();

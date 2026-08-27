@@ -1,4 +1,4 @@
-import { posAccessApi } from "../../api.js";
+﻿import { posAccessApi } from "../../api.js";
 import { invalidateSettingsCache } from "../../settingsCache.js";
 import { getCategories } from "../../catalogCache.js";
 
@@ -9,7 +9,7 @@ function numberFieldHtml(key, label, value, step = "0.01") {
     <div>
       <label class="block text-xs font-semibold text-gray-600 mb-1">${label}</label>
       <input type="number" step="${step}" min="0" data-shipping-key="${key}" value="${value ?? ""}"
-        class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-rose-400" />
+        class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-mexican" />
     </div>
   `;
 }
@@ -19,7 +19,7 @@ function textFieldHtml(key, label, value) {
     <div>
       <label class="block text-xs font-semibold text-gray-600 mb-1">${label}</label>
       <input type="text" data-shipping-key="${key}" value="${value ?? ""}"
-        class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-rose-400" />
+        class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-mexican" />
     </div>
   `;
 }
@@ -66,7 +66,7 @@ function shippingSettingsCardHtml(shippingSettings, categories) {
 
       <p data-shipping-error class="text-red-500 text-sm mb-2 hidden"></p>
       <p data-shipping-success class="text-green-600 text-sm mb-2 hidden">Guardado.</p>
-      <button data-save-shipping-settings class="bg-rose-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-rose-700">
+      <button data-save-shipping-settings class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
         <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar ajustes de envío
       </button>
     </div>
@@ -85,7 +85,7 @@ function posAccessCardHtml(posAccessSettings) {
       <input type="text" id="pos-pin-input" class="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2" />
       <p data-pos-pin-error class="text-red-500 text-sm mb-2 hidden"></p>
       <p data-pos-pin-success class="text-green-600 text-sm mb-2 hidden">PIN actualizado.</p>
-      <button data-save-pos-pin class="bg-rose-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-rose-700">
+      <button data-save-pos-pin class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
         <i class="fa-solid fa-key mr-2"></i>Guardar PIN
       </button>
     </div>
@@ -106,7 +106,7 @@ function uploadCardHtml(type, label, currentUrl, hint) {
       </div>
       <input type="file" data-file-input="${type}" accept="image/png,image/jpeg,image/webp" class="mb-3 text-sm" />
       <p data-error="${type}" class="text-red-500 text-sm mb-2 hidden"></p>
-      <button data-upload-btn="${type}" class="bg-rose-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-rose-700">
+      <button data-upload-btn="${type}" class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
         <i class="fa-solid fa-upload mr-2"></i>Guardar ${label}
       </button>
 
@@ -285,10 +285,10 @@ export function createAjustesSection(onUnauthorized) {
             (img) => `
           <button type="button" data-history-item="${img.url}" data-history-type="${type}"
             class="relative w-16 h-16 rounded-lg overflow-hidden border-2 ${
-              img.url === currentUrl ? "border-rose-600" : "border-transparent hover:border-rose-300"
+              img.url === currentUrl ? "border-brand-mexican" : "border-transparent hover:border-brand-pink"
             }" title="${img.url === currentUrl ? "En uso actualmente" : "Reutilizar esta imagen"}">
             <img src="${img.url}" class="w-full h-full object-cover" />
-            ${img.url === currentUrl ? `<span class="absolute inset-0 bg-rose-600 bg-opacity-30 flex items-center justify-center"><i class="fa-solid fa-check text-white"></i></span>` : ""}
+            ${img.url === currentUrl ? `<span class="absolute inset-0 bg-brand-mexican bg-opacity-30 flex items-center justify-center"><i class="fa-solid fa-check text-white"></i></span>` : ""}
           </button>`
           )
           .join("");

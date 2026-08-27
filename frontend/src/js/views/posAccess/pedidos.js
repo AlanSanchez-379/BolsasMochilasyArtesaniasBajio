@@ -1,4 +1,4 @@
-import { posAccessApi } from "../../api.js";
+﻿import { posAccessApi } from "../../api.js";
 import { money } from "./shared.js";
 
 const STATUSES = [
@@ -46,7 +46,7 @@ function orderDetailHtml(o) {
                 </p>
                 ${
                   children.length
-                    ? `<ul class="ml-4 mt-1 space-y-1 border-l-2 border-rose-200 pl-3">
+                    ? `<ul class="ml-4 mt-1 space-y-1 border-l-2 border-brand-pink pl-3">
                         ${children
                           .map(
                             (c) => `
@@ -94,7 +94,7 @@ function shipmentReconciliationHtml(shipping) {
       ${
         shipping.tracking_number
           ? `<p class="text-gray-500">Guía: <strong>${shipping.tracking_number}</strong>${
-              shipping.label_url ? ` — <a href="${shipping.label_url}" target="_blank" class="text-rose-600 underline">Ver PDF</a>` : ""
+              shipping.label_url ? ` — <a href="${shipping.label_url}" target="_blank" class="text-brand-mexican underline">Ver PDF</a>` : ""
             }</p>`
           : ""
       }
@@ -175,7 +175,7 @@ export function createPedidosSection(onUnauthorized) {
                   </div>
                 </div>
                 ${shipmentError ? `<p class="text-red-500 text-sm mb-3">${shipmentError}</p>` : ""}
-                <button id="shipment-quote-btn" ${shipmentBusy ? "disabled" : ""} class="w-full bg-gray-900 hover:bg-rose-600 text-white px-6 py-3 rounded font-semibold transition-colors disabled:opacity-50">
+                <button id="shipment-quote-btn" ${shipmentBusy ? "disabled" : ""} class="w-full bg-gray-900 hover:bg-brand-mexican text-white px-6 py-3 rounded font-semibold transition-colors disabled:opacity-50">
                   ${shipmentBusy ? "Cotizando..." : "Cotizar con Skydropx"}
                 </button>`
                   : `
@@ -202,7 +202,7 @@ export function createPedidosSection(onUnauthorized) {
                 ${shipmentError ? `<p class="text-red-500 text-sm mb-3">${shipmentError}</p>` : ""}
                 <div class="flex gap-3">
                   <button data-shipment-reprice class="flex-1 border-2 border-gray-300 hover:border-gray-900 px-4 py-3 rounded font-semibold text-sm">Volver a cotizar</button>
-                  <button id="shipment-purchase-btn" ${shipmentBusy || !shipmentSelectedRateId ? "disabled" : ""} class="flex-1 bg-rose-600 hover:bg-rose-700 text-white px-4 py-3 rounded font-semibold text-sm disabled:opacity-50">
+                  <button id="shipment-purchase-btn" ${shipmentBusy || !shipmentSelectedRateId ? "disabled" : ""} class="flex-1 bg-brand-mexican hover:opacity-90 text-white px-4 py-3 rounded font-semibold text-sm disabled:opacity-50">
                     ${shipmentBusy ? "Comprando..." : "Comprar guía"}
                   </button>
                 </div>`
@@ -244,7 +244,7 @@ export function createPedidosSection(onUnauthorized) {
                       <span class="block text-[10px] font-bold uppercase mt-0.5 ${o.channel === "in_store" ? "text-orange-600" : "text-gray-400"}">
                         <i class="fa-solid ${o.channel === "in_store" ? "fa-store" : "fa-globe"} mr-1"></i>${o.channel === "in_store" ? "Tienda Física" : "Online"}
                       </span>
-                      ${hasCustomBundle ? `<span class="block text-[10px] font-bold text-rose-500 uppercase mt-0.5">Paquete personalizado</span>` : ""}
+                      ${hasCustomBundle ? `<span class="block text-[10px] font-bold text-brand-mexican uppercase mt-0.5">Paquete personalizado</span>` : ""}
                     </td>
                     <td class="px-4 py-3 text-sm">${o.shipping.full_name || "Cliente de mostrador"}</td>
                     <td class="px-4 py-3 text-sm text-gray-500">${new Date(o.created_at).toLocaleDateString("es-MX")}</td>
@@ -263,7 +263,7 @@ export function createPedidosSection(onUnauthorized) {
                             </button>`
                           : ""
                       }
-                      <button data-toggle-detail="${o.id}" class="text-rose-600 font-semibold text-sm hover:underline whitespace-nowrap">
+                      <button data-toggle-detail="${o.id}" class="text-brand-mexican font-semibold text-sm hover:underline whitespace-nowrap">
                         ${isOpen ? "Ocultar" : "Ver detalle"} <i class="fa-solid ${isOpen ? "fa-chevron-up" : "fa-chevron-down"} ml-1 text-xs"></i>
                       </button>
                     </td>

@@ -1,4 +1,4 @@
-import { posAccessApi } from "../../api.js";
+﻿import { posAccessApi } from "../../api.js";
 import { createDashboardSection } from "./dashboard.js";
 import { createSaleSection } from "./cobrar.js";
 import { createCatalogoSection } from "./catalogo.js";
@@ -80,14 +80,14 @@ export async function renderPosAccess(container) {
           <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
             <div class="px-3 sm:px-4 py-3 flex items-center gap-2 sm:gap-3">
               <h1 class="font-bold text-slate-900 flex items-center gap-2 flex-shrink-0">
-                <span class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-cash-register text-sm"></i></span>
+                <span class="w-8 h-8 rounded-lg bg-brand-mexican text-white flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-cash-register text-sm"></i></span>
                 <span class="hidden md:inline">Venta Local</span>
               </h1>
               <div class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto flex-1 min-w-0">
                 ${SECTIONS.map(
                   (s) => `
                   <button data-section="${s.id}" title="${s.label}" class="section-btn flex-shrink-0 px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors ${
-                    activeSection === s.id ? "bg-rose-600 text-white" : "text-slate-500 hover:bg-slate-100"
+                    activeSection === s.id ? "bg-brand-mexican text-white" : "text-slate-500 hover:bg-slate-100"
                   }"><i class="fa-solid ${s.icon} sm:mr-1.5"></i><span class="hidden sm:inline">${s.label}</span></button>`
                 ).join("")}
               </div>

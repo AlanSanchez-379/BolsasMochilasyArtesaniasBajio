@@ -1,4 +1,4 @@
-import { api, posAccessApi } from "../../api.js";
+﻿import { api, posAccessApi } from "../../api.js";
 import { priceForQuantity } from "../../state.js";
 import { money } from "./shared.js";
 
@@ -23,8 +23,14 @@ export function createSaleSection(onUnauthorized) {
     return cart.filter((item) => !item.product.is_bundle).reduce((sum, item) => sum + item.quantity, 0);
   }
 
+  // priceOverride: null = automático por cantidad combinada (comportamiento normal);
+  // "normal" | "wholesale" | "super_wholesale" = fijado a mano para esta línea, sin
+  // importar cuántas piezas combinadas haya en el carrito.
   function lineUnitPrice(item) {
     if (item.product.is_bundle) return Number(item.product.price_normal);
+    if (item.priceOverride === "normal") return Number(item.product.price_normal);
+    if (item.priceOverride === "wholesale") return Number(item.product.price_wholesale);
+    if (item.priceOverride === "super_wholesale") return Number(item.product.price_super_wholesale);
     return priceForQuantity(item.product, combinedQty());
   }
 
@@ -58,7 +64,7 @@ export function createSaleSection(onUnauthorized) {
     const newQty = Math.min(currentQty + qty, variant.stock);
     if (newQty === currentQty) return;
     if (existing) existing.quantity = newQty;
-    else cart.push({ product, variant, quantity: newQty });
+    else cart.push({ product, variant, quantity: newQty, priceOverride: null });
   }
 
   // Simple (no paquetes): cada variante es su propio "producto vendible" en el
@@ -115,7 +121,7 @@ export function createSaleSection(onUnauthorized) {
     const field = (key, label, span = "") =>
       `<div class="${span}">
         <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">${label}</label>
-        <input data-shipping-field="${key}" type="text" value="${shipping[key]}" class="w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100" />
+        <input data-shipping-field="${key}" type="text" value="${shipping[key]}" class="w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs outline-none focus:border-brand-mexican focus:ring-2 focus:ring-brand-pink-light" />
       </div>`;
     return `
       <div class="mt-2 mb-3 pt-3 border-t border-slate-200 grid grid-cols-2 gap-2">
@@ -129,7 +135,7 @@ export function createSaleSection(onUnauthorized) {
         ${field("postal_code", "CP")}
         <div>
           <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Costo de envío</label>
-          <input id="shipping-cost-input" type="number" step="0.01" value="${shippingCost}" class="w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100" />
+          <input id="shipping-cost-input" type="text" inputmode="decimal" value="${shippingCost}" class="w-full px-2 py-1.5 border border-slate-200 rounded-md text-xs outline-none focus:border-brand-mexican focus:ring-2 focus:ring-brand-pink-light" />
         </div>
       </div>
     `;
@@ -139,7 +145,7 @@ export function createSaleSection(onUnauthorized) {
     const pillClass = (active) =>
       light
         ? active
-          ? "bg-rose-600 text-white"
+          ? "bg-brand-mexican text-white"
           : "bg-slate-100 text-slate-600 hover:bg-slate-200"
         : active
           ? "bg-white text-slate-900"
@@ -162,7 +168,7 @@ export function createSaleSection(onUnauthorized) {
     return `
       <button data-quick-add="${v.id}" ${v.stock === 0 ? "disabled" : ""}
         class="relative group flex flex-col rounded-xl overflow-hidden border border-slate-100 bg-white text-center ${
-          v.stock === 0 ? "opacity-40 cursor-not-allowed" : "hover:shadow-md hover:border-rose-200"
+          v.stock === 0 ? "opacity-40 cursor-not-allowed" : "hover:shadow-md hover:border-brand-pink"
         }">
         <div class="relative w-full h-36 sm:h-44 lg:h-40 xl:h-48 flex-shrink-0 bg-slate-100 overflow-hidden flex items-center justify-center">
           ${
@@ -173,7 +179,7 @@ export function createSaleSection(onUnauthorized) {
           ${
             v.stock > 0
               ? `<div class="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/30 flex items-center justify-center transition-colors">
-                  <span class="opacity-0 group-hover:opacity-100 w-12 h-12 rounded-full bg-rose-600 text-white flex items-center justify-center transition-opacity">
+                  <span class="opacity-0 group-hover:opacity-100 w-12 h-12 rounded-full bg-brand-mexican text-white flex items-center justify-center transition-opacity">
                     <i class="fa-solid fa-plus"></i>
                   </span>
                 </div>`
@@ -182,7 +188,7 @@ export function createSaleSection(onUnauthorized) {
         </div>
         <div class="p-4">
           <p class="text-base font-bold text-slate-900 leading-tight truncate">${product.name}</p>
-          <p class="text-lg font-black text-rose-600 mt-1">${money(product.price_normal)}</p>
+          <p class="text-lg font-black text-brand-mexican mt-1">${money(product.price_normal)}</p>
           <p class="text-xs text-slate-400 mt-0.5">Stock: ${v.stock}</p>
         </div>
       </button>`;
@@ -193,7 +199,7 @@ export function createSaleSection(onUnauthorized) {
     return `
       <button data-quick-add="${v.id}" ${v.stock === 0 ? "disabled" : ""}
         class="group flex flex-col rounded-lg overflow-hidden border border-slate-100 bg-white text-left ${
-          v.stock === 0 ? "opacity-40 cursor-not-allowed" : "hover:shadow-md hover:border-rose-200"
+          v.stock === 0 ? "opacity-40 cursor-not-allowed" : "hover:shadow-md hover:border-brand-pink"
         }">
         <div class="relative w-full h-24 sm:h-28 flex-shrink-0 bg-slate-100 overflow-hidden flex items-center justify-center">
           ${
@@ -207,7 +213,7 @@ export function createSaleSection(onUnauthorized) {
         <div class="p-2">
           <p class="text-[9px] text-slate-400 uppercase tracking-wide truncate">${product.category}</p>
           <p class="text-xs font-bold text-slate-900 leading-tight truncate">${product.name}</p>
-          <p class="text-sm font-black text-rose-600 mt-0.5">${money(product.price_normal)}</p>
+          <p class="text-sm font-black text-brand-mexican mt-0.5">${money(product.price_normal)}</p>
         </div>
       </button>`;
   }
@@ -227,14 +233,14 @@ export function createSaleSection(onUnauthorized) {
               <i class="fa-solid fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-slate-300"></i>
               <input id="barcode-input" type="text" autocomplete="off" placeholder="Teclea o escanea SKU, o busca por nombre..."
                 value="${search}"
-                class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 font-mono text-sm" />
+                class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg outline-none focus:border-brand-mexican focus:ring-2 focus:ring-brand-pink-light font-mono text-sm" />
             </div>
           </div>
 
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col flex-1">
             <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-              <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-cart-shopping text-rose-500 mr-2"></i>Venta actual</h3>
-              ${qty > 0 ? `<span class="text-xs bg-rose-50 text-rose-600 font-semibold px-2.5 py-1 rounded-full">${qty} pz combinadas</span>` : ""}
+              <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-cart-shopping text-brand-mexican mr-2"></i>Venta actual</h3>
+              ${qty > 0 ? `<span class="text-xs bg-brand-pink-light text-brand-mexican font-semibold px-2.5 py-1 rounded-full">${qty} pz combinadas</span>` : ""}
             </div>
             <div class="overflow-x-auto max-h-[40vh] overflow-y-auto">
               <table class="w-full text-left text-sm whitespace-nowrap">
@@ -256,6 +262,16 @@ export function createSaleSection(onUnauthorized) {
                       <td class="px-4 py-3">
                         <p class="font-semibold text-slate-900">${item.product.name}</p>
                         <p class="text-[10px] text-slate-400">${item.variant.color} · <span class="font-mono">${item.variant.sku}</span></p>
+                        ${
+                          item.product.is_bundle
+                            ? ""
+                            : `<select data-price-tier="${item.variant.id}" class="mt-1 text-[10px] border border-slate-200 rounded px-1 py-0.5 text-slate-500 outline-none focus:border-brand-mexican">
+                                <option value="" ${!item.priceOverride ? "selected" : ""}>Automático (por cantidad)</option>
+                                <option value="normal" ${item.priceOverride === "normal" ? "selected" : ""}>Menudeo</option>
+                                <option value="wholesale" ${item.priceOverride === "wholesale" ? "selected" : ""}>Mayoreo</option>
+                                <option value="super_wholesale" ${item.priceOverride === "super_wholesale" ? "selected" : ""}>Súper Mayoreo</option>
+                              </select>`
+                        }
                       </td>
                       <td class="px-4 py-3 text-right text-slate-600">${money(lineUnitPrice(item))}</td>
                       <td class="px-4 py-3">
@@ -264,7 +280,7 @@ export function createSaleSection(onUnauthorized) {
                             <i class="fa-solid fa-minus text-[10px]"></i>
                           </button>
                           <span class="w-6 text-center text-sm font-bold text-slate-900">${item.quantity}</span>
-                          <button data-qty-plus="${item.variant.id}" class="w-7 h-7 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center">
+                          <button data-qty-plus="${item.variant.id}" class="w-7 h-7 rounded-full bg-brand-pink-light text-brand-mexican hover:opacity-80 flex items-center justify-center">
                             <i class="fa-solid fa-plus text-[10px]"></i>
                           </button>
                         </div>
@@ -286,7 +302,7 @@ export function createSaleSection(onUnauthorized) {
                 </div>
                 <div class="bg-white rounded-lg border border-slate-200 p-3 flex flex-col">
                   <span class="text-[10px] font-bold uppercase text-slate-400">Pagó Con</span>
-                  <input id="amount-paid" type="number" step="0.01" class="w-full text-lg font-bold text-slate-900 outline-none bg-transparent" placeholder="0" value="${amountPaid}" />
+                  <input id="amount-paid" type="text" inputmode="decimal" class="w-full text-lg font-bold text-slate-900 outline-none bg-transparent" placeholder="0" value="${amountPaid}" />
                 </div>
                 <div class="bg-white rounded-lg border border-slate-200 p-3 flex flex-col">
                   <span class="text-[10px] font-bold uppercase text-slate-400">Su Cambio</span>
@@ -298,13 +314,13 @@ export function createSaleSection(onUnauthorized) {
                 <div class="relative">
                   <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
                   <input id="customer-name" type="text" placeholder="Cliente de mostrador" value="${customerName}"
-                    class="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100" />
+                    class="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-brand-mexican focus:ring-2 focus:ring-brand-pink-light" />
                 </div>
                 <label class="flex items-center justify-between gap-2 cursor-pointer bg-white border border-slate-200 rounded-lg px-3 py-2">
                   <span class="text-xs font-semibold text-slate-600"><i class="fa-solid fa-truck mr-1 text-slate-400"></i>Necesita envío</span>
                   <span class="relative inline-block w-9 h-5 flex-shrink-0">
                     <input type="checkbox" id="needs-shipping" ${needsShipping ? "checked" : ""} class="peer sr-only" />
-                    <span class="block w-9 h-5 bg-slate-200 peer-checked:bg-rose-500 rounded-full transition-colors"></span>
+                    <span class="block w-9 h-5 bg-slate-200 peer-checked:bg-brand-mexican rounded-full transition-colors"></span>
                     <span class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></span>
                   </span>
                 </label>
@@ -313,19 +329,19 @@ export function createSaleSection(onUnauthorized) {
 
               <div class="grid grid-cols-3 gap-2 mb-3">
                 <button data-payment="cash" class="payment-btn flex flex-col items-center justify-center gap-1 py-3 rounded-lg border-2 transition-colors ${
-                  paymentMethod === "cash" ? "border-rose-500 bg-rose-50 text-rose-600" : "border-slate-200 text-slate-500 hover:border-slate-300"
+                  paymentMethod === "cash" ? "border-brand-mexican bg-brand-pink-light text-brand-mexican" : "border-slate-200 text-slate-500 hover:border-slate-300"
                 }">
                   <i class="fa-solid fa-money-bill-wave"></i>
                   <span class="text-xs font-semibold">Efectivo</span>
                 </button>
                 <button data-payment="card" class="payment-btn flex flex-col items-center justify-center gap-1 py-3 rounded-lg border-2 transition-colors ${
-                  paymentMethod === "card" ? "border-rose-500 bg-rose-50 text-rose-600" : "border-slate-200 text-slate-500 hover:border-slate-300"
+                  paymentMethod === "card" ? "border-brand-mexican bg-brand-pink-light text-brand-mexican" : "border-slate-200 text-slate-500 hover:border-slate-300"
                 }">
                   <i class="fa-solid fa-credit-card"></i>
                   <span class="text-xs font-semibold">Terminal</span>
                 </button>
                 <button data-payment="spei" class="payment-btn flex flex-col items-center justify-center gap-1 py-3 rounded-lg border-2 transition-colors ${
-                  paymentMethod === "spei" ? "border-rose-500 bg-rose-50 text-rose-600" : "border-slate-200 text-slate-500 hover:border-slate-300"
+                  paymentMethod === "spei" ? "border-brand-mexican bg-brand-pink-light text-brand-mexican" : "border-slate-200 text-slate-500 hover:border-slate-300"
                 }">
                   <i class="fa-solid fa-building-columns"></i>
                   <span class="text-xs font-semibold">Transf.</span>
@@ -338,7 +354,7 @@ export function createSaleSection(onUnauthorized) {
               }
               ${error ? `<p class="text-red-500 text-xs mb-2">${error}</p>` : ""}
               <button id="checkout-btn" ${cart.length === 0 || busy ? "disabled" : ""}
-                class="w-full h-12 bg-rose-600 hover:bg-rose-700 text-white font-black text-base rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+                class="w-full h-12 bg-brand-mexican hover:opacity-90 text-white font-black text-base rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
                 ${busy ? `<i class="fa-solid fa-spinner fa-spin"></i>Procesando...` : `<i class="fa-solid fa-cash-register"></i>COBRAR ${money(grandTotal())}`}
               </button>
             </div>
@@ -348,7 +364,7 @@ export function createSaleSection(onUnauthorized) {
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
           <div class="bg-slate-900 px-4 py-3 text-white flex items-center justify-between gap-3 flex-shrink-0">
             <span class="text-xs font-bold uppercase tracking-widest flex items-center gap-2 flex-shrink-0">
-              <i class="fa-solid fa-bolt text-rose-400"></i>Catálogo Rápido
+              <i class="fa-solid fa-bolt text-brand-mexican"></i>Catálogo Rápido
             </span>
             ${categoryPillsHtml(topCategoryFilter, "top-category", categories, false)}
           </div>
@@ -371,7 +387,7 @@ export function createSaleSection(onUnauthorized) {
 
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between gap-3">
-          <h4 class="text-sm font-bold text-slate-900"><i class="fa-solid fa-grip text-rose-500 mr-2"></i>Catálogo Completo</h4>
+          <h4 class="text-sm font-bold text-slate-900"><i class="fa-solid fa-grip text-brand-mexican mr-2"></i>Catálogo Completo</h4>
         </div>
         <div class="p-4">
           <div class="mb-3">
@@ -443,6 +459,13 @@ export function createSaleSection(onUnauthorized) {
         rerender();
       });
     });
+    el.querySelectorAll("[data-price-tier]").forEach((select) => {
+      select.addEventListener("change", (e) => {
+        const item = findCartItem(select.dataset.priceTier);
+        if (item) item.priceOverride = e.target.value || null;
+        rerender();
+      });
+    });
 
     el.querySelectorAll(".payment-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -456,6 +479,7 @@ export function createSaleSection(onUnauthorized) {
       rerender();
       const input = el.querySelector("#amount-paid");
       input.focus();
+      input.selectionStart = input.selectionEnd = input.value.length;
     });
 
     el.querySelector("#customer-name").addEventListener("input", (e) => {
@@ -479,6 +503,7 @@ export function createSaleSection(onUnauthorized) {
         rerender();
         const input = el.querySelector("#shipping-cost-input");
         input.focus();
+        input.selectionStart = input.selectionEnd = input.value.length;
       });
     }
 
@@ -490,7 +515,7 @@ export function createSaleSection(onUnauthorized) {
         rerender();
         try {
           const payload = {
-            items: cart.map((item) => ({ variant_id: item.variant.id, quantity: item.quantity })),
+            items: cart.map((item) => ({ variant_id: item.variant.id, quantity: item.quantity, price_tier: item.priceOverride })),
             payment_method: paymentMethod,
             customer_name: customerName,
           };
