@@ -33,7 +33,10 @@ export function route(pattern, handler) {
 
 function currentPath() {
   const hash = window.location.hash.slice(1) || "/";
-  return hash.split("?")[0] || "/";
+  // Supabase pega "#access_token=..." directo después de nuestro propio hash-route al
+  // confirmar un correo (flujo implícito, no PKCE) -- ej. "/auth/callback#access_token=
+  // ...". Sin cortar también en ese segundo '#', esta ruta jamás haría match.
+  return hash.split(/[?#]/)[0] || "/";
 }
 
 function currentQuery() {

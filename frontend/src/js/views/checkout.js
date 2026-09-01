@@ -57,8 +57,9 @@ export function renderCheckout(container) {
 
   const flow = {
     step: 1,
-    shipping: { full_name: appState.currentUser.full_name || "", phone: "", street: "", colonia: "", city: "", state: "", postal_code: "" },
+    shipping: { full_name: appState.currentUser.full_name || "", phone: "", street: "", colonia: "", city: "", state: "", postal_code: "", use_bulk_promo: false },
     quoteOptions: null,
+    bulkPromoAvailable: false,
     selectedCarrier: null,
     paymentMethod: "card",
     order: null,
@@ -157,6 +158,7 @@ export function renderCheckout(container) {
         <p id="quote-error" class="text-red-500 text-sm mt-2 hidden"></p>
 
         <div id="quote-options" class="mt-6 space-y-3"></div>
+        <div id="bulk-promo-toggle" class="mt-4"></div>
         <p class="text-xs text-gray-400 mt-3">Costo de envío estimado; puede ajustarse una vez que se pese el paquete real.</p>
       </div>
       <div class="flex justify-between">
@@ -169,6 +171,42 @@ export function renderCheckout(container) {
     const nextBtn = el.querySelector("#next-2");
     const quoteError = el.querySelector("#quote-error");
     const quoteOptionsEl = el.querySelector("#quote-options");
+    const bulkPromoToggleEl = el.querySelector("#bulk-promo-toggle");
+
+    function renderBulkPromoToggle() {
+      if (!flow.bulkPromoAvailable) {
+        bulkPromoToggleEl.innerHTML = "";
+        return;
+      }
+      bulkPromoToggleEl.innerHTML = `
+        <label class="flex items-center gap-3 cursor-pointer bg-brand-pink-light bg-opacity-30 rounded p-3">
+          <input type="checkbox" id="bulk-promo-checkbox" ${flow.shipping.use_bulk_promo ? "checked" : ""} class="w-5 h-5 accent-brand-mexican" />
+          <span class="text-sm font-semibold text-gray-700">
+            Usar promoción de mayoreo (tarifa fija de envío, sin importar la cantidad)
+          </span>
+        </label>
+      `;
+      bulkPromoToggleEl.querySelector("#bulk-promo-checkbox").addEventListener("change", async (e) => {
+        flow.shipping.use_bulk_promo = e.target.checked;
+        await runQuote();
+      });
+    }
+
+    async function runQuote() {
+      quoteError.classList.add("hidden");
+      try {
+        const { options, bulk_promo_available } = await api.checkoutQuote(flow.shipping, buildCheckoutItems());
+        flow.quoteOptions = options;
+        flow.bulkPromoAvailable = bulk_promo_available;
+        flow.selectedCarrier = null;
+        nextBtn.disabled = true;
+        renderQuoteOptions();
+        renderBulkPromoToggle();
+      } catch (err) {
+        quoteError.textContent = err.message;
+        quoteError.classList.remove("hidden");
+      }
+    }
 
     function renderQuoteOptions() {
       if (!flow.quoteOptions) {
@@ -203,24 +241,14 @@ export function renderCheckout(container) {
     }
 
     el.querySelector("#quote-btn").addEventListener("click", async () => {
-      quoteError.classList.add("hidden");
       const formData = new FormData(form);
       Object.assign(flow.shipping, Object.fromEntries(formData.entries()));
       if (!form.reportValidity()) return;
-
-      try {
-        const { options } = await api.checkoutQuote(flow.shipping, buildCheckoutItems());
-        flow.quoteOptions = options;
-        flow.selectedCarrier = null;
-        nextBtn.disabled = true;
-        renderQuoteOptions();
-      } catch (err) {
-        quoteError.textContent = err.message;
-        quoteError.classList.remove("hidden");
-      }
+      await runQuote();
     });
 
     renderQuoteOptions();
+    renderBulkPromoToggle();
 
     el.querySelector("#back-2").addEventListener("click", () => {
       flow.step = 1;

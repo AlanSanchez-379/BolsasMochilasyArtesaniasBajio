@@ -34,6 +34,16 @@ def _upsert_profile(supa_user, full_name=None):
     return user
 
 
+def _frontend_origin():
+    """El origen del front que hizo la petición (localhost en dev, el dominio real en
+    prod) -- ya viene validado por CORS, solo confirmamos que esté en la lista antes de
+    usarlo para armar el link del correo de confirmación."""
+    origin = request.headers.get("Origin")
+    if origin in current_app.config["FRONTEND_ORIGINS"]:
+        return origin
+    return current_app.config["FRONTEND_ORIGINS"][0]
+
+
 @auth_bp.post("/register")
 def register():
     data = request.get_json() or {}
@@ -42,13 +52,19 @@ def register():
         return jsonify({"message": "Correo y contraseña son requeridos."}), 400
 
     try:
-        result = get_supabase().auth.sign_up({"email": email, "password": password})
+        result = get_supabase().auth.sign_up(
+            {
+                "email": email,
+                "password": password,
+                "options": {"email_redirect_to": f"{_frontend_origin()}/#/auth/callback"},
+            }
+        )
     except Exception as e:
         return jsonify({"message": str(e)}), 400
 
     if not result.session:
         # Confirmación de correo activada en Supabase: no hay sesión inmediata.
-        return jsonify({"message": "Cuenta creada. Revisa tu correo para confirmar antes de iniciar sesión."}), 201
+        return jsonify({"message": "Cuenta creada. Revisa tu correo y confirma tu cuenta -- al hacerlo, tu sesión se iniciará automáticamente."}), 201
 
     user = _upsert_profile(result.user, full_name)
     response = make_response(jsonify({"user": _serialize_user(user)}))

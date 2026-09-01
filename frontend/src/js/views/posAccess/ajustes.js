@@ -53,6 +53,21 @@ function shippingSettingsCardHtml(shippingSettings, categories) {
         ${numberFieldHtml("shipping_tres_guerras_fixed_cost", "Costo fijo Tres Guerras ($)", shippingSettings.shipping_tres_guerras_fixed_cost)}
       </div>
 
+      <div class="bg-brand-pink-light bg-opacity-40 rounded-xl p-4 mb-6">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" data-shipping-checkbox="shipping_bulk_promo_active"
+            ${shippingSettings.shipping_bulk_promo_active === "true" ? "checked" : ""}
+            class="w-5 h-5 accent-brand-mexican" />
+          <span class="text-sm font-semibold text-gray-700">
+            Promoción "Mayoreo desde 1 pieza" activa
+          </span>
+        </label>
+        <p class="text-xs text-gray-500 mt-1 ml-8">
+          Mientras esté prendida, en el checkout el cliente ve la opción de usar tarifa fija de envío
+          (Tres Guerras/Estafeta/DHL) aunque lleve pocas piezas.
+        </p>
+      </div>
+
       <h4 class="text-sm font-bold text-gray-700 mb-2">Dirección de origen</h4>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         ${textFieldHtml("shipping_origin_name", "Nombre / empresa", shippingSettings.shipping_origin_name)}
@@ -204,6 +219,9 @@ export function createAjustesSection(onUnauthorized) {
             }
           });
           payload.shipping_weight_per_category_kg = JSON.stringify(weightPerCategory);
+          container.querySelectorAll("[data-shipping-checkbox]").forEach((input) => {
+            payload[input.dataset.shippingCheckbox] = input.checked ? "true" : "false";
+          });
 
           btn.disabled = true;
           const originalText = btn.innerHTML;

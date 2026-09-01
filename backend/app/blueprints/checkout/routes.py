@@ -12,6 +12,8 @@ from app.models import (
     OrderStatus,
     PaymentMethod,
     TRES_GUERRAS_CARRIER_CODE,
+    FIXED_ESTAFETA_CARRIER_CODE,
+    FIXED_DHL_CARRIER_CODE,
 )
 from app.utils.decorators import login_required
 from app.utils.serializers import serialize_order
@@ -23,6 +25,8 @@ from app.utils.shipping_estimate import (
     tres_guerras_cost_for_weight,
     override_heavy_shipment_cost,
     carrier_is_allowed,
+    shipping_route_for_weight,
+    HEAVY_SHIPMENT_CARRIER_COSTS,
 )
 from app.utils.skydropx_client import get_rates, SkydropxError
 from app.utils.online_pricing import apply_online_markup
@@ -75,14 +79,40 @@ def _estimate_cart_weight_kg(items_payload):
     return estimate_package_weight_kg(cart_items, products)
 
 
-def _tres_guerras_option(settings=None, weight_kg=None):
+def _bulk_promo_forced(shipping, settings):
+    """La promo "mayoreo desde 1 pieza" es un interruptor de Ajustes -- el cliente solo
+    puede activar el bypass si la dueña la dejó prendida; nunca se confía en el flag
+    del cliente por sí solo."""
+    return bool(shipping.get("use_bulk_promo")) and settings["bulk_promo_active"]
+
+
+def _tres_guerras_option(settings=None, weight_kg=None, force_fixed=False):
     settings = settings or get_shipping_settings_dict()
     return {
         "carrier": TRES_GUERRAS_CARRIER_CODE,
         "label": "Tres Guerras",
-        "cost": tres_guerras_cost_for_weight(settings, weight_kg),
+        "cost": tres_guerras_cost_for_weight(settings, weight_kg, force_fixed=force_fixed),
         "eta": "3-5 días hábiles",
     }
+
+
+def _fixed_carrier_options():
+    """Opciones de Estafeta/DHL a precio fijo sin cotización viva de Skydropx -- se
+    usan en el tier voluminoso o cuando la promo de mayoreo bypassea Skydropx."""
+    return [
+        {
+            "carrier": FIXED_ESTAFETA_CARRIER_CODE,
+            "label": "Estafeta",
+            "cost": HEAVY_SHIPMENT_CARRIER_COSTS["estafeta"],
+            "eta": "3-5 días hábiles",
+        },
+        {
+            "carrier": FIXED_DHL_CARRIER_CODE,
+            "label": "DHL",
+            "cost": HEAVY_SHIPMENT_CARRIER_COSTS["dhl"],
+            "eta": "3-5 días hábiles",
+        },
+    ]
 
 
 def _destination_address(shipping):
@@ -100,10 +130,15 @@ def _destination_address(shipping):
     }
 
 
-def _skydropx_options(items_payload, shipping, settings, weight_kg):
+def _skydropx_options(items_payload, shipping, settings, weight_kg, skip=False):
     """Cotiza con Skydropx usando un peso estimado del carrito. Si falta la dirección
     de origen/destino o la llamada falla, degrada devolviendo lista vacía en vez de
-    tronar la cotización completa (Tres Guerras sigue disponible como respaldo)."""
+    tronar la cotización completa (Tres Guerras sigue disponible como respaldo).
+    `skip=True` bloquea la llamada por completo -- tier voluminoso o promo de mayoreo,
+    para no pagar cotizaciones aéreas exorbitantes en paquetes grandes."""
+    if skip:
+        return [], False
+
     try:
         origin = get_origin_address(settings)
     except ValueError:
@@ -145,9 +180,23 @@ def quote():
 
     settings = get_shipping_settings_dict()
     weight_kg = _estimate_cart_weight_kg(items_payload)
-    skydropx_options, skydropx_unavailable = _skydropx_options(items_payload, data, settings, weight_kg)
-    options = skydropx_options + [_tres_guerras_option(settings, weight_kg)]
-    return jsonify({"options": options, "skydropx_unavailable": skydropx_unavailable})
+    bulk_promo_forced = _bulk_promo_forced(data, settings)
+    route = "voluminous" if bulk_promo_forced else shipping_route_for_weight(weight_kg)
+
+    skydropx_options, skydropx_unavailable = _skydropx_options(
+        items_payload, data, settings, weight_kg, skip=(route == "voluminous")
+    )
+    options = skydropx_options + [_tres_guerras_option(settings, weight_kg, force_fixed=bulk_promo_forced)]
+    if route == "voluminous":
+        options += _fixed_carrier_options()
+
+    return jsonify(
+        {
+            "options": options,
+            "skydropx_unavailable": skydropx_unavailable,
+            "bulk_promo_available": settings["bulk_promo_active"],
+        }
+    )
 
 
 def _build_order(items_payload, shipping, payment_method):
@@ -333,8 +382,19 @@ def _build_order(items_payload, shipping, payment_method):
 
     settings = get_shipping_settings_dict()
     weight_kg = _estimate_cart_weight_kg(items_payload)
+    bulk_promo_forced = _bulk_promo_forced(shipping, settings)
+    route = "voluminous" if bulk_promo_forced else shipping_route_for_weight(weight_kg)
+
     if carrier_code == TRES_GUERRAS_CARRIER_CODE:
-        shipping_cost = tres_guerras_cost_for_weight(settings, weight_kg)
+        shipping_cost = tres_guerras_cost_for_weight(settings, weight_kg, force_fixed=bulk_promo_forced)
+    elif carrier_code in (FIXED_ESTAFETA_CARRIER_CODE, FIXED_DHL_CARRIER_CODE):
+        # Solo válidas en el tier voluminoso (o con la promo de mayoreo activa) -- no
+        # hay cotización viva de Skydropx que confirmar, así que se rechaza si el
+        # pedido no calificaba para saltarse Skydropx.
+        if route != "voluminous":
+            raise CheckoutError("Esa tarifa fija no está disponible para este pedido. Cotiza de nuevo.")
+        key = "estafeta" if carrier_code == FIXED_ESTAFETA_CARRIER_CODE else "dhl"
+        shipping_cost = HEAVY_SHIPMENT_CARRIER_COSTS[key]
     elif carrier_code.startswith("skydropx:"):
         # Nunca confiar en un precio mandado por el cliente: se vuelve a cotizar en el
         # servidor con el mismo rate_id antes de cobrar/crear la orden.

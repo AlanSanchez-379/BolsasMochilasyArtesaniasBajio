@@ -14,6 +14,7 @@ SHIPPING_SETTING_KEYS = {
     "shipping_origin_state",
     "shipping_origin_postal_code",
     "shipping_tres_guerras_fixed_cost",
+    "shipping_bulk_promo_active",
 }
 
 _ORIGIN_KEYS = {
@@ -30,28 +31,84 @@ DEFAULT_WEIGHT_PER_PIECE_KG = 0.3
 DEFAULT_PACKAGING_WEIGHT_KG = 0.5
 DEFAULT_TRES_GUERRAS_COST = 110.0
 
-# Paquetes que superan este peso cobran un precio fijo por paquetería al cliente, sin
-# importar si Skydropx cotiza un poco más caro (la diferencia la absorbe la tienda).
-HEAVY_SHIPMENT_WEIGHT_THRESHOLD_KG = 2.0
 HEAVY_SHIPMENT_TRES_GUERRAS_COST = 350.0
 HEAVY_SHIPMENT_CARRIER_COSTS = {
     "estafeta": 380.0,
     "dhl": 380.0,
 }
 
+# Asignación automática de caja según el peso estimado del pedido (referencia de
+# ~0.45 kg por bolsa para traducir los umbrales de piezas del negocio a kg -- el peso
+# real que se usa siempre viene de estimate_package_weight_kg, que ya pesa por
+# categoría). "route" define cómo se cotiza el envío en cada tier:
+#   light      -- solo Skydropx en vivo, sin tarifa fija forzada (1 a 3 piezas).
+#   medium     -- se cotiza con Skydropx pero Estafeta/DHL se fuerzan al precio fijo
+#                 (4 a 12 piezas, cajas 6-M/12-M).
+#   voluminous -- se bloquea la llamada a Skydropx por completo, solo tarifas fijas
+#                 (13+ piezas, cajas consolidadas 24z/36z).
+# Ajustable moviendo max_kg si cambia cómo se acomoda el producto en bodega.
+_WEIGHT_PER_PIECE_REFERENCE_KG = 0.45
+BOX_TIERS = [
+    {
+        "key": "individual",
+        "label": "Caja individual",
+        "dimensions_cm": "44x34x12",
+        "max_kg": round(3 * _WEIGHT_PER_PIECE_REFERENCE_KG, 2),
+        "route": "light",
+    },
+    {
+        "key": "6-m",
+        "label": "Caja 6-M",
+        "dimensions_cm": "36x35x36",
+        "max_kg": round(6 * _WEIGHT_PER_PIECE_REFERENCE_KG, 2),
+        "route": "medium",
+    },
+    {
+        "key": "12-m",
+        "label": "Caja 12-M",
+        "dimensions_cm": "36x34x64",
+        "max_kg": round(12 * _WEIGHT_PER_PIECE_REFERENCE_KG, 2),
+        "route": "medium",
+    },
+    {
+        "key": "consolidada",
+        "label": "Caja consolidada (24z/36z)",
+        "dimensions_cm": None,
+        "max_kg": None,
+        "route": "voluminous",
+    },
+]
 
-def tres_guerras_cost_for_weight(settings, weight_kg):
+
+def assign_box_tier(weight_kg):
+    """Devuelve el tier de caja (dict con key/label/dimensions_cm/max_kg/route) que le
+    corresponde a un peso estimado."""
+    for tier in BOX_TIERS:
+        if tier["max_kg"] is None or weight_kg <= tier["max_kg"]:
+            return tier
+    return BOX_TIERS[-1]
+
+
+def shipping_route_for_weight(weight_kg):
+    """"light" | "medium" | "voluminous" según el peso estimado del pedido."""
+    if weight_kg is None:
+        return "light"
+    return assign_box_tier(weight_kg)["route"]
+
+
+def tres_guerras_cost_for_weight(settings, weight_kg, force_fixed=False):
     """Costo de Tres Guerras: fijo configurado en Ajustes, o el precio fijo de paquete
-    pesado si el envío supera HEAVY_SHIPMENT_WEIGHT_THRESHOLD_KG."""
-    if weight_kg is not None and weight_kg > HEAVY_SHIPMENT_WEIGHT_THRESHOLD_KG:
+    pesado si el pedido cae en tier medium/voluminous (o se fuerza por la promo de
+    mayoreo desde 1 pieza)."""
+    if force_fixed or (weight_kg is not None and shipping_route_for_weight(weight_kg) != "light"):
         return HEAVY_SHIPMENT_TRES_GUERRAS_COST
     return settings["tres_guerras_fixed_cost"]
 
 
 def override_heavy_shipment_cost(carrier_name, cost, weight_kg):
-    """Para cotizaciones reales de Skydropx: si el paquete supera el umbral de peso y
-    la paquetería es Estafeta o DHL, se cobra el precio fijo en vez del cotizado."""
-    if weight_kg is None or weight_kg <= HEAVY_SHIPMENT_WEIGHT_THRESHOLD_KG:
+    """Para cotizaciones reales de Skydropx en el tier medium: si la paquetería es
+    Estafeta o DHL, se cobra el precio fijo en vez del cotizado."""
+    if weight_kg is None or shipping_route_for_weight(weight_kg) == "light":
         return cost
     name = (carrier_name or "").lower()
     for key, fixed_cost in HEAVY_SHIPMENT_CARRIER_COSTS.items():
@@ -89,6 +146,7 @@ def get_shipping_settings_dict():
         "default_weight_per_piece_kg": _float("shipping_default_weight_per_piece_kg", DEFAULT_WEIGHT_PER_PIECE_KG),
         "packaging_weight_kg": _float("shipping_packaging_weight_kg", DEFAULT_PACKAGING_WEIGHT_KG),
         "tres_guerras_fixed_cost": _float("shipping_tres_guerras_fixed_cost", DEFAULT_TRES_GUERRAS_COST),
+        "bulk_promo_active": (rows.get("shipping_bulk_promo_active") or "false").lower() == "true",
         "origin_name": rows.get("shipping_origin_name"),
         "origin_phone": rows.get("shipping_origin_phone"),
         "origin_street": rows.get("shipping_origin_street"),

@@ -47,6 +47,13 @@ class OrderChannel(str, enum.Enum):
 # ("3guerras" para el manual, o "skydropx:<rate_id>" para lo cotizado por Skydropx).
 TRES_GUERRAS_CARRIER_CODE = "3guerras"
 
+# Códigos fijos para Estafeta/DHL a precio fijo SIN cotización viva de Skydropx --
+# se usan cuando el pedido cae en el tier "voluminoso" (o la promo de mayoreo bypassea
+# la cotización) y no hay rate_id real que confirmar. La guía real se compra después,
+# a mano, desde Pedidos (ese flujo ya cotiza y compra con Skydropx por separado).
+FIXED_ESTAFETA_CARRIER_CODE = "fixed_estafeta"
+FIXED_DHL_CARRIER_CODE = "fixed_dhl"
+
 
 def _generate_order_number():
     return "ORD-" + "".join(random.choices(string.digits, k=6))
