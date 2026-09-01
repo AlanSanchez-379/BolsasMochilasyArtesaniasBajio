@@ -21,6 +21,13 @@ export function renderRegister(container) {
             <label class="block text-sm font-bold text-gray-700 mb-1">Contraseña</label>
             <input type="password" name="password" required minlength="6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal" />
           </div>
+          <label class="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
+            <input type="checkbox" id="accept-terms" required class="mt-1 w-4 h-4 flex-shrink-0" />
+            <span>
+              He leído y acepto los <a href="#/terminos-y-condiciones" target="_blank" class="text-brand-blue-dark font-semibold hover:underline">Términos y Condiciones</a>
+              y la <a href="#/politica-privacidad" target="_blank" class="text-brand-blue-dark font-semibold hover:underline">Política de Privacidad</a>.
+            </span>
+          </label>
           <p id="register-error" class="text-red-500 text-sm hidden"></p>
           <p id="register-success" class="text-brand-teal text-sm hidden"></p>
           <button type="submit" class="w-full bg-brand-blue-dark text-white py-3 rounded-full text-lg font-semibold hover:bg-brand-blue">

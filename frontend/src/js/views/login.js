@@ -9,9 +9,13 @@ export function renderLogin(container) {
       <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
         <h1 class="text-3xl font-bold mb-6 text-center">Iniciar Sesión</h1>
 
-        <button id="google-btn" class="w-full flex items-center justify-center gap-3 border-2 border-gray-200 rounded-full py-3 font-semibold text-gray-700 hover:bg-gray-50 mb-6">
+        <button id="google-btn" class="w-full flex items-center justify-center gap-3 border-2 border-gray-200 rounded-full py-3 font-semibold text-gray-700 hover:bg-gray-50">
           <i class="fa-brands fa-google text-brand-salmon"></i> Continuar con Google
         </button>
+        <p class="text-center text-xs text-gray-400 mt-2 mb-6">
+          Al continuar aceptas nuestros <a href="#/terminos-y-condiciones" target="_blank" class="text-brand-mexican hover:underline">Términos y Condiciones</a>
+          y <a href="#/politica-privacidad" target="_blank" class="text-brand-mexican hover:underline">Política de Privacidad</a>.
+        </p>
 
         <div class="flex items-center gap-3 mb-6">
           <div class="flex-grow h-px bg-gray-200"></div>

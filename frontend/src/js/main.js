@@ -12,6 +12,7 @@ import { renderRegister } from "./views/register.js";
 import { renderAuthCallback } from "./views/authCallback.js";
 import { renderMyOrders } from "./views/myOrders.js";
 import { renderPosAccess } from "./views/posAccess/index.js";
+import { renderShippingPolicy, renderPrivacyPolicy, renderTerms } from "./views/legal.js";
 import { subscribe, setCurrentUser } from "./state.js";
 import { api } from "./api.js";
 import { getCategories } from "./catalogCache.js";
@@ -57,6 +58,9 @@ route("/login", () => renderLogin(view));
 route("/registro", () => renderRegister(view));
 route("/auth/callback", () => renderAuthCallback(view));
 route("/mis-pedidos", () => renderMyOrders(view));
+route("/politica-envios", () => renderShippingPolicy(view));
+route("/politica-privacidad", () => renderPrivacyPolicy(view));
+route("/terminos-y-condiciones", () => renderTerms(view));
 route("/venta-local", () => renderPosAccess(view));
 
 // Antes de resolver la ruta inicial hay que saber si ya hay sesión de cliente (cookie),

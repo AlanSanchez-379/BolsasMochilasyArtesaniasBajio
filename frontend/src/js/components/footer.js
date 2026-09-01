@@ -43,6 +43,9 @@ export function renderFooter(container) {
             <li>Mayoreo desde 6 piezas combinadas</li>
             <li>Súper mayoreo desde 50 piezas</li>
             <li>Pago con tarjeta o SPEI</li>
+            <li><a href="#/politica-envios" class="hover:text-brand-mexican transition-colors">Política de Envíos</a></li>
+            <li><a href="#/politica-privacidad" class="hover:text-brand-mexican transition-colors">Política de Privacidad</a></li>
+            <li><a href="#/terminos-y-condiciones" class="hover:text-brand-mexican transition-colors">Términos y Condiciones</a></li>
           </ul>
         </div>
         <div>

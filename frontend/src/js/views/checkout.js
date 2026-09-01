@@ -274,6 +274,11 @@ export function renderCheckout(container) {
         </div>
 
         <p id="order-error" class="text-red-500 text-sm mt-4 hidden"></p>
+
+        <p class="text-xs text-gray-400 mt-4">
+          Al confirmar aceptas nuestra
+          <a href="#/politica-envios" target="_blank" class="text-brand-mexican hover:underline">Política de Envíos</a>.
+        </p>
       </div>
       <div class="flex justify-between">
         <button id="back-3" class="text-sm font-semibold text-gray-500 hover:text-gray-900">Atrás</button>
