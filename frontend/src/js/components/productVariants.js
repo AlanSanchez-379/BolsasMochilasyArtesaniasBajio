@@ -12,7 +12,7 @@ function photoSlotsHtml(images, { fileAttr, uploadAttr, historyAttr, removeAttr 
       (url, i) => `
     <div class="relative w-14 h-14 flex-shrink-0">
       <img src="${url}" class="w-14 h-14 rounded object-cover border border-gray-200" />
-      <button type="button" data-${removeAttr}="${i}" title="Quitar foto"
+      <button type="button" data-${removeAttr}${i}" title="Quitar foto"
         class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs leading-none flex items-center justify-center hover:bg-red-600">
         <i class="fa-solid fa-xmark"></i>
       </button>
