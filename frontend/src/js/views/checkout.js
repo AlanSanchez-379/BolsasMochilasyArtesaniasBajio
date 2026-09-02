@@ -12,6 +12,10 @@ import { STRIPE_PUBLISHABLE_KEY } from "../config.js";
 import { getSettings } from "../settingsCache.js";
 
 const STEPS = ["Carrito", "Envío", "Pago"];
+const currencyFormatter = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
+function money(n) {
+  return currencyFormatter.format(n);
+}
 
 function stepperHtml(current) {
   return `
@@ -97,13 +101,13 @@ export function renderCheckout(container) {
                 <p class="font-semibold text-gray-900">${item.product.name}</p>
                 <p class="text-sm text-gray-500">${item.variant.color} · x${item.quantity}</p>
               </div>
-              <span class="font-bold">$${price * item.quantity}</span>
+              <span class="font-bold">${money(price * item.quantity)}</span>
             </div>`;
           })
           .join("")}
         <div class="flex justify-between items-center pt-4 mt-2">
           <span class="text-lg font-bold text-gray-900">Subtotal</span>
-          <span class="text-2xl font-bold text-gray-900">$${cartTotal()}</span>
+          <span class="text-2xl font-bold text-gray-900">${money(cartTotal())}</span>
         </div>
       </div>
       <div class="flex justify-between">
@@ -227,7 +231,7 @@ export function renderCheckout(container) {
               <p class="text-sm text-gray-500">${opt.eta}</p>
             </div>
           </div>
-          <span class="text-lg font-bold text-gray-900">$${opt.cost}</span>
+          <span class="text-lg font-bold text-gray-900">${money(opt.cost)}</span>
         </label>`
         )
         .join("");
@@ -293,13 +297,19 @@ export function renderCheckout(container) {
             ? `<div class="bg-orange-50 border border-orange-200 rounded p-4 mb-6 text-sm text-orange-800">
                 <p class="font-bold mb-1"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Atención</p>
                 Tu pedido se creará como <strong>Pendiente de pago</strong>. Tendrás <strong>2 horas</strong> para
-                realizar el depósito SPEI o el inventario se liberará automáticamente.
+                realizar el depósito SPEI ${money(total)} a esta CLABE
+                ${
+                  settings.spei_clabe
+                    ? `<strong>${settings.spei_clabe}</strong>`
+                    : "(te la confirmamos por WhatsApp)"
+                }
+                o el inventario se liberará automáticamente.
               </div>`
             : flow.paymentMethod === "paypal"
             ? `<div class="bg-orange-50 border border-orange-200 rounded p-4 mb-6 text-sm text-orange-800">
                 <p class="font-bold mb-1"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Atención</p>
                 Tu pedido se creará como <strong>Pendiente de pago</strong>. Tendrás <strong>2 horas</strong> para enviar
-                $${total} por PayPal a
+                ${money(total)} por PayPal a
                 ${
                   settings.paypal_receiving_email
                     ? `<strong>${settings.paypal_receiving_email}</strong>`
@@ -313,9 +323,9 @@ export function renderCheckout(container) {
         }
 
         <div class="border-t border-gray-100 pt-4 space-y-2">
-          <div class="flex justify-between text-gray-600"><span>Subtotal</span><span>$${cartTotal()}</span></div>
-          <div class="flex justify-between text-gray-600"><span>Envío (${selectedOption.label})</span><span>$${selectedOption.cost}</span></div>
-          <div class="flex justify-between text-2xl font-bold pt-2 text-gray-900"><span>Total</span><span>$${total}</span></div>
+          <div class="flex justify-between text-gray-600"><span>Subtotal</span><span>${money(cartTotal())}</span></div>
+          <div class="flex justify-between text-gray-600"><span>Envío (${selectedOption.label})</span><span>${money(selectedOption.cost)}</span></div>
+          <div class="flex justify-between text-2xl font-bold pt-2 text-gray-900"><span>Total</span><span>${money(total)}</span></div>
         </div>
 
         <p id="order-error" class="text-red-500 text-sm mt-4 hidden"></p>
@@ -381,11 +391,11 @@ export function renderCheckout(container) {
     el.innerHTML = `
       <div class="border border-gray-200 rounded-lg p-6 mb-8 bg-white">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">Pago con tarjeta</h2>
-        <p class="text-sm text-gray-500 mb-4">Pedido <strong>${flow.order.order_number}</strong> · Total: <strong>$${flow.order.total}</strong></p>
+        <p class="text-sm text-gray-500 mb-4">Pedido <strong>${flow.order.order_number}</strong> · Total: <strong>${money(flow.order.total)}</strong></p>
         <div id="payment-element" class="mb-4"></div>
         <p id="payment-element-errors" class="text-red-500 text-sm mb-4 hidden"></p>
         <button id="confirm-payment" class="w-full bg-brand-mexican hover:opacity-90 text-white px-8 py-4 rounded text-lg font-bold transition-opacity">
-          Pagar $${flow.order.total}
+          Pagar ${money(flow.order.total)}
         </button>
       </div>
     `;
@@ -406,7 +416,7 @@ export function renderCheckout(container) {
         errorEl.textContent = submitError.message || "Revisa los datos de tu tarjeta.";
         errorEl.classList.remove("hidden");
         btn.disabled = false;
-        btn.textContent = `Pagar $${flow.order.total}`;
+        btn.textContent = `Pagar ${money(flow.order.total)}`;
         return;
       }
 
@@ -421,7 +431,7 @@ export function renderCheckout(container) {
         errorEl.textContent = error.message || "No se pudo procesar el pago. Intenta de nuevo.";
         errorEl.classList.remove("hidden");
         btn.disabled = false;
-        btn.textContent = `Pagar $${flow.order.total}`;
+        btn.textContent = `Pagar ${money(flow.order.total)}`;
         return;
       }
 
@@ -438,7 +448,7 @@ export function renderCheckout(container) {
 async function renderSuccess(container, order) {
   const isSpei = order.payment_method === "spei";
   const isPaypal = order.payment_method === "paypal";
-  const settings = isPaypal ? await getSettings() : null;
+  const settings = isPaypal || isSpei ? await getSettings() : null;
   container.innerHTML = `
     <div class="max-w-xl mx-auto px-4 py-16 text-center fade-in">
       <i class="fa-solid fa-circle-check text-6xl text-brand-mexican mb-6"></i>
@@ -449,7 +459,12 @@ async function renderSuccess(container, order) {
         isSpei
           ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
               <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-clock mr-2"></i>Realiza tu transferencia SPEI antes de:</p>
-              <p class="text-lg text-orange-800">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
+              <p class="text-lg text-orange-800 mb-2">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
+              ${
+                settings?.spei_clabe
+                  ? `<p class="text-sm text-orange-800">A esta CLABE: <strong>${settings.spei_clabe}</strong></p>`
+                  : ""
+              }
             </div>`
           : isPaypal
           ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
@@ -466,7 +481,7 @@ async function renderSuccess(container, order) {
             </div>`
       }
 
-      <p class="text-2xl font-bold text-gray-900 mb-8">Total: $${order.total}</p>
+      <p class="text-2xl font-bold text-gray-900 mb-8">Total: ${money(order.total)}</p>
 
       <div class="flex gap-4 justify-center">
         <button data-nav="/mis-pedidos" class="bg-gray-900 hover:bg-brand-mexican text-white px-6 py-3 rounded font-semibold transition-colors">Ver Mis Pedidos</button>

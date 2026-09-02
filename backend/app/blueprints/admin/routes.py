@@ -30,7 +30,7 @@ BRANDING_FOLDER = "branding"
 PRODUCT_IMAGES_FOLDER = "products"
 ALLOWED_SETTING_TYPES = {"logo": "logo_url", "banner": "banner_url"}
 ALLOWED_IMAGE_MIMETYPES = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
-PAYMENT_SETTING_KEYS = {"paypal_receiving_email"}
+PAYMENT_SETTING_KEYS = {"paypal_receiving_email", "spei_clabe"}
 
 
 def _public_asset_url_is_valid(url):
@@ -195,8 +195,9 @@ def get_payment_settings():
 @pos_access_required
 def update_payment_settings():
     """Body: { <key>: <value>, ... } — uno o varios de PAYMENT_SETTING_KEYS a la vez.
-    Por ahora solo paypal_receiving_email: la cuenta de PayPal a la que el cliente
-    transfiere manualmente (no hay integración con la API de PayPal)."""
+    paypal_receiving_email: la cuenta de PayPal a la que el cliente transfiere
+    manualmente (no hay integración con la API de PayPal). spei_clabe: la CLABE que
+    se le muestra al elegir SPEI en el checkout."""
     data = request.get_json() or {}
     invalid = set(data) - PAYMENT_SETTING_KEYS
     if invalid:

@@ -25,6 +25,7 @@ def get_settings():
             "logo_url": settings.get("logo_url"),
             "banner_url": settings.get("banner_url"),
             "paypal_receiving_email": settings.get("paypal_receiving_email"),
+            "spei_clabe": settings.get("spei_clabe"),
         }
     )
 
