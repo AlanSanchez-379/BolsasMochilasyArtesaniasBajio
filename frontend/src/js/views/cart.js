@@ -10,6 +10,11 @@ import { bindNavLinks } from "../dom.js";
 import { navigate } from "../router.js";
 import { NO_IMAGE_PLACEHOLDER } from "../imageFallback.js";
 
+const currencyFormatter = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
+function money(n) {
+  return currencyFormatter.format(n);
+}
+
 function lineHtml(item, combinedQty) {
   const price = priceForQuantity(item.product, item.product.is_bundle ? item.quantity : combinedQty);
   const lineTotal = price * item.quantity;
@@ -22,7 +27,7 @@ function lineHtml(item, combinedQty) {
         <p class="text-xs text-gray-400 uppercase tracking-wide">${item.product.category}</p>
         <p data-nav="/producto/${item.product.slug}" class="font-semibold text-gray-900 cursor-pointer hover:text-brand-mexican">${item.product.name}</p>
         <p class="text-gray-500 text-sm ${isCustomBundle ? "max-w-md" : ""}">${item.variant.color}</p>
-        <p class="text-gray-900 font-bold mt-1">$${price} c/u</p>
+        <p class="text-gray-900 font-bold mt-1">${money(price)} c/u</p>
       </div>
       <div class="flex items-center gap-4">
         ${
@@ -34,7 +39,7 @@ function lineHtml(item, combinedQty) {
                 <button data-qty-plus="${item.variant.id}" class="w-9 h-9 font-bold text-gray-600 hover:text-gray-900">+</button>
               </div>`
         }
-        <span class="text-lg font-bold w-24 text-right">$${lineTotal}</span>
+        <span class="text-lg font-bold w-24 text-right">${money(lineTotal)}</span>
         <button data-remove="${item.variant.id}" class="text-gray-400 hover:text-red-500">
           <i class="fa-solid fa-trash-can"></i>
         </button>
@@ -81,7 +86,7 @@ export function renderCart(container) {
         <div class="border border-gray-200 rounded-lg p-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-brand-peach-light bg-opacity-30">
           <div>
             <p class="text-gray-600 text-sm">Total (precios ya reflejan descuento por volumen)</p>
-            <p class="text-3xl font-bold text-gray-900">$${total}</p>
+            <p class="text-3xl font-bold text-gray-900">${money(total)}</p>
           </div>
           <button id="checkout-btn" class="bg-gray-900 hover:bg-brand-mexican text-white px-8 py-4 rounded text-lg font-semibold transition-colors">
             Continuar al Pago <i class="fa-solid fa-arrow-right ml-2"></i>

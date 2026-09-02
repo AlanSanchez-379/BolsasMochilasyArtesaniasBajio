@@ -5,6 +5,11 @@ import { bindNavLinks } from "../dom.js";
 import { navigate, currentRenderToken } from "../router.js";
 import { NO_IMAGE_PLACEHOLDER } from "../imageFallback.js";
 
+const currencyFormatter = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
+function money(n) {
+  return currencyFormatter.format(n);
+}
+
 function pricingTiersHtml(product, totalProposedQty) {
   const tierClass = (active) => (active ? "bg-white border-brand-pink border-2" : "border border-gray-200");
   return `
@@ -17,9 +22,9 @@ function pricingTiersHtml(product, totalProposedQty) {
           <p class="text-sm font-bold">1-${product.wholesale_min_qty - 1} pz</p>
           ${
             product.is_on_sale
-              ? `<p class="text-xs text-gray-400 line-through">$${product.price_normal}</p>
-                 <p class="text-xl text-red-500 font-bold">$${product.sale_price}</p>`
-              : `<p class="text-xl text-gray-900 font-bold">$${product.price_normal}</p>`
+              ? `<p class="text-xs text-gray-400 line-through">${money(product.price_normal)}</p>
+                 <p class="text-xl text-red-500 font-bold">${money(product.sale_price)}</p>`
+              : `<p class="text-xl text-gray-900 font-bold">${money(product.price_normal)}</p>`
           }
         </div>
         <div class="p-3 rounded ${tierClass(
@@ -27,12 +32,12 @@ function pricingTiersHtml(product, totalProposedQty) {
         )}">
           <p class="text-xs text-gray-500">Mayoreo</p>
           <p class="text-sm font-bold">${product.wholesale_min_qty}-${product.super_wholesale_min_qty - 1} pz</p>
-          <p class="text-xl text-gray-900 font-bold">$${product.price_wholesale}</p>
+          <p class="text-xl text-gray-900 font-bold">${money(product.price_wholesale)}</p>
         </div>
         <div class="p-3 rounded ${tierClass(totalProposedQty >= product.super_wholesale_min_qty)}">
           <p class="text-xs text-gray-500">Súper Mayoreo</p>
           <p class="text-sm font-bold">${product.super_wholesale_min_qty}+ pz</p>
-          <p class="text-xl text-gray-900 font-bold">$${product.price_super_wholesale}</p>
+          <p class="text-xl text-gray-900 font-bold">${money(product.price_super_wholesale)}</p>
         </div>
       </div>
     </div>
@@ -278,7 +283,7 @@ export async function renderProductDetail(container, slug) {
     return `
       <div class="bg-brand-peach-light bg-opacity-40 rounded-lg p-6 mb-6 border border-gray-200 text-center">
         <p class="text-sm text-gray-500">Precio fijo del paquete</p>
-        <p class="text-3xl font-bold text-gray-900">$${product.price_normal}</p>
+        <p class="text-3xl font-bold text-gray-900">${money(product.price_normal)}</p>
         <p class="text-gray-600 mt-1">Incluye <strong>${product.bundle_limit}</strong> piezas a elegir</p>
       </div>
 

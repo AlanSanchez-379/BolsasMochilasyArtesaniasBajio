@@ -3,6 +3,11 @@ import { state as appState } from "../state.js";
 import { bindNavLinks } from "../dom.js";
 import { navigate, currentRenderToken } from "../router.js";
 
+const currencyFormatter = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
+function money(n) {
+  return currencyFormatter.format(n);
+}
+
 const STATUS_COLORS = {
   "Pendiente de pago": "bg-yellow-100 text-yellow-700",
   "Pago en validación": "bg-blue-100 text-blue-700",
@@ -39,7 +44,7 @@ function orderCardHtml(order) {
       </div>
       <div class="flex justify-between items-center border-t pt-4">
         <span class="text-gray-500">Envío: ${carrierLabel(order.shipping.carrier)}</span>
-        <span class="text-xl font-bold text-brand-blue-dark">$${order.total}</span>
+        <span class="text-xl font-bold text-brand-blue-dark">${money(order.total)}</span>
       </div>
       ${
         order.status === "Pendiente de pago" && order.spei_payment_deadline

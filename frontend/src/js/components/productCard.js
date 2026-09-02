@@ -1,5 +1,10 @@
 import { NO_IMAGE_PLACEHOLDER } from "../imageFallback.js";
 
+const currencyFormatter = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
+function money(n) {
+  return currencyFormatter.format(n);
+}
+
 export function productCardHtml(product) {
   const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
   const defaultImage = product.variants[0]?.image_url || NO_IMAGE_PLACEHOLDER;
@@ -29,10 +34,10 @@ export function productCardHtml(product) {
         <div>
           ${
             product.is_on_sale
-              ? `<p class="text-xs text-gray-400 line-through">Antes: $${product.price_normal}</p>
-                 <p class="text-lg font-bold text-red-500">$${product.sale_price} <span class="text-xs font-normal text-gray-400">Oferta</span></p>`
-              : `<p class="text-xs text-gray-400 line-through">Menudeo: $${product.price_normal}</p>
-                 <p class="text-lg font-bold text-gray-900">$${product.price_wholesale} <span class="text-xs font-normal text-gray-400">Mayoreo</span></p>`
+              ? `<p class="text-xs text-gray-400 line-through">Antes: ${money(product.price_normal)}</p>
+                 <p class="text-lg font-bold text-red-500">${money(product.sale_price)} <span class="text-xs font-normal text-gray-400">Oferta</span></p>`
+              : `<p class="text-xs text-gray-400 line-through">Menudeo: ${money(product.price_normal)}</p>
+                 <p class="text-lg font-bold text-gray-900">${money(product.price_wholesale)} <span class="text-xs font-normal text-gray-400">Mayoreo</span></p>`
           }
           ${totalStock > 0 ? '<p class="text-xs text-brand-mexican font-semibold mt-1"><i class="fa-solid fa-circle-check mr-1"></i>Disponible</p>' : ""}
         </div>
