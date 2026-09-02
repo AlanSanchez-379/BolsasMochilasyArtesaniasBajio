@@ -30,6 +30,7 @@ BRANDING_FOLDER = "branding"
 PRODUCT_IMAGES_FOLDER = "products"
 ALLOWED_SETTING_TYPES = {"logo": "logo_url", "banner": "banner_url"}
 ALLOWED_IMAGE_MIMETYPES = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
+PAYMENT_SETTING_KEYS = {"paypal_receiving_email"}
 
 
 def _public_asset_url_is_valid(url):
@@ -172,6 +173,34 @@ def update_shipping_settings():
         except (TypeError, ValueError):
             return jsonify({"message": "shipping_weight_per_category_kg debe ser un objeto JSON."}), 400
         data["shipping_weight_per_category_kg"] = json.dumps(parsed)
+
+    for key, value in data.items():
+        setting = Setting.query.get(key) or Setting(key=key)
+        setting.value = str(value) if value is not None else None
+        db.session.add(setting)
+    db.session.commit()
+
+    rows = Setting.query.filter(Setting.key.in_(data.keys())).all()
+    return jsonify({s.key: s.value for s in rows})
+
+
+@admin_bp.get("/payment-settings")
+@pos_access_required
+def get_payment_settings():
+    rows = Setting.query.filter(Setting.key.in_(PAYMENT_SETTING_KEYS)).all()
+    return jsonify({s.key: s.value for s in rows})
+
+
+@admin_bp.patch("/payment-settings")
+@pos_access_required
+def update_payment_settings():
+    """Body: { <key>: <value>, ... } — uno o varios de PAYMENT_SETTING_KEYS a la vez.
+    Por ahora solo paypal_receiving_email: la cuenta de PayPal a la que el cliente
+    transfiere manualmente (no hay integración con la API de PayPal)."""
+    data = request.get_json() or {}
+    invalid = set(data) - PAYMENT_SETTING_KEYS
+    if invalid:
+        return jsonify({"message": f"Claves inválidas: {', '.join(invalid)}"}), 400
 
     for key, value in data.items():
         setting = Setting.query.get(key) or Setting(key=key)

@@ -9,6 +9,7 @@ import {
 } from "../state.js";
 import { navigate } from "../router.js";
 import { STRIPE_PUBLISHABLE_KEY } from "../config.js";
+import { getSettings } from "../settingsCache.js";
 
 const STEPS = ["Carrito", "Envío", "Pago"];
 
@@ -261,12 +262,13 @@ export function renderCheckout(container) {
     });
   }
 
-  function renderStep3(el) {
+  async function renderStep3(el) {
     if (flow.paymentMethod === "card" && flow.order) {
       renderCardPaymentStep(el);
       return;
     }
 
+    const settings = await getSettings();
     const selectedOption = flow.quoteOptions.find((o) => o.carrier === flow.selectedCarrier);
     const total = cartTotal() + selectedOption.cost;
 
@@ -281,6 +283,9 @@ export function renderCheckout(container) {
           <button data-method="spei" class="method-btn flex-1 py-4 rounded font-semibold border-2 ${
             flow.paymentMethod === "spei" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
           }"><i class="fa-solid fa-building-columns mr-2"></i>Transferencia SPEI</button>
+          <button data-method="paypal" class="method-btn flex-1 py-4 rounded font-semibold border-2 ${
+            flow.paymentMethod === "paypal" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
+          }"><i class="fa-brands fa-paypal mr-2"></i>PayPal</button>
         </div>
 
         ${
@@ -289,6 +294,18 @@ export function renderCheckout(container) {
                 <p class="font-bold mb-1"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Atención</p>
                 Tu pedido se creará como <strong>Pendiente de pago</strong>. Tendrás <strong>2 horas</strong> para
                 realizar el depósito SPEI o el inventario se liberará automáticamente.
+              </div>`
+            : flow.paymentMethod === "paypal"
+            ? `<div class="bg-orange-50 border border-orange-200 rounded p-4 mb-6 text-sm text-orange-800">
+                <p class="font-bold mb-1"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Atención</p>
+                Tu pedido se creará como <strong>Pendiente de pago</strong>. Tendrás <strong>2 horas</strong> para enviar
+                $${total} por PayPal a
+                ${
+                  settings.paypal_receiving_email
+                    ? `<strong>${settings.paypal_receiving_email}</strong>`
+                    : "la cuenta de PayPal de la tienda (te la confirmamos por WhatsApp)"
+                }
+                o el inventario se liberará automáticamente.
               </div>`
             : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-4 mb-6 text-sm text-gray-700">
                 En el siguiente paso vas a ingresar los datos de tu tarjeta. El cargo se procesa de forma segura con Stripe.
@@ -418,8 +435,10 @@ export function renderCheckout(container) {
   render();
 }
 
-function renderSuccess(container, order) {
+async function renderSuccess(container, order) {
   const isSpei = order.payment_method === "spei";
+  const isPaypal = order.payment_method === "paypal";
+  const settings = isPaypal ? await getSettings() : null;
   container.innerHTML = `
     <div class="max-w-xl mx-auto px-4 py-16 text-center fade-in">
       <i class="fa-solid fa-circle-check text-6xl text-brand-mexican mb-6"></i>
@@ -431,6 +450,16 @@ function renderSuccess(container, order) {
           ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
               <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-clock mr-2"></i>Realiza tu transferencia SPEI antes de:</p>
               <p class="text-lg text-orange-800">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
+            </div>`
+          : isPaypal
+          ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
+              <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-clock mr-2"></i>Envía tu pago por PayPal antes de:</p>
+              <p class="text-lg text-orange-800 mb-2">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
+              ${
+                settings?.paypal_receiving_email
+                  ? `<p class="text-sm text-orange-800">A este correo de PayPal: <strong>${settings.paypal_receiving_email}</strong></p>`
+                  : ""
+              }
             </div>`
           : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-5 mb-8 text-left">
               <p><i class="fa-solid fa-circle-check mr-2 text-brand-mexican"></i>¡Tu pago fue aprobado! Estamos preparando tu pedido.</p>

@@ -42,4 +42,5 @@ class Config:
 
     # Business rules (Documento de Requerimientos secc. 2 y 5)
     DEFAULT_MIN_STOCK_WARNING = 5
+    # Ventana para pagos manuales fuera de la app (SPEI, PayPal) antes de liberar inventario.
     SPEI_PAYMENT_WINDOW_HOURS = 2

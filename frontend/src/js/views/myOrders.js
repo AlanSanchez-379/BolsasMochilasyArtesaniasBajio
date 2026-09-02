@@ -44,7 +44,7 @@ function orderCardHtml(order) {
       ${
         order.status === "Pendiente de pago" && order.spei_payment_deadline
           ? `<p class="text-sm text-brand-salmon font-semibold mt-2">
-              <i class="fa-solid fa-clock mr-1"></i> Deposita antes de ${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}
+              <i class="fa-solid fa-clock mr-1"></i> Completa tu pago antes de ${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}
             </p>`
           : ""
       }

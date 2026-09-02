@@ -167,6 +167,9 @@ export const posAccessApi = {
   getShippingSettings: () => posAccessFetch("/admin/shipping-settings"),
   updateShippingSettings: (payload) =>
     posAccessFetch("/admin/shipping-settings", { method: "PATCH", body: JSON.stringify(payload) }),
+  getPaymentSettings: () => posAccessFetch("/admin/payment-settings"),
+  updatePaymentSettings: (payload) =>
+    posAccessFetch("/admin/payment-settings", { method: "PATCH", body: JSON.stringify(payload) }),
   getPosAccessSettings: () => posAccessFetch("/admin/pos-access-settings"),
   updatePosAccessSettings: (pin) =>
     posAccessFetch("/admin/pos-access-settings", { method: "PATCH", body: JSON.stringify({ pin }) }),

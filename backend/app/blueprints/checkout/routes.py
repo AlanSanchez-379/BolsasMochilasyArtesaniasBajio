@@ -15,6 +15,11 @@ from app.models import (
     FIXED_ESTAFETA_CARRIER_CODE,
     FIXED_DHL_CARRIER_CODE,
 )
+
+# Métodos de pago "manuales": el cliente paga fuera de la app (transferencia/PayPal) y
+# el pedido queda Pendiente de pago con una ventana antes de liberar inventario --
+# a diferencia de tarjeta, que se valida al instante vía Stripe.
+MANUAL_PAYMENT_METHODS = (PaymentMethod.SPEI.value, PaymentMethod.PAYPAL.value)
 from app.utils.decorators import login_required
 from app.utils.serializers import serialize_order
 from app.utils.stock import adjust_stock
@@ -425,12 +430,12 @@ def _build_order(items_payload, shipping, payment_method):
         shipping_carrier=carrier_code,
         shipping_cost=shipping_cost,
         payment_method=PaymentMethod(payment_method),
-        status=OrderStatus.PENDING_PAYMENT if payment_method == PaymentMethod.SPEI.value else OrderStatus.PAYMENT_IN_VALIDATION,
+        status=OrderStatus.PENDING_PAYMENT if payment_method in MANUAL_PAYMENT_METHODS else OrderStatus.PAYMENT_IN_VALIDATION,
         subtotal=subtotal,
         total=total,
         items=order_items,
     )
-    if payment_method == PaymentMethod.SPEI.value:
+    if payment_method in MANUAL_PAYMENT_METHODS:
         window = current_app.config["SPEI_PAYMENT_WINDOW_HOURS"]
         order.spei_payment_deadline = datetime.now(timezone.utc) + timedelta(hours=window)
 
@@ -464,7 +469,7 @@ def create_order():
     shipping = data.get("shipping") or {}
     payment_method = data.get("payment_method")
 
-    if payment_method not in (PaymentMethod.CARD.value, PaymentMethod.SPEI.value):
+    if payment_method not in (PaymentMethod.CARD.value, *MANUAL_PAYMENT_METHODS):
         return jsonify({"message": "Método de pago inválido."}), 400
 
     required_shipping_fields = ["full_name", "phone", "street", "city", "state", "postal_code", "carrier"]

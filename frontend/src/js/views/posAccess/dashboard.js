@@ -31,7 +31,9 @@ export function createDashboardSection(onUnauthorized) {
               <span class="text-gray-400 font-normal">· ${o.customer_name || "Cliente"}</span>
               ${o.channel === "online" ? `<span class="ml-1 text-[10px] bg-brand-blue bg-opacity-30 text-brand-blue-dark px-2 py-0.5 rounded-full">ONLINE</span>` : ""}
             </p>
-            <p class="text-xs text-gray-500 uppercase">${o.payment_method === "spei" ? "Transferencia" : o.payment_method === "card" ? "Tarjeta" : "Efectivo"} · ${money(o.total)}</p>
+            <p class="text-xs text-gray-500 uppercase">${
+              o.payment_method === "spei" ? "Transferencia" : o.payment_method === "paypal" ? "PayPal" : o.payment_method === "card" ? "Tarjeta" : "Efectivo"
+            } · ${money(o.total)}</p>
             ${
               o.spei_payment_deadline
                 ? `<p class="text-xs text-brand-salmon font-semibold mt-1"><i class="fa-solid fa-clock mr-1"></i>Vence: ${timeAgo(o.spei_payment_deadline)}</p>`

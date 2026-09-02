@@ -33,6 +33,7 @@ PENDING_ORDER_STATUSES = (OrderStatus.PENDING_PAYMENT, OrderStatus.PAYMENT_IN_VA
 class PaymentMethod(str, enum.Enum):
     CARD = "card"
     SPEI = "spei"
+    PAYPAL = "paypal"  # Transferencia manual a la cuenta de PayPal de la tienda, fuera de la API de PayPal
     CASH = "cash"  # Solo Punto de Venta (tienda física)
 
 
@@ -82,7 +83,8 @@ class Order(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     shipping_cost = db.Column(db.Numeric(10, 2), default=0)
 
     payment_method = db.Column(db.Enum(PaymentMethod, name="payment_method"), nullable=False)
-    # Regla de negocio SPEI: ventana de 2h para depositar antes de liberar inventario
+    # Ventana para completar el pago antes de liberar inventario, en métodos de pago
+    # manuales (fuera de la app) -- SPEI y PayPal comparten esta misma columna.
     spei_payment_deadline = db.Column(db.DateTime(timezone=True), nullable=True)
 
     # Stripe: ID del PaymentIntent creado al momento del checkout (payment_method=card).

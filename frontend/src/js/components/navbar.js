@@ -38,8 +38,22 @@ function logoHtml(settings) {
   return `<span class="text-2xl font-black text-brand-pink tracking-tight">BM&amp;A del Bajío</span>`;
 }
 
+// El logo se sube desde Ajustes (Venta Local) y cambia de URL cada vez -- se usa el
+// mismo para el ícono de la pestaña del navegador en vez de un archivo estático fijo.
+function applyFavicon(url) {
+  if (!url) return;
+  let link = document.querySelector('link[rel="icon"]');
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "icon";
+    document.head.appendChild(link);
+  }
+  if (link.href !== url) link.href = url;
+}
+
 export async function renderNavbar(container) {
   const settings = await getSettings();
+  applyFavicon(settings.logo_url);
   const count = cartItemsCount();
 
   container.innerHTML = `

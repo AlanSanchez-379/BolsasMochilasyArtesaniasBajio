@@ -20,7 +20,13 @@ from . import catalog_bp
 @catalog_bp.get("/settings")
 def get_settings():
     settings = {s.key: s.value for s in Setting.query.all()}
-    return jsonify({"logo_url": settings.get("logo_url"), "banner_url": settings.get("banner_url")})
+    return jsonify(
+        {
+            "logo_url": settings.get("logo_url"),
+            "banner_url": settings.get("banner_url"),
+            "paypal_receiving_email": settings.get("paypal_receiving_email"),
+        }
+    )
 
 
 @catalog_bp.get("/categories")
