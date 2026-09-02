@@ -7,7 +7,7 @@ import { getCategories, getCachedOrFetch } from "../catalogCache.js";
 
 function categoryIconClass(name) {
   const key = name.toLowerCase();
-  if (key.includes("mochila")) return "fa-bag-shopping fa-rotate-90";
+  if (key.includes("mochila")) return "fa-bag-shopping";
   if (key.includes("cartera")) return "fa-wallet";
   if (key.includes("cosmetiquera")) return "fa-spray-can";
   if (key.includes("monedero")) return "fa-coins";
