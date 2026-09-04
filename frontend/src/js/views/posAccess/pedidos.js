@@ -21,6 +21,25 @@ function carrierLabel(carrier) {
   return carrier.toUpperCase();
 }
 
+function internationalShippingHtml(o) {
+  const hasCost = Number(o.shipping.cost) > 0;
+  return `
+    <div class="mt-2 pt-2 border-t border-blue-100 bg-blue-50 rounded p-3">
+      <p class="text-xs font-bold text-blue-800 uppercase mb-1"><i class="fa-solid fa-globe mr-1"></i>Envío internacional</p>
+      <p class="text-xs text-blue-800 mb-2">
+        ${hasCost ? `Costo de envío registrado: <strong>${money(o.shipping.cost)}</strong> (cóbralo aparte al cliente).` : "Sin costo de envío registrado todavía -- cotízalo fuera de la app y captúralo aquí."}
+      </p>
+      <div class="flex gap-2">
+        <input type="number" step="0.01" min="0" data-shipping-cost-input="${o.id}" placeholder="Costo de envío ($)"
+          class="flex-1 px-2 py-1.5 border border-blue-200 rounded text-sm" />
+        <button data-save-shipping-cost="${o.id}" class="bg-brand-mexican text-white px-3 py-1.5 rounded text-sm font-semibold hover:opacity-90">
+          Guardar
+        </button>
+      </div>
+    </div>
+  `;
+}
+
 function orderDetailHtml(o) {
   // Los paquetes personalizados guardan un OrderItem "padre" (el paquete en sí, con su
   // precio) y uno "hijo" por cada producto que el cliente eligió dentro (precio $0,
@@ -78,9 +97,13 @@ function orderDetailHtml(o) {
             : `<p class="text-sm text-gray-800 font-semibold">${o.shipping.full_name}</p>
                <p class="text-sm text-gray-600">${o.shipping.phone}</p>
                <p class="text-sm text-gray-600">${o.shipping.street}, ${o.shipping.colonia || "-"}, ${o.shipping.city}, ${o.shipping.state}</p>
-               <p class="text-sm text-gray-600">CP ${o.shipping.postal_code}</p>
-               <p class="text-sm text-gray-500 uppercase mt-2">${carrierLabel(o.shipping.carrier)} · ${money(o.shipping.cost)}</p>
-               ${o.shipping.real_cost != null ? shipmentReconciliationHtml(o.shipping) : ""}`
+               <p class="text-sm text-gray-600">CP ${o.shipping.postal_code || "-"}${o.shipping.country && o.shipping.country !== "México" ? ` · ${o.shipping.country}` : ""}</p>
+               ${
+                 o.shipping.carrier === "international_pending"
+                   ? internationalShippingHtml(o)
+                   : `<p class="text-sm text-gray-500 uppercase mt-2">${carrierLabel(o.shipping.carrier)} · ${money(o.shipping.cost)}</p>
+                      ${o.shipping.real_cost != null ? shipmentReconciliationHtml(o.shipping) : ""}`
+               }`
         }
       </div>
     </div>
@@ -381,6 +404,32 @@ export function createPedidosSection(onUnauthorized) {
             });
           }
         }
+
+        container.querySelectorAll("[data-save-shipping-cost]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const orderId = btn.dataset.saveShippingCost;
+            const input = container.querySelector(`[data-shipping-cost-input="${orderId}"]`);
+            const cost = parseFloat(input.value);
+            if (isNaN(cost) || cost < 0) {
+              alert("Escribe un costo de envío válido.");
+              return;
+            }
+            btn.disabled = true;
+            try {
+              const { order: updatedOrder } = await posAccessApi.updateShippingCost(orderId, cost);
+              const idx = orders.findIndex((o) => o.id === orderId);
+              orders[idx] = updatedOrder;
+              render();
+            } catch (err) {
+              if (err.status === 401 && onUnauthorized) {
+                onUnauthorized();
+                return;
+              }
+              alert(err.message);
+              btn.disabled = false;
+            }
+          });
+        });
 
         container.querySelectorAll("[data-toggle-detail]").forEach((btn) => {
           btn.addEventListener("click", () => {

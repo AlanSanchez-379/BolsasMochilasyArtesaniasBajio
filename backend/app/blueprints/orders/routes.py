@@ -60,6 +60,28 @@ def update_status(order_id):
     return jsonify({"order": serialize_order(order)})
 
 
+@orders_bp.patch("/<order_id>/shipping-cost")
+@pos_access_required
+def update_shipping_cost(order_id):
+    """Para envíos internacionales (shipping_carrier="international_pending"): la
+    dueña cotiza el envío real a mano, fuera de la app, y aquí registra el costo --
+    recalcula el total del pedido para que quede correcto en el sistema, aunque el
+    cobro de ese envío se haga aparte (transferencia/PayPal, no por este flujo)."""
+    order = Order.query.get_or_404(order_id)
+    data = request.get_json() or {}
+    try:
+        shipping_cost = float(data.get("shipping_cost"))
+    except (TypeError, ValueError):
+        return jsonify({"message": "Costo de envío inválido."}), 400
+    if shipping_cost < 0:
+        return jsonify({"message": "Costo de envío inválido."}), 400
+
+    order.shipping_cost = shipping_cost
+    order.total = float(order.subtotal) + shipping_cost
+    db.session.commit()
+    return jsonify({"order": serialize_order(order)})
+
+
 @orders_bp.post("/<order_id>/shipment/rates")
 @pos_access_required
 def get_shipment_rates(order_id):

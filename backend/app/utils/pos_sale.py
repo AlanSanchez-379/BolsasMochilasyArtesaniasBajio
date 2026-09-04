@@ -127,6 +127,7 @@ def execute_pos_sale(items_payload, payment_method, customer_name, shipping=None
         shipping_city=shipping.get("city"),
         shipping_state=shipping.get("state"),
         shipping_postal_code=shipping.get("postal_code"),
+        shipping_country="México",
         shipping_carrier=(shipping.get("carrier") or "Envío") if needs_shipping else None,
         shipping_cost=shipping_cost,
         payment_method=PaymentMethod(payment_method),

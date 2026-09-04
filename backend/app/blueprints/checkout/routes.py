@@ -12,6 +12,7 @@ from app.models import (
     OrderStatus,
     PaymentMethod,
     TRES_GUERRAS_CARRIER_CODE,
+    INTERNATIONAL_PENDING_CARRIER_CODE,
 )
 from app.utils.decorators import login_required
 from app.utils.serializers import serialize_order
@@ -47,6 +48,24 @@ ZONE_SHIPPING_CARRIER_PREFIX = "zone_shipping"
 
 def _valid_postal_code(postal_code):
     return bool(postal_code) and postal_code.isdigit() and len(postal_code) == 5
+
+
+_DOMESTIC_COUNTRY_NAMES = {"", "mexico", "méxico", "mx"}
+
+
+def _is_domestic(country):
+    """Skydropx solo cotiza dentro de México -- cualquier otro país entra al flujo de
+    envío internacional (sin costo automático, se cotiza a mano después)."""
+    return (country or "").strip().lower() in _DOMESTIC_COUNTRY_NAMES
+
+
+def _international_option():
+    return {
+        "carrier": INTERNATIONAL_PENDING_CARRIER_CODE,
+        "label": "Envío internacional",
+        "cost": 0,
+        "eta": "Te contactaremos para confirmar el costo real de envío",
+    }
 
 
 def _cost_price(product):
@@ -170,8 +189,12 @@ def _skydropx_options(items_payload, shipping, settings, weight_kg):
 @checkout_bp.post("/quote")
 def quote():
     data = request.get_json() or {}
-    postal_code = (data.get("postal_code") or "").strip()
     items_payload = data.get("items") or []
+
+    if not _is_domestic(data.get("country")):
+        return jsonify({"options": [_international_option()], "skydropx_unavailable": False, "international": True})
+
+    postal_code = (data.get("postal_code") or "").strip()
     if not _valid_postal_code(postal_code):
         return jsonify({"message": "Código postal inválido. Debe tener 5 dígitos."}), 400
 
@@ -191,6 +214,7 @@ def quote():
             "options": options,
             "skydropx_unavailable": skydropx_unavailable,
             "bulk_promo_available": settings["bulk_promo_active"],
+            "international": False,
         }
     )
 
@@ -382,38 +406,47 @@ def _build_order(items_payload, shipping, payment_method):
         raise CheckoutError("El carrito está vacío.")
 
     carrier_code = shipping.get("carrier") or ""
-    if not _valid_postal_code(shipping.get("postal_code", "")):
-        raise CheckoutError("Código postal inválido.")
+    domestic = _is_domestic(shipping.get("country"))
 
-    settings = get_shipping_settings_dict()
-    weight_kg = _estimate_cart_weight_kg(items_payload)
-    bulk_promo_forced = _bulk_promo_forced(shipping, settings)
-    light = is_light_shipment(weight_kg, bulk_promo_forced)
-
-    if not light:
-        # Ya no se distingue paquetería en pedidos que no califican para "light" --
-        # una sola tarifa fija por zona, recalculada en el servidor (nunca confiar en
-        # el costo que mandó el cliente).
-        if carrier_code != ZONE_SHIPPING_CARRIER_PREFIX:
-            raise CheckoutError("Esa opción de envío no está disponible para este pedido. Cotiza de nuevo.")
-        shipping_cost = zone_shipping_cost(shipping.get("postal_code"), settings)
-    elif carrier_code == TRES_GUERRAS_CARRIER_CODE:
-        shipping_cost = settings["tres_guerras_fixed_cost"]
-    elif carrier_code.startswith("skydropx:"):
-        # Nunca confiar en un precio mandado por el cliente: se vuelve a cotizar en el
-        # servidor con el mismo rate_id antes de cobrar/crear la orden.
-        rate_id = carrier_code.split(":", 1)[1]
-        try:
-            origin = get_origin_address(settings)
-            rates = get_rates(origin, _destination_address(shipping), weight_kg)
-        except (ValueError, SkydropxError):
-            raise CheckoutError("No se pudo confirmar el costo de envío. Cotiza de nuevo.")
-        matching_rate = next((r for r in rates if r["rate_id"] == rate_id), None)
-        if matching_rate is None or not carrier_is_allowed(matching_rate["carrier_name"]):
-            raise CheckoutError("La tarifa de envío elegida ya no está disponible. Cotiza de nuevo.")
-        shipping_cost = matching_rate["cost"]
+    if not domestic:
+        # Skydropx no cotiza fuera de México -- el pedido se crea sin costo de envío;
+        # la dueña lo cotiza a mano y lo cobra aparte después de confirmar el pago del
+        # producto.
+        carrier_code = INTERNATIONAL_PENDING_CARRIER_CODE
+        shipping_cost = 0.0
     else:
-        raise CheckoutError("Paquetería inválida.")
+        if not _valid_postal_code(shipping.get("postal_code", "")):
+            raise CheckoutError("Código postal inválido.")
+
+        settings = get_shipping_settings_dict()
+        weight_kg = _estimate_cart_weight_kg(items_payload)
+        bulk_promo_forced = _bulk_promo_forced(shipping, settings)
+        light = is_light_shipment(weight_kg, bulk_promo_forced)
+
+        if not light:
+            # Ya no se distingue paquetería en pedidos que no califican para "light" --
+            # una sola tarifa fija por zona, recalculada en el servidor (nunca confiar en
+            # el costo que mandó el cliente).
+            if carrier_code != ZONE_SHIPPING_CARRIER_PREFIX:
+                raise CheckoutError("Esa opción de envío no está disponible para este pedido. Cotiza de nuevo.")
+            shipping_cost = zone_shipping_cost(shipping.get("postal_code"), settings)
+        elif carrier_code == TRES_GUERRAS_CARRIER_CODE:
+            shipping_cost = settings["tres_guerras_fixed_cost"]
+        elif carrier_code.startswith("skydropx:"):
+            # Nunca confiar en un precio mandado por el cliente: se vuelve a cotizar en el
+            # servidor con el mismo rate_id antes de cobrar/crear la orden.
+            rate_id = carrier_code.split(":", 1)[1]
+            try:
+                origin = get_origin_address(settings)
+                rates = get_rates(origin, _destination_address(shipping), weight_kg)
+            except (ValueError, SkydropxError):
+                raise CheckoutError("No se pudo confirmar el costo de envío. Cotiza de nuevo.")
+            matching_rate = next((r for r in rates if r["rate_id"] == rate_id), None)
+            if matching_rate is None or not carrier_is_allowed(matching_rate["carrier_name"]):
+                raise CheckoutError("La tarifa de envío elegida ya no está disponible. Cotiza de nuevo.")
+            shipping_cost = matching_rate["cost"]
+        else:
+            raise CheckoutError("Paquetería inválida.")
 
     total = subtotal + shipping_cost
 
@@ -425,7 +458,8 @@ def _build_order(items_payload, shipping, payment_method):
         shipping_colonia=shipping.get("colonia"),
         shipping_city=shipping["city"],
         shipping_state=shipping["state"],
-        shipping_postal_code=shipping["postal_code"],
+        shipping_postal_code=shipping.get("postal_code"),
+        shipping_country=shipping.get("country") or "México",
         shipping_carrier=carrier_code,
         shipping_cost=shipping_cost,
         payment_method=PaymentMethod(payment_method),
@@ -471,7 +505,9 @@ def create_order():
     if payment_method not in (PaymentMethod.CARD.value, *MANUAL_PAYMENT_METHODS):
         return jsonify({"message": "Método de pago inválido."}), 400
 
-    required_shipping_fields = ["full_name", "phone", "street", "city", "state", "postal_code", "carrier"]
+    required_shipping_fields = ["full_name", "phone", "street", "city", "state"]
+    if _is_domestic(shipping.get("country")):
+        required_shipping_fields += ["postal_code", "carrier"]
     missing = [f for f in required_shipping_fields if not shipping.get(f)]
     if missing:
         return jsonify({"message": f"Faltan datos de envío: {', '.join(missing)}"}), 400

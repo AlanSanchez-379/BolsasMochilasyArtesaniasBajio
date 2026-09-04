@@ -18,6 +18,11 @@ function money(n) {
   return currencyFormatter.format(n);
 }
 
+const DOMESTIC_COUNTRY_NAMES = new Set(["", "mexico", "méxico", "mx"]);
+function isDomesticCountry(country) {
+  return DOMESTIC_COUNTRY_NAMES.has((country || "").trim().toLowerCase());
+}
+
 function stepperHtml(current) {
   return `
     <div class="flex items-center justify-center gap-4 mb-10">
@@ -63,7 +68,7 @@ export function renderCheckout(container) {
 
   const flow = {
     step: 1,
-    shipping: { full_name: appState.currentUser.full_name || "", phone: "", street: "", colonia: "", city: "", state: "", postal_code: "", use_bulk_promo: false },
+    shipping: { full_name: appState.currentUser.full_name || "", phone: "", street: "", colonia: "", city: "", state: "", postal_code: "", country: "México", use_bulk_promo: false },
     quoteOptions: null,
     bulkPromoAvailable: false,
     selectedCarrier: null,
@@ -150,8 +155,12 @@ export function renderCheckout(container) {
             <input name="phone" required value="${s.phone}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
           </div>
           <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">País</label>
+            <input name="country" value="${s.country}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
+          </div>
+          <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Código Postal</label>
-            <input name="postal_code" required maxlength="5" pattern="[0-9]{5}" value="${s.postal_code}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
+            <input name="postal_code" maxlength="10" value="${s.postal_code}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
           </div>
           <div class="sm:col-span-2">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Calle y número</label>
@@ -159,7 +168,7 @@ export function renderCheckout(container) {
           </div>
           <div class="sm:col-span-2">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Colonia</label>
-            <input name="colonia" required value="${s.colonia}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
+            <input name="colonia" value="${s.colonia}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
           </div>
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Ciudad</label>
@@ -170,6 +179,13 @@ export function renderCheckout(container) {
             <input name="state" required value="${s.state}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
           </div>
         </form>
+        ${
+          !isDomesticCountry(s.country)
+            ? `<p class="text-xs text-brand-mexican font-semibold mt-2">
+                <i class="fa-solid fa-globe mr-1"></i>Envío fuera de México: el costo real se confirma después de tu compra, te contactaremos para cobrarlo aparte.
+              </p>`
+            : ""
+        }
         <button id="quote-btn" class="mt-4 bg-gray-900 hover:bg-brand-mexican text-white px-6 py-3 rounded font-semibold transition-colors">
           <i class="fa-solid fa-truck-fast mr-2"></i> Cotizar Envío
         </button>
@@ -244,7 +260,7 @@ export function renderCheckout(container) {
               <p class="text-sm text-gray-500">${opt.eta}</p>
             </div>
           </div>
-          <span class="text-lg font-bold text-gray-900">${money(opt.cost)}</span>
+          <span class="text-lg font-bold text-gray-900">${opt.carrier === "international_pending" ? "Por confirmar" : money(opt.cost)}</span>
         </label>`
         )
         .join("");
@@ -262,6 +278,18 @@ export function renderCheckout(container) {
       const formData = new FormData(form);
       Object.assign(flow.shipping, Object.fromEntries(formData.entries()));
       if (!form.reportValidity()) return;
+      if (isDomesticCountry(flow.shipping.country)) {
+        if (!/^\d{5}$/.test(flow.shipping.postal_code || "")) {
+          quoteError.textContent = "Código postal inválido. Debe tener 5 dígitos.";
+          quoteError.classList.remove("hidden");
+          return;
+        }
+        if (!flow.shipping.colonia) {
+          quoteError.textContent = "Falta la colonia.";
+          quoteError.classList.remove("hidden");
+          return;
+        }
+      }
       await runQuote();
     });
 
@@ -337,9 +365,20 @@ export function renderCheckout(container) {
 
         <div class="border-t border-gray-100 pt-4 space-y-2">
           <div class="flex justify-between text-gray-600"><span>Subtotal</span><span>${money(cartTotal())}</span></div>
-          <div class="flex justify-between text-gray-600"><span>Envío (${selectedOption.label})</span><span>${money(selectedOption.cost)}</span></div>
+          <div class="flex justify-between text-gray-600">
+            <span>Envío (${selectedOption.label})</span>
+            <span>${selectedOption.carrier === "international_pending" ? "Por confirmar" : money(selectedOption.cost)}</span>
+          </div>
           <div class="flex justify-between text-2xl font-bold pt-2 text-gray-900"><span>Total</span><span>${money(total)}</span></div>
         </div>
+        ${
+          selectedOption.carrier === "international_pending"
+            ? `<p class="text-xs text-brand-mexican font-semibold mt-3">
+                <i class="fa-solid fa-globe mr-1"></i>El total de arriba NO incluye el envío -- te contactaremos para confirmar
+                el costo real y cobrarlo aparte.
+              </p>`
+            : ""
+        }
 
         <p id="order-error" class="text-red-500 text-sm mt-4 hidden"></p>
 
@@ -492,6 +531,15 @@ async function renderSuccess(container, order) {
           : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-5 mb-8 text-left">
               <p><i class="fa-solid fa-circle-check mr-2 text-brand-mexican"></i>¡Tu pago fue aprobado! Estamos preparando tu pedido.</p>
             </div>`
+      }
+
+      ${
+        order.shipping.carrier === "international_pending"
+          ? `<div class="bg-blue-50 border border-blue-200 rounded p-5 mb-8 text-left">
+              <p class="font-bold mb-1 text-blue-800"><i class="fa-solid fa-globe mr-2"></i>Envío internacional</p>
+              <p class="text-sm text-blue-800">El total de abajo no incluye el envío -- te contactaremos para confirmar el costo real y cobrarlo aparte.</p>
+            </div>`
+          : ""
       }
 
       <p class="text-2xl font-bold text-gray-900 mb-8">Total: ${money(order.total)}</p>

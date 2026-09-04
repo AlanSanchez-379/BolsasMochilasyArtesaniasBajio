@@ -48,6 +48,11 @@ class OrderChannel(str, enum.Enum):
 # Skydropx, o "zone_shipping" para la tarifa fija por zona en pedidos no-"light").
 TRES_GUERRAS_CARRIER_CODE = "3guerras"
 
+# Envío internacional: Skydropx no cotiza fuera de México, así que no hay costo
+# automático -- el pedido se crea con shipping_cost=0 y este código, y la dueña
+# cotiza/cobra el envío real después, fuera de la app.
+INTERNATIONAL_PENDING_CARRIER_CODE = "international_pending"
+
 
 def _generate_order_number():
     return "ORD-" + "".join(random.choices(string.digits, k=6))
@@ -72,6 +77,11 @@ class Order(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     shipping_city = db.Column(db.String(100), nullable=True)
     shipping_state = db.Column(db.String(100), nullable=True)
     shipping_postal_code = db.Column(db.String(10), nullable=True)
+    # "México" (o vacío) = envío nacional, cotizado con Skydropx/tarifa por zona.
+    # Cualquier otro país = envío internacional: Skydropx no cotiza fuera de México,
+    # así que el pedido se crea con shipping_cost=0 y shipping_carrier=
+    # "international_pending" -- la dueña cotiza a mano y actualiza el costo después.
+    shipping_country = db.Column(db.String(100), nullable=True)
     shipping_carrier = db.Column(db.String(50))
     shipping_cost = db.Column(db.Numeric(10, 2), default=0)
 

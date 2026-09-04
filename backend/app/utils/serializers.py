@@ -87,6 +87,7 @@ def serialize_order(order):
             "city": order.shipping_city,
             "state": order.shipping_state,
             "postal_code": order.shipping_postal_code,
+            "country": order.shipping_country,
             "carrier": order.shipping_carrier,
             "cost": float(order.shipping_cost),
             "real_weight_kg": float(order.package_weight_kg) if order.package_weight_kg is not None else None,

@@ -22,6 +22,7 @@ function carrierLabel(carrier) {
   if (!carrier) return "-";
   if (carrier === "3guerras") return "Tres Guerras";
   if (carrier === "zone_shipping") return "Envío";
+  if (carrier === "international_pending") return "Envío internacional";
   if (carrier.startsWith("skydropx:")) return "Paquetería (cotizado)";
   if (carrier === "fixed_estafeta") return "Estafeta";
   if (carrier === "fixed_dhl") return "DHL";
@@ -53,6 +54,17 @@ function orderCardHtml(order) {
         order.status === "Pendiente de pago" && order.spei_payment_deadline
           ? `<p class="text-sm text-brand-salmon font-semibold mt-2">
               <i class="fa-solid fa-clock mr-1"></i> Completa tu pago antes de ${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}
+            </p>`
+          : ""
+      }
+      ${
+        order.shipping.carrier === "international_pending"
+          ? `<p class="text-sm text-brand-mexican font-semibold mt-2">
+              <i class="fa-solid fa-globe mr-1"></i> ${
+                Number(order.shipping.cost) > 0
+                  ? `Costo de envío confirmado: ${money(order.shipping.cost)} (se cobra aparte).`
+                  : "Costo de envío pendiente de confirmar, te contactaremos."
+              }
             </p>`
           : ""
       }

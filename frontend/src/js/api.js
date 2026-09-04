@@ -152,6 +152,8 @@ export const posAccessApi = {
     posAccessFetch(`/orders/${orderId}/shipment/rates`, { method: "POST", body: JSON.stringify(payload) }),
   purchaseShipmentLabel: (orderId, payload) =>
     posAccessFetch(`/orders/${orderId}/shipment/purchase`, { method: "POST", body: JSON.stringify(payload) }),
+  updateShippingCost: (orderId, shippingCost) =>
+    posAccessFetch(`/orders/${orderId}/shipping-cost`, { method: "PATCH", body: JSON.stringify({ shipping_cost: shippingCost }) }),
 
   // Ajustes (branding, envío, PIN de esta misma terminal)
   getAdminSettings: () => posAccessFetch("/admin/settings"),
