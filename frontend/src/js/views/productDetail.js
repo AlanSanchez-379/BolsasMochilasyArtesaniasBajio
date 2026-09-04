@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { addToCart, combinedNonBundleQty } from "../state.js";
+import { addToCart, combinedQtyForSubcategory } from "../state.js";
 import { productCardHtml } from "../components/productCard.js";
 import { bindNavLinks } from "../dom.js";
 import { navigate, currentRenderToken } from "../router.js";
@@ -100,7 +100,7 @@ export async function renderProductDetail(container, slug) {
   }
 
   function render() {
-    const totalProposedQty = combinedNonBundleQty() + view.quantity;
+    const totalProposedQty = combinedQtyForSubcategory(product.subcategory) + view.quantity;
 
     container.innerHTML = `
       <div class="max-w-6xl mx-auto px-4 py-8 fade-in">

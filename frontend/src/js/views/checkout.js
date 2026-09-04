@@ -2,8 +2,9 @@ import { api } from "../api.js";
 import {
   state as appState,
   cartTotal,
+  cartSavings,
   priceForQuantity,
-  combinedNonBundleQty,
+  combinedQtyForSubcategory,
   buildCheckoutItems,
   clearCart,
 } from "../state.js";
@@ -87,14 +88,18 @@ export function renderCheckout(container) {
   }
 
   function renderStep1(el) {
-    const combinedQty = combinedNonBundleQty();
+    const savings = cartSavings();
 
     el.innerHTML = `
       <div class="border border-gray-200 rounded-lg p-6 mb-8 bg-white">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">Revisa tu pedido</h2>
+        <p class="text-xs text-gray-400 mb-4">
+          El precio de mayoreo se aplica combinando piezas de la misma línea (no se puede combinar animado con yute).
+        </p>
         ${appState.cart
           .map((item) => {
-            const price = priceForQuantity(item.product, item.product.is_bundle ? item.quantity : combinedQty);
+            const qty = item.product.is_bundle ? item.quantity : combinedQtyForSubcategory(item.product.subcategory);
+            const price = priceForQuantity(item.product, qty);
             return `
             <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
               <div>
@@ -105,6 +110,14 @@ export function renderCheckout(container) {
             </div>`;
           })
           .join("")}
+        ${
+          savings > 0
+            ? `<div class="bg-green-50 border border-green-200 rounded px-4 py-3 mt-4 text-sm text-green-800 font-semibold">
+                <i class="fa-solid fa-piggy-bank mr-2"></i>
+                Estás ahorrando ${money(savings)} por precio de mayoreo/súper mayoreo.
+              </div>`
+            : ""
+        }
         <div class="flex justify-between items-center pt-4 mt-2">
           <span class="text-lg font-bold text-gray-900">Subtotal</span>
           <span class="text-2xl font-bold text-gray-900">${money(cartTotal())}</span>

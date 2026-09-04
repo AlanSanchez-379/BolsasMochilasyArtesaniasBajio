@@ -64,27 +64,37 @@ export function cartItemsCount() {
 }
 
 // Mayoreo combinado (Mix & Match): el precio por volumen se decide por el total de
-// piezas de productos normales en el carrito, sin importar si son de distintos productos
-// (ej. 5 bolsas + 1 monedero = 6 piezas -> todas al precio de mayoreo). Los paquetes
-// tienen precio fijo y no participan en esta suma.
+// piezas de productos normales de la MISMA línea (subcategory) en el carrito -- no se
+// puede combinar, por ejemplo, animado con yute para alcanzar el mínimo de mayoreo.
+// Los paquetes tienen precio fijo y no participan en esta suma.
 export function priceForQuantity(product, quantity) {
   if (quantity >= product.super_wholesale_min_qty) return product.price_super_wholesale;
   if (quantity >= product.wholesale_min_qty) return product.price_wholesale;
   return product.price_normal;
 }
 
-export function combinedNonBundleQty() {
+export function combinedQtyForSubcategory(subcategory) {
   return state.cart
-    .filter((item) => !item.product.is_bundle)
+    .filter((item) => !item.product.is_bundle && item.product.subcategory === subcategory)
     .reduce((sum, item) => sum + item.quantity, 0);
 }
 
 export function cartTotal() {
-  const combinedQty = combinedNonBundleQty();
   return state.cart.reduce((total, item) => {
-    const qty = item.product.is_bundle ? item.quantity : combinedQty;
+    const qty = item.product.is_bundle ? item.quantity : combinedQtyForSubcategory(item.product.subcategory);
     const price = priceForQuantity(item.product, qty);
     return total + price * item.quantity;
+  }, 0);
+}
+
+// Cuánto se está ahorrando el cliente vs. precio de menudeo, sumando las líneas del
+// carrito que ya alcanzaron mayoreo/súper mayoreo por combinar piezas de su misma línea.
+export function cartSavings() {
+  return state.cart.reduce((total, item) => {
+    if (item.product.is_bundle) return total;
+    const qty = combinedQtyForSubcategory(item.product.subcategory);
+    const price = priceForQuantity(item.product, qty);
+    return total + (Number(item.product.price_normal) - price) * item.quantity;
   }, 0);
 }
 

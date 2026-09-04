@@ -3,8 +3,9 @@ import {
   updateCartQuantity,
   removeFromCart,
   cartTotal,
+  cartSavings,
   priceForQuantity,
-  combinedNonBundleQty,
+  combinedQtyForSubcategory,
 } from "../state.js";
 import { bindNavLinks } from "../dom.js";
 import { navigate } from "../router.js";
@@ -15,8 +16,21 @@ function money(n) {
   return currencyFormatter.format(n);
 }
 
-function lineHtml(item, combinedQty) {
-  const price = priceForQuantity(item.product, item.product.is_bundle ? item.quantity : combinedQty);
+function subcategoryTotals() {
+  const totals = {};
+  appState.cart
+    .filter((item) => !item.product.is_bundle)
+    .forEach((item) => {
+      totals[item.product.subcategory] = (totals[item.product.subcategory] || 0) + item.quantity;
+    });
+  return totals;
+}
+
+function lineHtml(item) {
+  const price = priceForQuantity(
+    item.product,
+    item.product.is_bundle ? item.quantity : combinedQtyForSubcategory(item.product.subcategory)
+  );
   const lineTotal = price * item.quantity;
   const isCustomBundle = item.variant.isCustom;
 
@@ -65,23 +79,36 @@ export function renderCart(container) {
       return;
     }
 
-    const combinedQty = combinedNonBundleQty();
+    const totals = subcategoryTotals();
+    const totalPieces = Object.values(totals).reduce((sum, n) => sum + n, 0);
     const total = cartTotal();
+    const savings = cartSavings();
 
     container.innerHTML = `
       <div class="max-w-5xl mx-auto px-4 py-10 fade-in">
         <h1 class="text-3xl font-bold text-gray-900 mb-8">Tu Carrito</h1>
         ${
-          combinedQty > 0
+          totalPieces > 0
             ? `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded px-4 py-3 mb-6 text-sm text-gray-700">
                 <i class="fa-solid fa-tags text-brand-mexican mr-2"></i>
-                Llevas <strong>${combinedQty}</strong> piezas combinadas de productos normales — el precio de mayoreo
-                se aplica sumando todos tus productos, sin importar el modelo.
+                El precio de mayoreo se aplica combinando piezas de la <strong>misma línea</strong>
+                (no se puede combinar animado con yute, por ejemplo):
+                ${Object.entries(totals)
+                  .map(([subcategory, qty]) => `<strong>${qty}</strong> ${subcategory}`)
+                  .join(" · ")}
+              </div>`
+            : ""
+        }
+        ${
+          savings > 0
+            ? `<div class="bg-green-50 border border-green-200 rounded px-4 py-3 mb-6 text-sm text-green-800 font-semibold">
+                <i class="fa-solid fa-piggy-bank mr-2"></i>
+                Estás ahorrando ${money(savings)} por precio de mayoreo/súper mayoreo.
               </div>`
             : ""
         }
         <div class="border border-gray-200 rounded-lg p-6 mb-8 bg-white">
-          ${appState.cart.map((item) => lineHtml(item, combinedQty)).join("")}
+          ${appState.cart.map((item) => lineHtml(item)).join("")}
         </div>
         <div class="border border-gray-200 rounded-lg p-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-brand-peach-light bg-opacity-30">
           <div>

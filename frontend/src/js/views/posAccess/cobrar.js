@@ -19,8 +19,22 @@ export function createSaleSection(onUnauthorized) {
   let error = null;
   let busy = false;
 
-  function combinedQty() {
-    return cart.filter((item) => !item.product.is_bundle).reduce((sum, item) => sum + item.quantity, 0);
+  // Mayoreo combinado: solo suma piezas de productos normales de la MISMA línea
+  // (subcategory) -- no se puede combinar animado con yute para alcanzar el mínimo.
+  function combinedQtyForSubcategory(subcategory) {
+    return cart
+      .filter((item) => !item.product.is_bundle && item.product.subcategory === subcategory)
+      .reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  function subcategoryTotals() {
+    const totals = {};
+    cart
+      .filter((item) => !item.product.is_bundle)
+      .forEach((item) => {
+        totals[item.product.subcategory] = (totals[item.product.subcategory] || 0) + item.quantity;
+      });
+    return totals;
   }
 
   // priceOverride: null = automático por cantidad combinada (comportamiento normal);
@@ -31,11 +45,18 @@ export function createSaleSection(onUnauthorized) {
     if (item.priceOverride === "normal") return Number(item.product.price_normal);
     if (item.priceOverride === "wholesale") return Number(item.product.price_wholesale);
     if (item.priceOverride === "super_wholesale") return Number(item.product.price_super_wholesale);
-    return priceForQuantity(item.product, combinedQty());
+    return priceForQuantity(item.product, combinedQtyForSubcategory(item.product.subcategory));
   }
 
   function itemsTotal() {
     return cart.reduce((sum, item) => sum + lineUnitPrice(item) * item.quantity, 0);
+  }
+
+  function itemsSavings() {
+    return cart.reduce((sum, item) => {
+      if (item.product.is_bundle || item.priceOverride) return sum;
+      return sum + (Number(item.product.price_normal) - lineUnitPrice(item)) * item.quantity;
+    }, 0);
   }
 
   function shippingCostValue() {
@@ -219,7 +240,11 @@ export function createSaleSection(onUnauthorized) {
   }
 
   function html() {
-    const qty = combinedQty();
+    const totals = subcategoryTotals();
+    const totalsLabel = Object.entries(totals)
+      .map(([subcategory, n]) => `${n} ${subcategory}`)
+      .join(" · ");
+    const savings = itemsSavings();
     const categories = catalogCategories();
     const topSellersFiltered = filteredTopSellers();
     const fullCatalog = filteredFullCatalog();
@@ -240,7 +265,7 @@ export function createSaleSection(onUnauthorized) {
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col flex-1">
             <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
               <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-cart-shopping text-brand-mexican mr-2"></i>Venta actual</h3>
-              ${qty > 0 ? `<span class="text-xs bg-brand-pink-light text-brand-mexican font-semibold px-2.5 py-1 rounded-full">${qty} pz combinadas</span>` : ""}
+              ${totalsLabel ? `<span class="text-xs bg-brand-pink-light text-brand-mexican font-semibold px-2.5 py-1 rounded-full" title="Mayoreo solo combina piezas de la misma línea">${totalsLabel}</span>` : ""}
             </div>
             <div class="overflow-x-auto max-h-[40vh] overflow-y-auto">
               <table class="w-full text-left text-sm whitespace-nowrap">
@@ -299,6 +324,7 @@ export function createSaleSection(onUnauthorized) {
                   <span class="text-[10px] font-bold uppercase text-slate-400">Total</span>
                   <span class="text-xl font-black text-slate-900">${money(grandTotal())}</span>
                   ${needsShipping ? `<span class="text-[10px] text-slate-400">incl. ${money(shippingCostValue())} envío</span>` : ""}
+                  ${savings > 0 ? `<span class="text-[10px] text-green-600 font-semibold"><i class="fa-solid fa-piggy-bank mr-1"></i>Ahorro: ${money(savings)}</span>` : ""}
                 </div>
                 <div class="bg-white rounded-lg border border-slate-200 p-3 flex flex-col">
                   <span class="text-[10px] font-bold uppercase text-slate-400">Pagó Con</span>

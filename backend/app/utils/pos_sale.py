@@ -57,13 +57,16 @@ def execute_pos_sale(items_payload, payment_method, customer_name, shipping=None
     }
 
     # Mayoreo combinado: igual que en la web, el precio por volumen se decide sumando
-    # las piezas de productos normales en esta venta. Los paquetes tienen precio fijo
-    # (igual que "Surtido al azar" en la web) y no participan en esa suma.
-    combined_qty = sum(
-        int(item.get("quantity") or 0)
-        for item in items_payload
-        if (v := variants.get(item.get("variant_id"))) and not v.product.is_bundle
-    )
+    # las piezas de productos normales de la MISMA línea (subcategory) en esta venta --
+    # no se puede combinar animado con yute para alcanzar el mínimo. Los paquetes tienen
+    # precio fijo (igual que "Surtido al azar" en la web) y no participan en esa suma.
+    combined_qty_by_subcategory = {}
+    for item in items_payload:
+        v = variants.get(item.get("variant_id"))
+        if v and not v.product.is_bundle:
+            combined_qty_by_subcategory[v.product.subcategory] = combined_qty_by_subcategory.get(
+                v.product.subcategory, 0
+            ) + int(item.get("quantity") or 0)
 
     order_items = []
     subtotal = 0.0
@@ -86,6 +89,7 @@ def execute_pos_sale(items_payload, payment_method, customer_name, shipping=None
         elif price_tier in PRICE_TIER_FIELDS:
             unit_price = float(getattr(variant.product, PRICE_TIER_FIELDS[price_tier]))
         else:
+            combined_qty = combined_qty_by_subcategory.get(variant.product.subcategory, quantity)
             unit_price = float(variant.product.price_for_quantity(combined_qty))
         cost_price = float(variant.product.cost_price) if variant.product.cost_price is not None else None
         variant.stock -= quantity
