@@ -21,7 +21,10 @@ const STATUS_COLORS = {
 function carrierLabel(carrier) {
   if (!carrier) return "-";
   if (carrier === "3guerras") return "Tres Guerras";
+  if (carrier === "zone_shipping") return "Envío";
   if (carrier.startsWith("skydropx:")) return "Paquetería (cotizado)";
+  if (carrier === "fixed_estafeta") return "Estafeta";
+  if (carrier === "fixed_dhl") return "DHL";
   return carrier.toUpperCase();
 }
 

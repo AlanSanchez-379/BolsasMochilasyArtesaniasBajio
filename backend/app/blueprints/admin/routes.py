@@ -174,6 +174,16 @@ def update_shipping_settings():
             return jsonify({"message": "shipping_weight_per_category_kg debe ser un objeto JSON."}), 400
         data["shipping_weight_per_category_kg"] = json.dumps(parsed)
 
+    if "shipping_extended_zone_postal_prefixes" in data:
+        raw = data["shipping_extended_zone_postal_prefixes"]
+        try:
+            parsed = json.loads(raw) if isinstance(raw, str) else raw
+            if not isinstance(parsed, list) or not all(isinstance(p, str) for p in parsed):
+                raise ValueError
+        except (TypeError, ValueError):
+            return jsonify({"message": "shipping_extended_zone_postal_prefixes debe ser una lista JSON de texto."}), 400
+        data["shipping_extended_zone_postal_prefixes"] = json.dumps(parsed)
+
     for key, value in data.items():
         setting = Setting.query.get(key) or Setting(key=key)
         setting.value = str(value) if value is not None else None

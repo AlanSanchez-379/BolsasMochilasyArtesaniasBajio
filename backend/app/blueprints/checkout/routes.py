@@ -12,14 +12,7 @@ from app.models import (
     OrderStatus,
     PaymentMethod,
     TRES_GUERRAS_CARRIER_CODE,
-    FIXED_ESTAFETA_CARRIER_CODE,
-    FIXED_DHL_CARRIER_CODE,
 )
-
-# Métodos de pago "manuales": el cliente paga fuera de la app (transferencia/PayPal) y
-# el pedido queda Pendiente de pago con una ventana antes de liberar inventario --
-# a diferencia de tarjeta, que se valida al instante vía Stripe.
-MANUAL_PAYMENT_METHODS = (PaymentMethod.SPEI.value, PaymentMethod.PAYPAL.value)
 from app.utils.decorators import login_required
 from app.utils.serializers import serialize_order
 from app.utils.stock import adjust_stock
@@ -27,11 +20,9 @@ from app.utils.shipping_estimate import (
     get_shipping_settings_dict,
     estimate_package_weight_kg,
     get_origin_address,
-    tres_guerras_cost_for_weight,
-    override_heavy_shipment_cost,
     carrier_is_allowed,
-    shipping_route_for_weight,
-    HEAVY_SHIPMENT_CARRIER_COSTS,
+    is_light_shipment,
+    zone_shipping_cost,
 )
 from app.utils.skydropx_client import get_rates, SkydropxError
 from app.utils.online_pricing import apply_online_markup
@@ -41,6 +32,17 @@ from . import checkout_bp
 
 class CheckoutError(Exception):
     pass
+
+
+# Métodos de pago "manuales": el cliente paga fuera de la app (transferencia/PayPal) y
+# el pedido queda Pendiente de pago con una ventana antes de liberar inventario --
+# a diferencia de tarjeta, que se valida al instante vía Stripe.
+MANUAL_PAYMENT_METHODS = (PaymentMethod.SPEI.value, PaymentMethod.PAYPAL.value)
+
+# Código fijo para la tarifa única por zona (ver ZONE_SHIPPING_COSTS en
+# shipping_estimate.py) -- reemplaza la distinción por paquetería en pedidos que no
+# califican para el tier "light" (ver is_light_shipment).
+ZONE_SHIPPING_CARRIER_PREFIX = "zone_shipping"
 
 
 def _valid_postal_code(postal_code):
@@ -91,33 +93,27 @@ def _bulk_promo_forced(shipping, settings):
     return bool(shipping.get("use_bulk_promo")) and settings["bulk_promo_active"]
 
 
-def _tres_guerras_option(settings=None, weight_kg=None, force_fixed=False):
-    settings = settings or get_shipping_settings_dict()
+def _tres_guerras_option(settings):
+    """Solo se ofrece en el tier "light" -- a partir de ahí se reemplaza por la tarifa
+    única por zona (_zone_shipping_option)."""
     return {
         "carrier": TRES_GUERRAS_CARRIER_CODE,
         "label": "Tres Guerras",
-        "cost": tres_guerras_cost_for_weight(settings, weight_kg, force_fixed=force_fixed),
+        "cost": settings["tres_guerras_fixed_cost"],
         "eta": "3-5 días hábiles",
     }
 
 
-def _fixed_carrier_options():
-    """Opciones de Estafeta/DHL a precio fijo sin cotización viva de Skydropx -- se
-    usan en el tier voluminoso o cuando la promo de mayoreo bypassea Skydropx."""
-    return [
-        {
-            "carrier": FIXED_ESTAFETA_CARRIER_CODE,
-            "label": "Estafeta",
-            "cost": HEAVY_SHIPMENT_CARRIER_COSTS["estafeta"],
-            "eta": "3-5 días hábiles",
-        },
-        {
-            "carrier": FIXED_DHL_CARRIER_CODE,
-            "label": "DHL",
-            "cost": HEAVY_SHIPMENT_CARRIER_COSTS["dhl"],
-            "eta": "3-5 días hábiles",
-        },
-    ]
+def _zone_shipping_option(postal_code, settings):
+    """Tarifa fija única (sin distinguir paquetería) para pedidos que no califican
+    para el tier "light" -- $380/$480 según si el código postal cae en zona extendida
+    (configurable en Ajustes)."""
+    return {
+        "carrier": ZONE_SHIPPING_CARRIER_PREFIX,
+        "label": "Envío",
+        "cost": zone_shipping_cost(postal_code, settings),
+        "eta": "3-5 días hábiles",
+    }
 
 
 def _destination_address(shipping):
@@ -135,15 +131,11 @@ def _destination_address(shipping):
     }
 
 
-def _skydropx_options(items_payload, shipping, settings, weight_kg, skip=False):
-    """Cotiza con Skydropx usando un peso estimado del carrito. Si falta la dirección
-    de origen/destino o la llamada falla, degrada devolviendo lista vacía en vez de
-    tronar la cotización completa (Tres Guerras sigue disponible como respaldo).
-    `skip=True` bloquea la llamada por completo -- tier voluminoso o promo de mayoreo,
-    para no pagar cotizaciones aéreas exorbitantes en paquetes grandes."""
-    if skip:
-        return [], False
-
+def _skydropx_options(items_payload, shipping, settings, weight_kg):
+    """Cotiza con Skydropx usando un peso estimado del carrito -- solo se llama para el
+    tier "light" (ver is_light_shipment). Si falta la dirección de origen/destino o la
+    llamada falla, degrada devolviendo lista vacía en vez de tronar la cotización
+    completa (Tres Guerras sigue disponible como respaldo)."""
     try:
         origin = get_origin_address(settings)
     except ValueError:
@@ -166,7 +158,7 @@ def _skydropx_options(items_payload, shipping, settings, weight_kg, skip=False):
         {
             "carrier": f"skydropx:{rate['rate_id']}",
             "label": f"{rate['carrier_name']} · {rate['service_level']}",
-            "cost": override_heavy_shipment_cost(rate["carrier_name"], rate["cost"], weight_kg),
+            "cost": rate["cost"],
             "eta": f"{rate['eta_days']} días hábiles" if rate.get("eta_days") else "Tiempo estimado por confirmar",
             "rate_id": rate["rate_id"],
             "quotation_id": rate["quotation_id"],
@@ -186,14 +178,13 @@ def quote():
     settings = get_shipping_settings_dict()
     weight_kg = _estimate_cart_weight_kg(items_payload)
     bulk_promo_forced = _bulk_promo_forced(data, settings)
-    route = "voluminous" if bulk_promo_forced else shipping_route_for_weight(weight_kg)
 
-    skydropx_options, skydropx_unavailable = _skydropx_options(
-        items_payload, data, settings, weight_kg, skip=(route == "voluminous")
-    )
-    options = skydropx_options + [_tres_guerras_option(settings, weight_kg, force_fixed=bulk_promo_forced)]
-    if route == "voluminous":
-        options += _fixed_carrier_options()
+    if is_light_shipment(weight_kg, bulk_promo_forced):
+        skydropx_options, skydropx_unavailable = _skydropx_options(items_payload, data, settings, weight_kg)
+        options = skydropx_options + [_tres_guerras_option(settings)]
+    else:
+        skydropx_unavailable = False
+        options = [_zone_shipping_option(postal_code, settings)]
 
     return jsonify(
         {
@@ -397,18 +388,17 @@ def _build_order(items_payload, shipping, payment_method):
     settings = get_shipping_settings_dict()
     weight_kg = _estimate_cart_weight_kg(items_payload)
     bulk_promo_forced = _bulk_promo_forced(shipping, settings)
-    route = "voluminous" if bulk_promo_forced else shipping_route_for_weight(weight_kg)
+    light = is_light_shipment(weight_kg, bulk_promo_forced)
 
-    if carrier_code == TRES_GUERRAS_CARRIER_CODE:
-        shipping_cost = tres_guerras_cost_for_weight(settings, weight_kg, force_fixed=bulk_promo_forced)
-    elif carrier_code in (FIXED_ESTAFETA_CARRIER_CODE, FIXED_DHL_CARRIER_CODE):
-        # Solo válidas en el tier voluminoso (o con la promo de mayoreo activa) -- no
-        # hay cotización viva de Skydropx que confirmar, así que se rechaza si el
-        # pedido no calificaba para saltarse Skydropx.
-        if route != "voluminous":
-            raise CheckoutError("Esa tarifa fija no está disponible para este pedido. Cotiza de nuevo.")
-        key = "estafeta" if carrier_code == FIXED_ESTAFETA_CARRIER_CODE else "dhl"
-        shipping_cost = HEAVY_SHIPMENT_CARRIER_COSTS[key]
+    if not light:
+        # Ya no se distingue paquetería en pedidos que no califican para "light" --
+        # una sola tarifa fija por zona, recalculada en el servidor (nunca confiar en
+        # el costo que mandó el cliente).
+        if carrier_code != ZONE_SHIPPING_CARRIER_PREFIX:
+            raise CheckoutError("Esa opción de envío no está disponible para este pedido. Cotiza de nuevo.")
+        shipping_cost = zone_shipping_cost(shipping.get("postal_code"), settings)
+    elif carrier_code == TRES_GUERRAS_CARRIER_CODE:
+        shipping_cost = settings["tres_guerras_fixed_cost"]
     elif carrier_code.startswith("skydropx:"):
         # Nunca confiar en un precio mandado por el cliente: se vuelve a cotizar en el
         # servidor con el mismo rate_id antes de cobrar/crear la orden.
@@ -421,7 +411,7 @@ def _build_order(items_payload, shipping, payment_method):
         matching_rate = next((r for r in rates if r["rate_id"] == rate_id), None)
         if matching_rate is None or not carrier_is_allowed(matching_rate["carrier_name"]):
             raise CheckoutError("La tarifa de envío elegida ya no está disponible. Cotiza de nuevo.")
-        shipping_cost = override_heavy_shipment_cost(matching_rate["carrier_name"], matching_rate["cost"], weight_kg)
+        shipping_cost = matching_rate["cost"]
     else:
         raise CheckoutError("Paquetería inválida.")
 

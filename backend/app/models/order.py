@@ -42,18 +42,11 @@ class OrderChannel(str, enum.Enum):
     IN_STORE = "in_store"  # Punto de Venta (caja registradora)
 
 
-# Código interno fijo para la opción de envío manual/fuera de Skydropx (Tres Guerras).
-# shipping_carrier ya no es un enum de Postgres: Skydropx cotiza combinaciones
-# dinámicas de paquetería/nivel de servicio, así que se guarda como texto libre
-# ("3guerras" para el manual, o "skydropx:<rate_id>" para lo cotizado por Skydropx).
+# Código interno fijo para la opción de envío manual/fuera de Skydropx (Tres Guerras,
+# solo tier "light"). shipping_carrier ya no es un enum de Postgres: se guarda como
+# texto libre ("3guerras" para el manual, "skydropx:<rate_id>" para lo cotizado por
+# Skydropx, o "zone_shipping" para la tarifa fija por zona en pedidos no-"light").
 TRES_GUERRAS_CARRIER_CODE = "3guerras"
-
-# Códigos fijos para Estafeta/DHL a precio fijo SIN cotización viva de Skydropx --
-# se usan cuando el pedido cae en el tier "voluminoso" (o la promo de mayoreo bypassea
-# la cotización) y no hay rate_id real que confirmar. La guía real se compra después,
-# a mano, desde Pedidos (ese flujo ya cotiza y compra con Skydropx por separado).
-FIXED_ESTAFETA_CARRIER_CODE = "fixed_estafeta"
-FIXED_DHL_CARRIER_CODE = "fixed_dhl"
 
 
 def _generate_order_number():

@@ -3,6 +3,9 @@ import { invalidateSettingsCache } from "../../settingsCache.js";
 import { getCategories } from "../../catalogCache.js";
 
 const SETTING_KEYS = { logo: "logo_url", banner: "banner_url" };
+// Debe coincidir con ZONE_SHIPPING_COSTS en backend/app/utils/shipping_estimate.py.
+const ZONE_NORMAL_COST = 380;
+const ZONE_EXTENDED_COST = 480;
 
 function numberFieldHtml(key, label, value, step = "0.01") {
   return `
@@ -32,6 +35,13 @@ function shippingSettingsCardHtml(shippingSettings, categories) {
     weightPerCategory = {};
   }
 
+  let extendedZonePrefixes = [];
+  try {
+    extendedZonePrefixes = JSON.parse(shippingSettings.shipping_extended_zone_postal_prefixes || "[]");
+  } catch {
+    extendedZonePrefixes = [];
+  }
+
   return `
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:col-span-2">
       <h3 class="text-xl font-bold mb-1">Envíos (Skydropx)</h3>
@@ -50,7 +60,7 @@ function shippingSettingsCardHtml(shippingSettings, categories) {
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
         ${numberFieldHtml("shipping_default_weight_per_piece_kg", "Peso por defecto (categoría sin dato)", shippingSettings.shipping_default_weight_per_piece_kg)}
         ${numberFieldHtml("shipping_packaging_weight_kg", "Peso de empaque (una vez por pedido)", shippingSettings.shipping_packaging_weight_kg)}
-        ${numberFieldHtml("shipping_tres_guerras_fixed_cost", "Costo fijo Tres Guerras ($)", shippingSettings.shipping_tres_guerras_fixed_cost)}
+        ${numberFieldHtml("shipping_tres_guerras_fixed_cost", "Costo fijo Tres Guerras, pedidos ligeros ($)", shippingSettings.shipping_tres_guerras_fixed_cost)}
       </div>
 
       <div class="bg-brand-pink-light bg-opacity-40 rounded-xl p-4 mb-6">
@@ -63,9 +73,23 @@ function shippingSettingsCardHtml(shippingSettings, categories) {
           </span>
         </label>
         <p class="text-xs text-gray-500 mt-1 ml-8">
-          Mientras esté prendida, en el checkout el cliente ve la opción de usar tarifa fija de envío
-          (Tres Guerras/Estafeta/DHL) aunque lleve pocas piezas.
+          Mientras esté prendida, en el checkout el cliente ve la opción de usar la tarifa fija de envío
+          por zona aunque lleve pocas piezas.
         </p>
+      </div>
+
+      <h4 class="text-sm font-bold text-gray-700 mb-2">Tarifa fija de envío (pedidos de 4+ piezas)</h4>
+      <p class="text-xs text-gray-500 mb-2">
+        A partir de 4 piezas ya no se cotiza con Skydropx: se cobra $${ZONE_NORMAL_COST} (zona normal) o
+        $${ZONE_EXTENDED_COST} (zona extendida). Escribe los prefijos de código postal que cuenten como
+        zona extendida, separados por coma (ej. <code>77, 97, 23</code>).
+      </p>
+      <div class="mb-6">
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Prefijos de zona extendida</label>
+        <input type="text" data-shipping-key="shipping_extended_zone_postal_prefixes"
+          value="${extendedZonePrefixes.join(", ")}"
+          placeholder="ej. 77, 97, 23"
+          class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-mexican" />
       </div>
 
       <h4 class="text-sm font-bold text-gray-700 mb-2">Dirección de origen</h4>
@@ -270,6 +294,17 @@ export function createAjustesSection(onUnauthorized) {
           container.querySelectorAll("[data-shipping-key]").forEach((input) => {
             const key = input.dataset.shippingKey;
             const value = input.value.trim();
+            if (key === "shipping_extended_zone_postal_prefixes") {
+              payload[key] = JSON.stringify(
+                value
+                  ? value
+                      .split(",")
+                      .map((p) => p.trim())
+                      .filter(Boolean)
+                  : []
+              );
+              return;
+            }
             if (!value) return;
             if (key.startsWith("category:")) {
               weightPerCategory[key.slice("category:".length)] = Number(value);

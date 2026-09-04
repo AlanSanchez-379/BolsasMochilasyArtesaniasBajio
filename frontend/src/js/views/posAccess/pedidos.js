@@ -14,7 +14,10 @@ const STATUSES = [
 function carrierLabel(carrier) {
   if (!carrier) return "-";
   if (carrier === "3guerras") return "Tres Guerras";
+  if (carrier === "zone_shipping") return "Envío (tarifa por zona)";
   if (carrier.startsWith("skydropx:")) return "Paquetería (cotizado)";
+  if (carrier === "fixed_estafeta") return "Estafeta (tarifa fija)";
+  if (carrier === "fixed_dhl") return "DHL (tarifa fija)";
   return carrier.toUpperCase();
 }
 

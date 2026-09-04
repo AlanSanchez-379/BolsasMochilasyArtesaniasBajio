@@ -15,6 +15,7 @@ SHIPPING_SETTING_KEYS = {
     "shipping_origin_postal_code",
     "shipping_tres_guerras_fixed_cost",
     "shipping_bulk_promo_active",
+    "shipping_extended_zone_postal_prefixes",
 }
 
 _ORIGIN_KEYS = {
@@ -31,21 +32,19 @@ DEFAULT_WEIGHT_PER_PIECE_KG = 0.3
 DEFAULT_PACKAGING_WEIGHT_KG = 0.5
 DEFAULT_TRES_GUERRAS_COST = 110.0
 
-HEAVY_SHIPMENT_TRES_GUERRAS_COST = 350.0
-HEAVY_SHIPMENT_CARRIER_COSTS = {
-    "estafeta": 380.0,
-    "dhl": 380.0,
-}
+# Pedidos que no califican para tier "light" (ver shipping_route_for_weight) ya no se
+# cotizan por paquetería individual -- una sola tarifa fija según la zona del código
+# postal de destino, configurable en Ajustes.
+ZONE_SHIPPING_COSTS = {"normal": 380.0, "extended": 480.0}
 
 # Asignación automática de caja según el peso estimado del pedido (referencia de
 # ~0.45 kg por bolsa para traducir los umbrales de piezas del negocio a kg -- el peso
 # real que se usa siempre viene de estimate_package_weight_kg, que ya pesa por
-# categoría). "route" define cómo se cotiza el envío en cada tier:
-#   light      -- solo Skydropx en vivo, sin tarifa fija forzada (1 a 3 piezas).
-#   medium     -- se cotiza con Skydropx pero Estafeta/DHL se fuerzan al precio fijo
-#                 (4 a 12 piezas, cajas 6-M/12-M).
-#   voluminous -- se bloquea la llamada a Skydropx por completo, solo tarifas fijas
-#                 (13+ piezas, cajas consolidadas 24z/36z).
+# categoría). "route" define cómo se cotiza el envío:
+#   light      -- solo Skydropx en vivo + Tres Guerras a su costo configurable (1 a 3
+#                 piezas).
+#   medium/voluminous -- se bloquea la llamada a Skydropx, una sola tarifa fija por
+#                 zona (ZONE_SHIPPING_COSTS) sin distinguir paquetería (4+ piezas).
 # Ajustable moviendo max_kg si cambia cómo se acomoda el producto en bodega.
 _WEIGHT_PER_PIECE_REFERENCE_KG = 0.45
 BOX_TIERS = [
@@ -96,33 +95,35 @@ def shipping_route_for_weight(weight_kg):
     return assign_box_tier(weight_kg)["route"]
 
 
-def tres_guerras_cost_for_weight(settings, weight_kg, force_fixed=False):
-    """Costo de Tres Guerras: fijo configurado en Ajustes, o el precio fijo de paquete
-    pesado si el pedido cae en tier medium/voluminous (o se fuerza por la promo de
-    mayoreo desde 1 pieza)."""
-    if force_fixed or (weight_kg is not None and shipping_route_for_weight(weight_kg) != "light"):
-        return HEAVY_SHIPMENT_TRES_GUERRAS_COST
-    return settings["tres_guerras_fixed_cost"]
+def is_light_shipment(weight_kg, bulk_promo_forced=False):
+    """El tier "light" es el único que sigue cotizando con Skydropx en vivo -- la promo
+    de mayoreo desde 1 pieza fuerza a que un pedido se trate como no-light aunque pese
+    poco (bypass a la tarifa fija por zona)."""
+    if bulk_promo_forced:
+        return False
+    return weight_kg is None or shipping_route_for_weight(weight_kg) == "light"
 
 
-def override_heavy_shipment_cost(carrier_name, cost, weight_kg):
-    """Para cotizaciones reales de Skydropx en el tier medium: si la paquetería es
-    Estafeta o DHL, se cobra el precio fijo en vez del cotizado."""
-    if weight_kg is None or shipping_route_for_weight(weight_kg) == "light":
-        return cost
-    name = (carrier_name or "").lower()
-    for key, fixed_cost in HEAVY_SHIPMENT_CARRIER_COSTS.items():
-        if key in name:
-            return fixed_cost
-    return cost
+def shipping_zone_for_postal_code(postal_code, settings):
+    """"extended" si el código postal empieza con alguno de los prefijos configurados
+    en Ajustes (shipping_extended_zone_postal_prefixes), si no "normal"."""
+    prefixes = settings.get("extended_zone_postal_prefixes") or []
+    postal_code = (postal_code or "").strip()
+    if any(postal_code.startswith(prefix) for prefix in prefixes):
+        return "extended"
+    return "normal"
+
+
+def zone_shipping_cost(postal_code, settings):
+    return ZONE_SHIPPING_COSTS[shipping_zone_for_postal_code(postal_code, settings)]
 
 
 def carrier_is_allowed(carrier_name):
     """La dueña solo quiere gestionar Tres Guerras/Estafeta/DHL -- cualquier otra
     paquetería que Skydropx llegue a cotizar (FedEx, Redpack, Paquetexpress, etc.) se
-    descarta de las opciones que ve el cliente en el checkout."""
+    descarta de las opciones que ve el cliente en el checkout (tier light)."""
     name = (carrier_name or "").lower()
-    return any(key in name for key in HEAVY_SHIPMENT_CARRIER_COSTS)
+    return any(key in name for key in ("estafeta", "dhl"))
 
 
 def get_shipping_settings_dict():
@@ -133,6 +134,13 @@ def get_shipping_settings_dict():
         weight_per_category = json.loads(rows.get("shipping_weight_per_category_kg") or "{}")
     except (TypeError, ValueError):
         weight_per_category = {}
+
+    try:
+        extended_zone_prefixes = json.loads(rows.get("shipping_extended_zone_postal_prefixes") or "[]")
+        if not isinstance(extended_zone_prefixes, list):
+            extended_zone_prefixes = []
+    except (TypeError, ValueError):
+        extended_zone_prefixes = []
 
     def _float(key, default):
         raw = rows.get(key)
@@ -147,6 +155,7 @@ def get_shipping_settings_dict():
         "packaging_weight_kg": _float("shipping_packaging_weight_kg", DEFAULT_PACKAGING_WEIGHT_KG),
         "tres_guerras_fixed_cost": _float("shipping_tres_guerras_fixed_cost", DEFAULT_TRES_GUERRAS_COST),
         "bulk_promo_active": (rows.get("shipping_bulk_promo_active") or "false").lower() == "true",
+        "extended_zone_postal_prefixes": extended_zone_prefixes,
         "origin_name": rows.get("shipping_origin_name"),
         "origin_phone": rows.get("shipping_origin_phone"),
         "origin_street": rows.get("shipping_origin_street"),
