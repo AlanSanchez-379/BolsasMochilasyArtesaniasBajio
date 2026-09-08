@@ -173,6 +173,9 @@ export const posAccessApi = {
   updatePaymentSettings: (payload) =>
     posAccessFetch("/admin/payment-settings", { method: "PATCH", body: JSON.stringify(payload) }),
   getPosAccessSettings: () => posAccessFetch("/admin/pos-access-settings"),
-  updatePosAccessSettings: (pin) =>
-    posAccessFetch("/admin/pos-access-settings", { method: "PATCH", body: JSON.stringify({ pin }) }),
+  updatePosAccessSettings: (pin, emp_pin) =>
+    posAccessFetch("/admin/pos-access-settings", {
+      method: "PATCH",
+      body: JSON.stringify({ pin, emp_pin }),
+    }),
 };

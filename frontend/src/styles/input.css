@@ -4,13 +4,17 @@
 
 @layer base {
   body {
-    background-color: #ffffff;
+    background-color: #f9fafb; /* gray-50 */
     color: #333333;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
   }
 }
 
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
@@ -23,14 +27,25 @@
   background: #e4007c;
 }
 
-.fade-in {
-  animation: fadeIn 0.3s ease-in;
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm;
   }
-  to {
-    opacity: 1;
+  .glass-dark {
+    @apply bg-gray-900/80 backdrop-blur-lg border border-gray-700/50 shadow-lg;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    height: 3px;
+    width: 3px;
+  }
+  .hide-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .hide-scrollbar::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 3px;
+  }
+  .hide-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
   }
 }

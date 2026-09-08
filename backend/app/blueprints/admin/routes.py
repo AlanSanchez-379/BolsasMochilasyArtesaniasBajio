@@ -227,22 +227,37 @@ def update_payment_settings():
 @pos_access_required
 def get_pos_access_settings():
     setting = Setting.query.get("pos_access_pin_hash")
-    return jsonify({"pin_configured": bool(setting and setting.value)})
+    emp_setting = Setting.query.get("pos_access_employee_pin_hash")
+    return jsonify({
+        "pin_configured": bool(setting and setting.value),
+        "emp_pin_configured": bool(emp_setting and emp_setting.value)
+    })
 
 
 @admin_bp.patch("/pos-access-settings")
 @pos_access_required
 def update_pos_access_settings():
-    """Body: {pin}. Cambia el PIN compartido de la liga de venta local (/venta-local).
-    Se guarda hasheado, nunca se expone en texto plano ni el hash a ningún cliente."""
-    pin = ((request.get_json() or {}).get("pin") or "").strip()
-    if len(pin) < 4:
-        return jsonify({"message": "El PIN debe tener al menos 4 caracteres."}), 400
-    setting = Setting.query.get("pos_access_pin_hash") or Setting(key="pos_access_pin_hash")
-    setting.value = generate_password_hash(pin)
-    db.session.add(setting)
+    """Body: {pin, emp_pin}. Cambia los PINs compartidos de la liga de venta local."""
+    data = request.get_json() or {}
+    
+    pin = (data.get("pin") or "").strip()
+    if pin:
+        if len(pin) < 4:
+            return jsonify({"message": "El PIN de Admin debe tener al menos 4 caracteres."}), 400
+        setting = Setting.query.get("pos_access_pin_hash") or Setting(key="pos_access_pin_hash")
+        setting.value = generate_password_hash(pin)
+        db.session.add(setting)
+
+    emp_pin = (data.get("emp_pin") or "").strip()
+    if emp_pin:
+        if len(emp_pin) < 4:
+            return jsonify({"message": "El PIN de Empleado debe tener al menos 4 caracteres."}), 400
+        setting_emp = Setting.query.get("pos_access_employee_pin_hash") or Setting(key="pos_access_employee_pin_hash")
+        setting_emp.value = generate_password_hash(emp_pin)
+        db.session.add(setting_emp)
+
     db.session.commit()
-    return jsonify({"pin_configured": True})
+    return jsonify({"ok": True})
 
 
 @admin_bp.get("/products/image-history")

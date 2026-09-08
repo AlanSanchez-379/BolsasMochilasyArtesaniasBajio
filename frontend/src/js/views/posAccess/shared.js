@@ -22,6 +22,20 @@ export function marginHtml(product) {
   return `<span class="${colorClass} font-semibold">${money(margin)} (${pct.toFixed(0)}%)</span>`;
 }
 
+export function getNextSku(products) {
+  let maxSku = 0;
+  for (const product of products) {
+    for (const variant of product.variants || []) {
+      const match = (variant.sku || "").match(/\d+/);
+      if (match) {
+        const num = parseInt(match[0], 10);
+        if (num > maxSku) maxSku = num;
+      }
+    }
+  }
+  return maxSku > 0 ? (maxSku + 1).toString() : "1000";
+}
+
 // Modal genérico para formularios largos (crear/editar producto o paquete) -- antes
 // estos formularios se insertaban en un panel debajo de la tabla, lo que con muchas
 // filas quedaba fuera de la vista y parecía que el botón "no hacía nada". Se cierra

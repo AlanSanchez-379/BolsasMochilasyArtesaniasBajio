@@ -39,22 +39,31 @@ def login():
         wait = int(locked_until - time.time())
         return jsonify({"message": f"Demasiados intentos. Espera {wait} segundos."}), 429
 
-    setting = Setting.query.get("pos_access_pin_hash")
-    if not setting or not setting.value:
+    admin_setting = Setting.query.get("pos_access_pin_hash")
+    emp_setting = Setting.query.get("pos_access_employee_pin_hash")
+    
+    if not admin_setting or not admin_setting.value:
         return jsonify({"message": "PIN no configurado. Pídele al administrador que lo configure en Ajustes."}), 400
 
     password = (request.get_json() or {}).get("password") or ""
-    if not check_password_hash(setting.value, password):
+    
+    role = None
+    if check_password_hash(admin_setting.value, password):
+        role = "admin"
+    elif emp_setting and emp_setting.value and check_password_hash(emp_setting.value, password):
+        role = "employee"
+
+    if not role:
         fails += 1
         locked_until = time.time() + LOCKOUT_SECONDS if fails >= MAX_FAILED_ATTEMPTS else 0
         _failed_attempts[ip] = (fails, locked_until)
         return jsonify({"message": "PIN incorrecto."}), 401
 
     _failed_attempts.pop(ip, None)
-    response = make_response(jsonify({"ok": True}))
+    response = make_response(jsonify({"ok": True, "role": role}))
     response.set_cookie(
         POS_ACCESS_COOKIE_NAME,
-        issue_pos_access_token(),
+        issue_pos_access_token(role),
         httponly=True,
         samesite=current_app.config["COOKIE_SAMESITE"],
         secure=current_app.config["COOKIE_SECURE"],
@@ -77,7 +86,8 @@ def logout():
 @pos_access_bp.get("/me")
 @pos_access_required
 def me():
-    return jsonify({"ok": True})
+    from flask import g
+    return jsonify({"ok": True, "role": getattr(g, "pos_role", "admin")})
 
 
 @pos_access_bp.get("/products")

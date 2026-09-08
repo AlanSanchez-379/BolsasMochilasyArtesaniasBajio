@@ -50,7 +50,7 @@ onRouteChange((path) => {
 });
 
 route("/", () => renderHome(view));
-route("/categoria/:name", ({ params }) => renderCategory(view, params.name));
+route("/categoria/:name", ({ params, query }) => renderCategory(view, params.name, query));
 route("/producto/:slug", ({ params }) => renderProductDetail(view, params.slug));
 route("/carrito", () => renderCart(view));
 route("/checkout", () => renderCheckout(view));

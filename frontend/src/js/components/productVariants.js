@@ -40,7 +40,7 @@ function photoSlotsHtml(images, { fileAttr, uploadAttr, historyAttr, removeAttr 
 // Editor de variantes de un producto (o paquete) ya guardado: cada fila se edita y
 // sube su imagen de forma independiente contra el backend. Compartido entre el tab
 // de Catálogo y el de Paquetes del panel admin.
-export function renderVariantsSection(el, product) {
+export function renderVariantsSection(el, product, getNextSkuCb) {
   el.innerHTML = `
     <h4 class="text-xl font-bold mb-4">Variantes</h4>
     <div id="variants-list" class="space-y-3 mb-4"></div>
@@ -198,7 +198,7 @@ export function renderVariantsSection(el, product) {
     try {
       const { product: updated } = await posAccessApi.createVariant(product.id, {
         color: "Nuevo",
-        sku: `SKU-${Date.now()}`,
+        sku: getNextSkuCb ? getNextSkuCb() : `SKU-${Date.now()}`,
         stock: 0,
       });
       Object.assign(product, updated);
@@ -213,7 +213,17 @@ export function renderVariantsSection(el, product) {
 // guardado: solo mantiene la lista en memoria (`variants`); se envía junto con el
 // resto del formulario al crear. `variants` se muta in-place para que el caller lea
 // su contenido final al hacer submit.
-export function renderNewVariantsBuilder(el, variants) {
+export function renderNewVariantsBuilder(el, variants, getNextSkuCb) {
+  if (variants.length === 0) {
+    variants.push({
+      tempId: `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      color: "Diseño 1",
+      sku: getNextSkuCb ? getNextSkuCb() : "",
+      stock: 0,
+      image_urls: [],
+    });
+  }
+
   el.innerHTML = `
     <div id="new-variants-list" class="space-y-3 mb-3"></div>
     <button type="button" id="add-new-variant-row" class="text-brand-blue-dark font-semibold hover:underline text-sm">
@@ -328,10 +338,26 @@ export function renderNewVariantsBuilder(el, variants) {
   }
 
   el.querySelector("#add-new-variant-row").addEventListener("click", () => {
+    // Determine max existing new variant SKU to suggest the next one if possible
+    let nextSku = getNextSkuCb ? getNextSkuCb() : "";
+    if (variants.length > 0) {
+      let maxLocalSku = 0;
+      variants.forEach(v => {
+        const match = (v.sku || "").match(/\d+/);
+        if (match) {
+          const num = parseInt(match[0], 10);
+          if (num > maxLocalSku) maxLocalSku = num;
+        }
+      });
+      if (maxLocalSku > 0) {
+        nextSku = (maxLocalSku + 1).toString();
+      }
+    }
+
     variants.push({
       tempId: `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      color: "",
-      sku: "",
+      color: "Diseño " + (variants.length + 1),
+      sku: nextSku,
       stock: 0,
       image_urls: [],
     });

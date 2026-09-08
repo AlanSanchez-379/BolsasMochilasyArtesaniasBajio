@@ -1,4 +1,4 @@
-﻿import { posAccessApi } from "../../api.js";
+import { posAccessApi } from "../../api.js";
 import { invalidateSettingsCache } from "../../settingsCache.js";
 import { getCategories } from "../../catalogCache.js";
 
@@ -144,12 +144,16 @@ function posAccessCardHtml(posAccessSettings) {
         PIN compartido para entrar a esta misma terminal (<code>/venta-local</code>) —
         ${posAccessSettings.pin_configured ? "ya hay uno configurado." : "todavía no hay uno configurado."}
       </p>
-      <label class="block text-xs font-semibold text-gray-600 mb-1">Nuevo PIN (mínimo 4 caracteres)</label>
-      <input type="text" id="pos-pin-input" class="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2" />
+      <label class="block text-xs font-semibold text-gray-600 mb-1">Nuevo PIN de Admin (mínimo 4 caracteres)</label>
+      <input type="text" id="pos-pin-input" class="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2" placeholder="Dejar en blanco para no cambiar" />
+      
+      <label class="block text-xs font-semibold text-gray-600 mb-1 mt-4">PIN de Empleados (Mínimo 4 caracteres)</label>
+      <input type="text" id="pos-emp-pin-input" class="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2" placeholder="${posAccessSettings.emp_pin_configured ? 'Ya configurado (escribe para cambiar)' : 'No configurado'}" />
+      
       <p data-pos-pin-error class="text-red-500 text-sm mb-2 hidden"></p>
-      <p data-pos-pin-success class="text-green-600 text-sm mb-2 hidden">PIN actualizado.</p>
+      <p data-pos-pin-success class="text-green-600 text-sm mb-2 hidden">PINs actualizados.</p>
       <button data-save-pos-pin class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
-        <i class="fa-solid fa-key mr-2"></i>Guardar PIN
+        <i class="fa-solid fa-key mr-2"></i>Guardar PINs
       </button>
     </div>
   `;
@@ -224,6 +228,7 @@ export function createAjustesSection(onUnauthorized) {
         container.querySelector("[data-save-pos-pin]").addEventListener("click", async () => {
           const btn = container.querySelector("[data-save-pos-pin]");
           const input = container.querySelector("#pos-pin-input");
+          const empInput = container.querySelector("#pos-emp-pin-input");
           const errorEl = container.querySelector("[data-pos-pin-error]");
           const successEl = container.querySelector("[data-pos-pin-success]");
           errorEl.classList.add("hidden");
@@ -233,8 +238,10 @@ export function createAjustesSection(onUnauthorized) {
           const originalText = btn.innerHTML;
           btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>Guardando...`;
           try {
-            posAccessSettings = await posAccessApi.updatePosAccessSettings(input.value);
+            await posAccessApi.updatePosAccessSettings(input.value, empInput.value);
+            posAccessSettings = await posAccessApi.getPosAccessSettings();
             input.value = "";
+            empInput.value = "";
             successEl.classList.remove("hidden");
           } catch (err) {
             if (err.status === 401 && onUnauthorized) {

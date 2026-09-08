@@ -25,7 +25,7 @@ function userMenuHtml() {
     </div>
     <button data-nav="/mis-pedidos" class="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-brand-mexican">Mis Pedidos</button>
     <div class="border-t border-gray-100 mt-1"></div>
-    <button id="logout-btn" class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-red-500">
+    <button class="logout-btn block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-red-500">
       Cerrar Sesión
     </button>
   `;
@@ -33,9 +33,9 @@ function userMenuHtml() {
 
 function logoHtml(settings) {
   if (settings.logo_url) {
-    return `<img src="${settings.logo_url}" alt="Bolsas, Mochilas Y Artesanías del Bajío" class="h-full w-auto object-contain max-h-20" />`;
+    return `<img src="${settings.logo_url}" alt="Bolsas, Mochilas Y Artesanías del Bajío" class="w-auto h-auto max-h-20 max-w-[200px] object-contain" />`;
   }
-  return `<span class="text-2xl font-black text-brand-pink tracking-tight">BM&amp;A del Bajío</span>`;
+  return `<span class="text-2xl font-black text-white tracking-tight">BM&amp;A del Bajío</span>`;
 }
 
 // El logo se sube desde Ajustes (Venta Local) y cambia de URL cada vez -- se usa el
@@ -57,18 +57,20 @@ export async function renderNavbar(container) {
   const count = cartItemsCount();
 
   container.innerHTML = `
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav class="bg-brand-pink sticky top-0 z-50 shadow-md">
+      <div class="h-1.5 w-full bg-gradient-to-r from-green-500 via-white to-red-500"></div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between gap-4 lg:gap-8 h-24">
-          <div class="flex-shrink-0 flex items-center cursor-pointer h-full py-2" data-nav="/">
+        <div class="flex items-center justify-between gap-4 lg:gap-8 h-24 relative">
+          <div class="flex-shrink-0 flex items-center cursor-pointer max-w-[50%]" data-nav="/">
             ${logoHtml(settings)}
           </div>
 
-          <div class="hidden lg:flex items-center space-x-6 flex-shrink-0">
+          <div class="hidden lg:flex items-center space-x-8 flex-shrink-0">
             ${NAV_LINKS.map(
               (link) => `
-              <button data-nav="${link.href}" class="text-sm font-bold text-gray-800 hover:text-brand-mexican transition-colors uppercase tracking-wide whitespace-nowrap">
+              <button data-nav="${link.href}" class="relative text-sm font-bold text-white hover:text-gray-100 transition-colors uppercase tracking-widest whitespace-nowrap group">
                 ${link.label}
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all group-hover:w-full"></span>
               </button>`
             ).join("")}
           </div>
@@ -76,33 +78,81 @@ export async function renderNavbar(container) {
           <div class="hidden md:flex flex-1 justify-center px-2">
             <div class="relative w-full max-w-sm">
               <input type="text" placeholder="Buscar productos..."
-                class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm outline-none focus:border-brand-pink transition-colors" />
-              <i class="fa-solid fa-search absolute left-4 top-2.5 text-gray-400"></i>
+                class="search-input w-full pl-11 pr-4 py-2.5 bg-gray-100/50 border border-gray-200 rounded-full text-sm outline-none focus:border-brand-pink focus:bg-white focus:shadow-sm transition-all" />
+              <i class="search-icon fa-solid fa-search absolute left-4 top-3 text-gray-400 cursor-pointer hover:text-brand-pink"></i>
             </div>
           </div>
 
-          <div class="flex items-center space-x-5 flex-shrink-0">
-            <div class="relative">
-              <button id="user-menu-btn" class="flex items-center gap-2 text-gray-600 hover:text-brand-mexican">
+          <div class="flex items-center space-x-3 sm:space-x-4 flex-shrink-0">
+            <div class="hidden lg:block relative">
+              <button id="user-menu-btn" class="flex items-center gap-2 text-white hover:text-gray-100 transition-colors">
                 <i class="fa-regular fa-user text-xl"></i>
-                <span class="hidden sm:inline text-sm font-medium">
+                <span class="text-sm font-medium">
                   ${state.currentUser ? "Mi Cuenta" : "Invitado"}
                 </span>
               </button>
-              <div id="user-menu" class="hidden absolute right-0 mt-4 w-56 bg-white border border-gray-200 rounded shadow-lg py-1 z-50 fade-in">
+              <div id="user-menu" class="hidden absolute right-0 mt-4 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 z-50 animate-fade-in-up">
                 ${userMenuHtml()}
               </div>
             </div>
 
-            <button data-nav="/carrito" class="bg-gray-900 hover:bg-brand-mexican text-white px-5 py-2.5 rounded flex items-center gap-3 transition-colors">
+            <button data-nav="/carrito" class="bg-white hover:bg-gray-100 text-brand-pink w-11 h-11 lg:w-auto lg:px-6 lg:py-2.5 rounded-full flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:-translate-y-0.5 shadow-md relative">
               <i class="fa-solid fa-cart-shopping"></i>
-              <span class="font-semibold text-sm hidden sm:block">Tu Carrito</span>
+              <span class="font-semibold text-sm hidden lg:block tracking-wide">CARRITO</span>
               ${
                 count > 0
-                  ? `<span class="bg-white text-brand-mexican text-xs px-2 py-0.5 rounded-full font-bold">${count}</span>`
+                  ? `<span class="absolute -top-1 -right-1 lg:static lg:top-auto lg:right-auto bg-brand-salmon text-white text-[10px] lg:text-xs w-5 h-5 lg:w-auto lg:px-2 lg:py-0.5 flex items-center justify-center rounded-full font-bold shadow-sm">${count}</span>`
                   : ""
               }
             </button>
+            
+            <button id="mobile-menu-btn" class="lg:hidden text-white hover:text-gray-100 w-11 h-11 flex items-center justify-center transition-colors">
+              <i class="fa-solid fa-bars text-2xl"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menú Móvil -->
+      <div id="mobile-menu" class="hidden lg:hidden bg-white shadow-xl absolute top-full left-0 w-full animate-fade-in-down border-t border-gray-100 z-40">
+        <div class="px-4 py-4 bg-gray-50 flex items-center gap-4 border-b border-gray-100">
+          <div class="w-12 h-12 rounded-full bg-brand-pink/10 text-brand-pink flex items-center justify-center text-xl">
+            <i class="fa-regular fa-user"></i>
+          </div>
+          <div>
+            ${state.currentUser ? `
+              <p class="text-xs text-gray-500">Sesión actual</p>
+              <p class="text-sm font-bold text-gray-900">${state.currentUser.full_name || state.currentUser.email}</p>
+            ` : `
+              <p class="text-sm font-bold text-gray-900">Bienvenido</p>
+              <p class="text-xs text-gray-500">Inicia sesión para comprar</p>
+            `}
+          </div>
+        </div>
+        <div class="px-4 pt-2 pb-2 space-y-1">
+          ${NAV_LINKS.map(
+            (link) => `
+            <button data-nav="${link.href}" class="mobile-nav-link block w-full text-left px-4 py-3 rounded-md text-sm font-bold text-gray-700 hover:text-brand-pink hover:bg-gray-50 uppercase tracking-widest">
+              ${link.label}
+            </button>`
+          ).join("")}
+        </div>
+        
+        <div class="px-4 py-2 border-t border-gray-100 space-y-1">
+            ${state.currentUser ? `
+              <button data-nav="/mis-pedidos" class="mobile-nav-link block w-full text-left px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50">Mis Pedidos</button>
+              <button class="logout-btn block w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50">Cerrar Sesión</button>
+            ` : `
+              <button data-nav="/login" class="mobile-nav-link block w-full text-left px-4 py-3 text-sm font-bold text-brand-pink hover:bg-brand-pink/5">Iniciar Sesión</button>
+              <button data-nav="/registro" class="mobile-nav-link block w-full text-left px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50">Crear Cuenta</button>
+            `}
+        </div>
+
+        <div class="px-4 py-4 mt-2 border-t border-gray-100 bg-gray-50">
+          <div class="relative w-full">
+            <input type="text" placeholder="Buscar productos..."
+              class="search-input w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-full text-sm outline-none focus:border-brand-pink focus:shadow-sm transition-all" />
+            <i class="search-icon fa-solid fa-search absolute left-4 top-3.5 text-gray-400 cursor-pointer hover:text-brand-pink"></i>
           </div>
         </div>
       </div>
@@ -117,12 +167,49 @@ export async function renderNavbar(container) {
   const menu = container.querySelector("#user-menu");
   menuBtn.addEventListener("click", () => menu.classList.toggle("hidden"));
 
-  const logoutBtn = container.querySelector("#logout-btn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
+  const mobileMenuBtn = container.querySelector("#mobile-menu-btn");
+  const mobileMenu = container.querySelector("#mobile-menu");
+  mobileMenuBtn.addEventListener("click", () => {
+    mobileMenu.classList.toggle("hidden");
+    const icon = mobileMenuBtn.querySelector("i");
+    icon.classList.toggle("fa-bars");
+    icon.classList.toggle("fa-xmark");
+  });
+
+  container.querySelectorAll(".mobile-nav-link").forEach(el => {
+    el.addEventListener("click", () => {
+      mobileMenu.classList.add("hidden");
+      mobileMenuBtn.querySelector("i").classList.remove("fa-xmark");
+      mobileMenuBtn.querySelector("i").classList.add("fa-bars");
+    });
+  });
+
+  container.querySelectorAll(".logout-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
       await api.logout();
       setCurrentUser(null);
       navigate("/");
     });
-  }
+  });
+
+  const performSearch = (val) => {
+    if (val.trim()) {
+      navigate(`/categoria/Todos?q=${encodeURIComponent(val.trim())}`);
+      if (mobileMenu) {
+        mobileMenu.classList.add("hidden");
+        mobileMenuBtn.querySelector("i").classList.remove("fa-xmark");
+        mobileMenuBtn.querySelector("i").classList.add("fa-bars");
+      }
+    }
+  };
+
+  container.querySelectorAll(".search-input").forEach((input, idx) => {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") performSearch(e.target.value);
+    });
+    const icon = container.querySelectorAll(".search-icon")[idx];
+    if (icon) {
+      icon.addEventListener("click", () => performSearch(input.value));
+    }
+  });
 }

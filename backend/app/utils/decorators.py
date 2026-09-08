@@ -62,26 +62,32 @@ def _pos_access_serializer():
     return URLSafeTimedSerializer(current_app.config["SECRET_KEY"], salt="pos-access")
 
 
-def issue_pos_access_token():
-    return _pos_access_serializer().dumps({"ok": True})
+def issue_pos_access_token(role="admin"):
+    return _pos_access_serializer().dumps({"ok": True, "role": role})
 
 
 def verify_pos_access_token(token):
     if not token:
-        return False
+        return None
     try:
         data = _pos_access_serializer().loads(token, max_age=POS_ACCESS_MAX_AGE)
     except (BadSignature, SignatureExpired):
-        return False
-    return bool(data.get("ok"))
+        return None
+    
+    if data.get("ok"):
+        return data.get("role", "admin")
+    return None
 
 
 def pos_access_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         token = request.cookies.get(POS_ACCESS_COOKIE_NAME)
-        if not verify_pos_access_token(token):
+        role = verify_pos_access_token(token)
+        if not role:
             return jsonify({"message": "Ingresa el PIN de la tienda."}), 401
+        
+        g.pos_role = role
         return fn(*args, **kwargs)
 
     return wrapper

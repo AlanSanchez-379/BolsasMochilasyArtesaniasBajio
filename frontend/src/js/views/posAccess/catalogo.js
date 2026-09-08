@@ -2,7 +2,7 @@ import { posAccessApi } from "../../api.js";
 import { showConfirmModal } from "../../components/confirmModal.js";
 import { getCategories } from "../../catalogCache.js";
 import { renderVariantsSection, renderNewVariantsBuilder } from "../../components/productVariants.js";
-import { money, marginHtml, openFormModal } from "./shared.js";
+import { money, marginHtml, openFormModal, getNextSku } from "./shared.js";
 
 // --- Sección "Catálogo": CRUD completo de productos (no paquetes), con costo/margen
 // visibles en la tabla -- absorbe lo que antes era la tabla de solo lectura "Inventario". ---
@@ -66,9 +66,9 @@ export function createCatalogoSection(onUnauthorized) {
                   <th class="px-4 py-3">Nombre</th>
                   <th class="px-4 py-3">Categoría</th>
                   <th class="px-4 py-3">Subcategoría</th>
-                  <th class="px-4 py-3">Costo</th>
+                  ${window.posRole !== "employee" ? '<th class="px-4 py-3">Costo</th>' : ''}
                   <th class="px-4 py-3">Precio</th>
-                  <th class="px-4 py-3">Margen</th>
+                  ${window.posRole !== "employee" ? '<th class="px-4 py-3">Margen</th>' : ''}
                   <th class="px-4 py-3">Stock total</th>
                   <th class="px-4 py-3"></th>
                 </tr>
@@ -82,9 +82,9 @@ export function createCatalogoSection(onUnauthorized) {
                       <td class="px-4 py-3 font-semibold">${p.name}${p.is_on_sale ? ' <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded ml-1">OFERTA</span>' : ""}</td>
                       <td class="px-4 py-3 text-sm">${p.category}</td>
                       <td class="px-4 py-3 text-sm">${p.subcategory}</td>
-                      <td class="px-4 py-3 text-sm text-gray-500">${p.cost_price != null ? money(p.cost_price) : "—"}</td>
+                      ${window.posRole !== "employee" ? `<td class="px-4 py-3 text-sm text-gray-500">${p.cost_price != null ? money(p.cost_price) : "—"}</td>` : ''}
                       <td class="px-4 py-3">${p.is_on_sale ? `<span class="line-through text-gray-400">${money(p.price_normal)}</span> <span class="text-red-500 font-bold">${money(p.sale_price)}</span>` : money(p.price_normal)}</td>
-                      <td class="px-4 py-3">${marginHtml(p)}</td>
+                      ${window.posRole !== "employee" ? `<td class="px-4 py-3">${marginHtml(p)}</td>` : ''}
                       <td class="px-4 py-3">${stock === 0 ? '<span class="text-red-500 font-bold">AGOTADO</span>' : stock}</td>
                       <td class="px-4 py-3 text-right">
                         <button data-edit="${p.id}" class="text-brand-mexican font-semibold hover:underline mr-3">Editar</button>
@@ -191,11 +191,15 @@ export function createCatalogoSection(onUnauthorized) {
                 <label class="block text-sm font-bold text-gray-700 mb-1">Precio Súper Mayoreo</label>
                 <input type="number" step="0.01" name="price_super_wholesale" required value="${product?.price_super_wholesale ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
               </div>
+              ${window.posRole !== "employee" ? `
               <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Costo (compra)</label>
                 <input type="number" step="0.01" name="cost_price" value="${product?.cost_price ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
                 <p id="margin-preview" class="text-xs text-gray-500 mt-1"></p>
               </div>
+              ` : `
+              <input type="hidden" name="cost_price" value="${product?.cost_price ?? ""}" />
+              `}
               <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Mín. piezas Mayoreo</label>
                 <input type="number" name="wholesale_min_qty" required value="${product?.wholesale_min_qty ?? 6}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
@@ -242,7 +246,7 @@ export function createCatalogoSection(onUnauthorized) {
         el.querySelector("#close-detail").addEventListener("click", () => modal.close());
 
         if (isNew) {
-          renderNewVariantsBuilder(el.querySelector("#new-variants-builder"), newVariants);
+          renderNewVariantsBuilder(el.querySelector("#new-variants-builder"), newVariants, () => getNextSku(allProducts));
         }
 
         el.querySelector("#is-on-sale-checkbox").addEventListener("change", (e) => {
@@ -328,7 +332,7 @@ export function createCatalogoSection(onUnauthorized) {
         });
 
         if (!isNew) {
-          renderVariantsSection(el.querySelector("#variants-section"), product);
+          renderVariantsSection(el.querySelector("#variants-section"), product, () => getNextSku(allProducts));
         }
       }
 

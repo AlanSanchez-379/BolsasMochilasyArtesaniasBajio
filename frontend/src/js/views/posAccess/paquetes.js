@@ -2,7 +2,7 @@ import { posAccessApi } from "../../api.js";
 import { showConfirmModal } from "../../components/confirmModal.js";
 import { getCategories } from "../../catalogCache.js";
 import { renderVariantsSection, renderNewVariantsBuilder } from "../../components/productVariants.js";
-import { money, openFormModal } from "./shared.js";
+import { money, openFormModal, getNextSku } from "./shared.js";
 
 // --- Sección "Paquetes": CRUD completo de productos is_bundle=true. ---
 export function createPaquetesSection(onUnauthorized) {
@@ -10,14 +10,15 @@ export function createPaquetesSection(onUnauthorized) {
     async mount(container) {
       container.innerHTML = `<div class="text-center py-12 text-gray-400">Cargando paquetes...</div>`;
 
-      let categories, subcategories, bundles, normalProducts;
+      let categories, subcategories, bundles, normalProducts, allProducts;
       try {
-        const [{ categories: cats, subcategories: subs }, { products: allProducts }] = await Promise.all([
+        const [{ categories: cats, subcategories: subs }, { products: fetchedProducts }] = await Promise.all([
           getCategories(),
           posAccessApi.listProducts(),
         ]);
         categories = cats;
         subcategories = subs;
+        allProducts = fetchedProducts;
         bundles = allProducts.filter((p) => p.is_bundle);
         normalProducts = allProducts.filter((p) => !p.is_bundle);
       } catch (err) {
@@ -421,7 +422,7 @@ export function createPaquetesSection(onUnauthorized) {
         });
 
         if (isNew) {
-          renderNewVariantsBuilder(el.querySelector("#new-variants-builder"), newVariants);
+          renderNewVariantsBuilder(el.querySelector("#new-variants-builder"), newVariants, () => getNextSku(allProducts));
         }
 
         const form = el.querySelector("#bundle-form");
@@ -521,7 +522,7 @@ export function createPaquetesSection(onUnauthorized) {
         });
 
         if (!isNew) {
-          renderVariantsSection(el.querySelector("#variants-section"), bundle);
+          renderVariantsSection(el.querySelector("#variants-section"), bundle, () => getNextSku(allProducts));
         }
       }
 

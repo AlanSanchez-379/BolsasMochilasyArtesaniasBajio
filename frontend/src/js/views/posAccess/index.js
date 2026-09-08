@@ -1,4 +1,4 @@
-﻿import { posAccessApi } from "../../api.js";
+import { posAccessApi } from "../../api.js";
 import { createDashboardSection } from "./dashboard.js";
 import { createSaleSection } from "./cobrar.js";
 import { createCatalogoSection } from "./catalogo.js";
@@ -8,16 +8,22 @@ import { createAjustesSection } from "./ajustes.js";
 
 function gateHtml() {
   return `
-    <div class="min-h-screen flex items-center justify-center bg-brand-cream px-4">
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-sm text-center">
-        <i class="fa-solid fa-cash-register text-4xl text-brand-mexican mb-4"></i>
-        <h1 class="text-xl font-bold text-gray-900 mb-1">Venta Local</h1>
-        <p class="text-sm text-gray-500 mb-6">Ingresa el PIN de la tienda</p>
-        <input id="pin-input" type="password" inputmode="numeric" autocomplete="off"
-          class="w-full text-center text-2xl tracking-widest px-4 py-3 border border-gray-300 rounded-lg mb-3 outline-none focus:border-brand-pink" />
-        <p id="pin-error" class="text-red-500 text-sm mb-3 hidden"></p>
-        <button id="pin-submit" class="w-full bg-gray-900 hover:bg-brand-mexican text-white font-bold py-3 rounded-full transition-colors">
-          Entrar
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 relative overflow-hidden">
+      <!-- Decoraciones de fondo -->
+      <div class="absolute -top-32 -right-32 w-96 h-96 bg-brand-pink/20 rounded-full blur-3xl mix-blend-multiply"></div>
+      <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-mexican/10 rounded-full blur-3xl mix-blend-multiply"></div>
+
+      <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white p-8 sm:p-10 w-full max-w-sm text-center relative z-10 animate-fade-in-up">
+        <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-brand-pink to-brand-mexican rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-brand-pink/30">
+          <i class="fa-solid fa-cash-register text-4xl text-white"></i>
+        </div>
+        <h1 class="text-2xl font-display font-bold text-gray-900 mb-1 tracking-tight">Punto de Venta</h1>
+        <p class="text-sm text-gray-500 mb-8 font-sans">Ingresa el PIN de seguridad</p>
+        <input id="pin-input" type="password" inputmode="numeric" autocomplete="off" placeholder="••••"
+          class="w-full text-center text-3xl tracking-[1em] px-4 py-4 bg-gray-50/50 border border-gray-200 rounded-xl mb-4 outline-none focus:border-brand-pink focus:bg-white focus:ring-4 focus:ring-brand-pink/10 transition-all font-mono" />
+        <p id="pin-error" class="text-red-500 text-sm mb-4 hidden font-medium"></p>
+        <button id="pin-submit" class="w-full bg-gray-900 hover:bg-brand-mexican text-white font-bold py-4 rounded-xl transition-colors shadow-md hover:shadow-lg uppercase tracking-wider text-sm">
+          Ingresar al Sistema
         </button>
       </div>
     </div>
@@ -35,9 +41,12 @@ const SECTIONS = [
 
 export async function renderPosAccess(container) {
   let unlocked = false;
+  let userRole = "admin";
   try {
-    await posAccessApi.me();
+    const res = await posAccessApi.me();
     unlocked = true;
+    userRole = res.role || "admin";
+    window.posRole = userRole;
   } catch {
     unlocked = false;
   }
@@ -53,7 +62,9 @@ export async function renderPosAccess(container) {
       submitBtn.disabled = true;
       submitBtn.textContent = "Verificando...";
       try {
-        await posAccessApi.login(input.value);
+        const res = await posAccessApi.login(input.value);
+        userRole = res.role || "admin";
+        window.posRole = userRole;
         renderMain();
       } catch (err) {
         errorEl.textContent = err.message;
@@ -73,30 +84,45 @@ export async function renderPosAccess(container) {
   function renderMain() {
     let activeSection = "cobrar";
     let sectionToken = 0;
+    const allowedSections = SECTIONS.filter(s => {
+      if (userRole === "employee" && (s.id === "dashboard" || s.id === "ajustes")) {
+        return false;
+      }
+      return true;
+    });
 
     function render() {
       container.innerHTML = `
-        <div class="min-h-screen bg-slate-50">
-          <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
-            <div class="px-3 sm:px-4 py-3 flex items-center gap-2 sm:gap-3">
-              <h1 class="font-bold text-slate-900 flex items-center gap-2 flex-shrink-0">
-                <span class="w-8 h-8 rounded-lg bg-brand-mexican text-white flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-cash-register text-sm"></i></span>
-                <span class="hidden md:inline">Venta Local</span>
+        <div class="min-h-screen bg-[#F4F4F9]">
+          <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/60 sticky top-0 z-30 shadow-sm">
+            <div class="px-4 sm:px-6 py-3 flex items-center justify-between gap-4 overflow-hidden">
+              
+              <!-- Logo / Título -->
+              <h1 class="font-display font-bold text-gray-900 flex items-center gap-3 flex-shrink-0">
+                <span class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-pink to-brand-mexican text-white flex items-center justify-center flex-shrink-0 shadow-md">
+                  <i class="fa-solid fa-store text-lg"></i>
+                </span>
+                <span class="hidden md:inline tracking-tight text-lg">Punto de Venta</span>
               </h1>
-              <div class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto flex-1 min-w-0">
-                ${SECTIONS.map(
+              
+              <!-- Navegación -->
+              <div class="flex items-center gap-2 overflow-x-auto flex-1 min-w-0 hide-scrollbar pb-1 -mb-1 px-2">
+                ${allowedSections.map(
                   (s) => `
-                  <button data-section="${s.id}" title="${s.label}" class="section-btn flex-shrink-0 px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors ${
-                    activeSection === s.id ? "bg-brand-mexican text-white" : "text-slate-500 hover:bg-slate-100"
-                  }"><i class="fa-solid ${s.icon} sm:mr-1.5"></i><span class="hidden sm:inline">${s.label}</span></button>`
+                  <button data-section="${s.id}" title="${s.label}" class="section-btn flex-shrink-0 px-3 sm:px-4 py-2 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-300 ${
+                    activeSection === s.id ? "bg-brand-mexican text-white shadow-md shadow-brand-mexican/20 scale-105" : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                  }"><i class="fa-solid ${s.icon} sm:mr-2"></i><span class="hidden sm:inline">${s.label}</span></button>`
                 ).join("")}
               </div>
-              <button id="logout-btn" title="Salir" class="flex-shrink-0 text-slate-400 hover:text-red-500 text-xs sm:text-sm px-1.5 sm:px-2">
-                <i class="fa-solid fa-right-from-bracket sm:mr-1"></i><span class="hidden sm:inline">Salir</span>
+
+              <!-- Salir -->
+              <button id="logout-btn" title="Cerrar Sesión" class="flex-shrink-0 flex items-center gap-2 text-gray-400 hover:text-red-500 text-sm font-bold bg-gray-50 hover:bg-red-50 px-3 py-2 rounded-xl transition-colors">
+                <i class="fa-solid fa-power-off"></i><span class="hidden lg:inline uppercase text-[10px] tracking-widest">Salir</span>
               </button>
             </div>
           </header>
-          <div class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6" id="pos-access-content"></div>
+          
+          <div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8" id="pos-access-content"></div>
         </div>
       `;
 
@@ -116,7 +142,9 @@ export async function renderPosAccess(container) {
       const myToken = ++sectionToken;
       const isCurrentSection = () => myToken === sectionToken;
 
-      const section = SECTIONS.find((s) => s.id === activeSection);
+      const section = allowedSections.find((s) => s.id === activeSection) || allowedSections[0];
+      if (activeSection !== section.id) activeSection = section.id;
+      
       section.create(() => {
         if (isCurrentSection()) renderGate();
       }).mount(contentEl);
