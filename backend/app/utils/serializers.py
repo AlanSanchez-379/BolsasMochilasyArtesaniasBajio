@@ -1,6 +1,41 @@
 from app.utils.online_pricing import apply_online_markup
 
 
+def serialize_bundle_fixed_items(product, apply_online_pricing=False):
+    """Resuelve el contenido fijo de un paquete (producto + cantidad) a datos
+    completos -- nombre/precio/variantes disponibles de cada producto real dentro --
+    para que el cliente vea qué incluye, elija color, y el frontend calcule el ahorro.
+    El admin solo fija el producto y la cantidad; la variante/color la elige el cliente
+    al comprar."""
+    if not product.bundle_fixed_items:
+        return None
+
+    from app.models import Product
+
+    product_ids = [item["product_id"] for item in product.bundle_fixed_items]
+    fixed_products = {str(p.id): p for p in Product.query.filter(Product.id.in_(product_ids)).all()}
+
+    resolved = []
+    for item in product.bundle_fixed_items:
+        fixed_product = fixed_products.get(item["product_id"])
+        if fixed_product is None:
+            continue
+        unit_price = float(fixed_product.price_normal)
+        if apply_online_pricing:
+            unit_price = apply_online_markup(unit_price)
+        resolved.append(
+            {
+                "product_id": str(fixed_product.id),
+                "product_name": fixed_product.name,
+                "product_slug": fixed_product.slug,
+                "quantity": item["quantity"],
+                "unit_price": unit_price,
+                "variants": [serialize_variant(v) for v in fixed_product.variants if v.stock > 0],
+            }
+        )
+    return resolved
+
+
 def serialize_variant(variant):
     image_urls = variant.image_paths or []
     return {
@@ -49,6 +84,8 @@ def serialize_product(product, apply_online_pricing=False):
         "is_bundle": product.is_bundle,
         "bundle_limit": product.bundle_limit,
         "bundle_category_limits": product.bundle_category_limits,
+        "bundle_eligible_subcategories": product.bundle_eligible_subcategories,
+        "bundle_fixed_items": serialize_bundle_fixed_items(product, apply_online_pricing),
         "created_at": product.created_at.isoformat(),
         "variants": [serialize_variant(v) for v in product.variants],
     }

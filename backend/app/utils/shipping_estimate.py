@@ -16,6 +16,7 @@ SHIPPING_SETTING_KEYS = {
     "shipping_tres_guerras_fixed_cost",
     "shipping_bulk_promo_active",
     "shipping_extended_zone_postal_prefixes",
+    "shipping_bundle_fixed_cost",
 }
 
 _ORIGIN_KEYS = {
@@ -31,6 +32,10 @@ _ORIGIN_KEYS = {
 DEFAULT_WEIGHT_PER_PIECE_KG = 0.3
 DEFAULT_PACKAGING_WEIGHT_KG = 0.5
 DEFAULT_TRES_GUERRAS_COST = 110.0
+# Costo de envío fijo para pedidos que incluyen un paquete de contenido fijo (tercer
+# tipo de Paquete Emprendedor) -- nunca se cotiza con Skydropx/tarifa por zona, la
+# dueña define aquí el precio manual que quiere para esos envíos.
+DEFAULT_BUNDLE_FIXED_SHIPPING_COST = 380.0
 
 # Pedidos que no califican para tier "light" (ver shipping_route_for_weight) ya no se
 # cotizan por paquetería individual -- una sola tarifa fija según la zona del código
@@ -154,6 +159,7 @@ def get_shipping_settings_dict():
         "default_weight_per_piece_kg": _float("shipping_default_weight_per_piece_kg", DEFAULT_WEIGHT_PER_PIECE_KG),
         "packaging_weight_kg": _float("shipping_packaging_weight_kg", DEFAULT_PACKAGING_WEIGHT_KG),
         "tres_guerras_fixed_cost": _float("shipping_tres_guerras_fixed_cost", DEFAULT_TRES_GUERRAS_COST),
+        "bundle_fixed_shipping_cost": _float("shipping_bundle_fixed_cost", DEFAULT_BUNDLE_FIXED_SHIPPING_COST),
         "bulk_promo_active": (rows.get("shipping_bulk_promo_active") or "false").lower() == "true",
         "extended_zone_postal_prefixes": extended_zone_prefixes,
         "origin_name": rows.get("shipping_origin_name"),

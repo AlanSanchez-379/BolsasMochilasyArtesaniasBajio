@@ -14,6 +14,7 @@ const SUBCATEGORY_OPTIONS_BY_CATEGORY = {
   Carteras: ["Estampado animado", "Estampado en yute"],
   Cosmetiqueras: ["Estampado animado", "Estampado en yute"],
   Monederos: ["Estampado animado", "Estampado en yute"],
+  "Porta Celular": ["Estampado animado", "Estampado en yute"],
 };
 
 function applyFilters(products, { search, subcategory, color, maxPrice }) {

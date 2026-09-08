@@ -11,6 +11,7 @@ function categoryIconClass(name) {
   if (key.includes("cartera")) return "fa-wallet";
   if (key.includes("cosmetiquera")) return "fa-spray-can";
   if (key.includes("monedero")) return "fa-coins";
+  if (key.includes("porta") && key.includes("celular")) return "fa-mobile-screen-button";
   return "fa-bag-shopping";
 }
 

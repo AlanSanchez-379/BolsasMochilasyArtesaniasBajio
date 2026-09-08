@@ -301,6 +301,31 @@ def _apply_product_fields(product, data):
     elif "bundle_limit" in data:
         product.bundle_limit = data["bundle_limit"]
 
+    # Restricción adicional de subcategorías para "Elegir mis diseños", POR categoría
+    # -- se guarda aparte de bundle_category_limits, no afecta bundle_limit.
+    # {"Bolsas": ["Estampado en yute"], ...}; categoría con lista vacía se descarta.
+    if "bundle_eligible_subcategories" in data:
+        per_category = {}
+        for category_name, subs in (data["bundle_eligible_subcategories"] or {}).items():
+            clean = [s for s in (subs or []) if s in SUBCATEGORIES]
+            if clean:
+                per_category[category_name] = clean
+        product.bundle_eligible_subcategories = per_category or None
+
+    # Paquete de contenido fijo (tercer tipo): producto + cantidad exactas que la
+    # dueña arma al crear el paquete -- el cliente elige la variante/color al comprar.
+    # bundle_limit se deriva de la suma de piezas, igual que con bundle_category_limits.
+    if "bundle_fixed_items" in data:
+        items = []
+        for item in data["bundle_fixed_items"] or []:
+            fixed_product_id = item.get("product_id")
+            quantity = int(item.get("quantity") or 0)
+            if fixed_product_id and quantity > 0:
+                items.append({"product_id": str(fixed_product_id), "quantity": quantity})
+        product.bundle_fixed_items = items or None
+        if items:
+            product.bundle_limit = sum(i["quantity"] for i in items)
+
 
 def _clean_image_urls(raw):
     """Normaliza la lista de fotos de una variante: descarta vacíos y aplica el
@@ -327,6 +352,30 @@ def _validate_sale_price(data, product=None):
     price_normal = data.get("price_normal", float(product.price_normal) if product else None)
     if price_normal is not None and not (0 < float(sale_price) < float(price_normal)):
         return "El precio de oferta debe ser mayor a 0 y menor al precio normal."
+    return None
+
+
+def _validate_bundle_fixed_items(data):
+    """Cada producto del contenido fijo de un paquete debe existir y ser un producto
+    normal (no se puede meter otro paquete dentro de un paquete). El admin solo fija
+    el producto y la cantidad -- el cliente elige la variante/color al comprar."""
+    if "bundle_fixed_items" not in data or not data["bundle_fixed_items"]:
+        return None
+    product_ids = [item.get("product_id") for item in data["bundle_fixed_items"] if item.get("product_id")]
+    if not product_ids:
+        return "El paquete de contenido fijo necesita al menos un producto."
+    for product_id in product_ids:
+        try:
+            uuid.UUID(str(product_id))
+        except ValueError:
+            return f"Producto inválido en el contenido del paquete: {product_id}."
+    products = {str(p.id): p for p in Product.query.filter(Product.id.in_(product_ids)).all()}
+    for product_id in product_ids:
+        fixed_product = products.get(str(product_id))
+        if fixed_product is None:
+            return f"Producto inválido en el contenido del paquete: {product_id}."
+        if fixed_product.is_bundle:
+            return "Un paquete no puede contener otro paquete."
     return None
 
 
@@ -370,6 +419,10 @@ def create_product():
     if sale_price_error:
         return jsonify({"message": sale_price_error}), 400
 
+    bundle_fixed_items_error = _validate_bundle_fixed_items(data)
+    if bundle_fixed_items_error:
+        return jsonify({"message": bundle_fixed_items_error}), 400
+
     product = Product(slug=unique_slug(Product, data["name"]))
     _apply_product_fields(product, data)
 
@@ -409,6 +462,10 @@ def update_product(product_id):
     sale_price_error = _validate_sale_price(data, product=product)
     if sale_price_error:
         return jsonify({"message": sale_price_error}), 400
+
+    bundle_fixed_items_error = _validate_bundle_fixed_items(data)
+    if bundle_fixed_items_error:
+        return jsonify({"message": bundle_fixed_items_error}), 400
 
     _apply_product_fields(product, data)
 

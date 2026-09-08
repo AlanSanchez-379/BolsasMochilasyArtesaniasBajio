@@ -61,13 +61,17 @@ export async function renderProductDetail(container, slug) {
   const relatedProducts = categoryProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
   let eligibleBundleProducts = [];
-  if (product.is_bundle) {
-    // La elegibilidad se calcula por "categoría de paquete" (subcategory del propio
-    // paquete): yute/animado 3D solo admiten esa subcategoría; Mixto admite cualquiera.
-    const filters = { is_bundle: "false" };
-    if (product.subcategory !== "Mixto") filters.subcategory = product.subcategory;
-    const { products: allProducts } = await api.getProducts(filters);
-    eligibleBundleProducts = allProducts;
+  if (product.is_bundle && !product.bundle_fixed_items?.length) {
+    // Elegibilidad: cualquier producto normal, salvo que el paquete restrinja a
+    // subcategorías específicas DENTRO de esa misma categoría (POR categoría, no
+    // global -- bundle_eligible_subcategories vacío/ausente en una categoría = admite
+    // cualquier subcategoría en esa categoría).
+    const { products: allProducts } = await api.getProducts({ is_bundle: "false" });
+    const eligibleSubsByCategory = product.bundle_eligible_subcategories || {};
+    eligibleBundleProducts = allProducts.filter((p) => {
+      const allowed = eligibleSubsByCategory[p.category];
+      return !allowed || !allowed.length || allowed.includes(p.subcategory);
+    });
   }
 
   if (token !== currentRenderToken()) return;
@@ -77,8 +81,15 @@ export async function renderProductDetail(container, slug) {
     quantity: 1,
     bundleMode: "surtido", // 'surtido' | 'personalizado'
     customSelections: {}, // variantId -> qty
+    fixedSelections: {}, // variantId -> qty (paquete de contenido fijo)
     expandedProducts: new Set(), // ids de modelos con el acordeón abierto
   };
+
+  function fixedSelectedQtyForProduct(productId) {
+    return (product.bundle_fixed_items || [])
+      .find((fi) => fi.product_id === productId)
+      ?.variants.reduce((sum, v) => sum + (view.fixedSelections[v.id] || 0), 0) || 0;
+  }
 
   function customTotal() {
     return Object.values(view.customSelections).reduce((sum, q) => sum + q, 0);
@@ -200,27 +211,28 @@ export async function renderProductDetail(container, slug) {
         </button>
         ${
           expanded
-            ? `<div class="p-4 border-t border-gray-100 bg-gray-50 space-y-3">
+            ? `<div class="p-4 border-t border-gray-100 bg-gray-50">
                 ${
                   inStockVariants.length === 0
                     ? `<p class="text-sm text-gray-400">Sin stock disponible en este modelo.</p>`
-                    : inStockVariants
-                        .map((v) => {
-                          const qty = view.customSelections[v.id] || 0;
-                          return `
-                        <div class="flex items-center justify-between">
-                          <div class="flex items-center gap-2">
-                            <img src="${v.image_url || NO_IMAGE_PLACEHOLDER}" class="w-8 h-8 border rounded object-cover" />
-                            <span class="text-sm text-gray-600">${v.color} <span class="text-xs">(${v.stock})</span></span>
-                          </div>
-                          <div class="flex items-center bg-white border border-gray-200 rounded overflow-hidden">
-                            <button data-bundle-minus="${v.id}" class="px-2 py-1 bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-minus text-xs"></i></button>
-                            <span class="px-3 text-sm font-bold w-8 text-center">${qty}</span>
-                            <button data-bundle-plus="${v.id}" data-max="${v.stock}" data-category="${ep.category}" class="px-2 py-1 bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-plus text-xs"></i></button>
-                          </div>
-                        </div>`;
-                        })
-                        .join("")
+                    : `<div class="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
+                        ${inStockVariants
+                          .map((v) => {
+                            const qty = view.customSelections[v.id] || 0;
+                            return `
+                          <div class="border border-gray-200 rounded-lg p-2 flex flex-col items-center text-center bg-white">
+                            <img src="${v.image_url || NO_IMAGE_PLACEHOLDER}" class="w-full aspect-square rounded object-cover border border-gray-100 mb-1 bg-gray-50" />
+                            <span class="text-xs text-gray-600 line-clamp-1 w-full">${v.color}</span>
+                            <span class="text-[10px] text-gray-400 mb-1">stock ${v.stock}</span>
+                            <div class="flex items-center bg-gray-50 border border-gray-200 rounded overflow-hidden">
+                              <button data-bundle-minus="${v.id}" class="px-1.5 py-1 bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-minus text-[10px]"></i></button>
+                              <span class="px-2 text-xs font-bold w-6 text-center">${qty}</span>
+                              <button data-bundle-plus="${v.id}" data-max="${v.stock}" data-category="${ep.category}" class="px-1.5 py-1 bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                            </div>
+                          </div>`;
+                          })
+                          .join("")}
+                      </div>`
                 }
               </div>`
             : ""
@@ -276,7 +288,75 @@ export async function renderProductDetail(container, slug) {
     `;
   }
 
+  function bundleFixedContentHtml() {
+    const items = product.bundle_fixed_items || [];
+    const sumIndividual = items.reduce((sum, i) => sum + i.unit_price * i.quantity, 0);
+    const savings = sumIndividual - product.price_normal;
+    return `
+      <div class="mb-6">
+        <h4 class="font-bold text-sm text-gray-900 mb-3">Elige el modelo que quieres de cada producto incluido:</h4>
+        <div class="space-y-5">
+          ${items
+            .map((i) => {
+              const selected = fixedSelectedQtyForProduct(i.product_id);
+              const complete = selected === i.quantity;
+              return `
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <div class="flex justify-between items-center mb-3">
+                <span class="font-bold text-sm text-gray-900">${i.product_name}</span>
+                <span class="font-bold text-sm ${complete ? "text-brand-mexican" : "text-gray-400"}">${selected} / ${i.quantity}</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
+                ${i.variants
+                  .map((v) => {
+                    const qty = view.fixedSelections[v.id] || 0;
+                    const remaining = i.quantity - selected;
+                    const canAdd = remaining > 0 && qty < v.stock;
+                    return `
+                  <div class="border border-gray-200 rounded-lg p-2 flex flex-col items-center text-center">
+                    <img src="${v.image_url || NO_IMAGE_PLACEHOLDER}" class="w-full aspect-square rounded object-cover border border-gray-100 mb-1 bg-gray-50" />
+                    <span class="text-xs text-gray-600 line-clamp-1 w-full">${v.color}</span>
+                    <span class="text-[10px] text-gray-400 mb-1">stock ${v.stock}</span>
+                    <div class="flex items-center bg-gray-50 border border-gray-200 rounded overflow-hidden">
+                      <button data-fixed-minus="${v.id}" class="px-1.5 py-1 bg-gray-100 hover:bg-gray-200"><i class="fa-solid fa-minus text-[10px]"></i></button>
+                      <span class="px-2 text-xs font-bold w-6 text-center">${qty}</span>
+                      <button data-fixed-plus="${v.id}" data-product-id="${i.product_id}" ${canAdd ? "" : "disabled"} class="px-1.5 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                    </div>
+                  </div>`;
+                  })
+                  .join("")}
+              </div>
+            </div>`;
+            })
+            .join("")}
+        </div>
+        ${
+          savings > 0
+            ? `<div class="bg-green-50 border border-green-200 rounded px-4 py-3 mt-4 text-sm text-green-800 font-semibold">
+                <i class="fa-solid fa-piggy-bank mr-2"></i>
+                Comprando por separado pagarías ${money(sumIndividual)} — te ahorras ${money(savings)}.
+              </div>`
+            : ""
+        }
+      </div>
+
+      <button id="add-fixed-bundle-to-cart" class="bg-gray-900 hover:bg-brand-mexican text-white font-semibold h-12 rounded transition-colors mt-auto">
+        <i class="fa-solid fa-cart-plus mr-2"></i> Añadir Paquete al Carrito
+      </button>
+    `;
+  }
+
   function bundleSectionHtml() {
+    if (product.bundle_fixed_items?.length) {
+      return `
+        <div class="bg-brand-peach-light bg-opacity-40 rounded-lg p-6 mb-6 border border-gray-200 text-center">
+          <p class="text-sm text-gray-500">Precio fijo del paquete</p>
+          <p class="text-3xl font-bold text-gray-900">${money(product.price_normal)}</p>
+        </div>
+        ${bundleFixedContentHtml()}
+      `;
+    }
+
     const hasCategoryLimits =
       product.bundle_category_limits && Object.keys(product.bundle_category_limits).length > 0;
 
@@ -344,6 +424,65 @@ export async function renderProductDetail(container, slug) {
         addToCart(product, view.selectedVariant, view.quantity);
         view.quantity = 1;
         render();
+      });
+    }
+
+    container.querySelectorAll("[data-fixed-plus]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const id = el.dataset.fixedPlus;
+        const productId = el.dataset.productId;
+        const fixedItem = (product.bundle_fixed_items || []).find((fi) => fi.product_id === productId);
+        const variant = fixedItem?.variants.find((v) => v.id === id);
+        if (!fixedItem || !variant) return;
+        const current = view.fixedSelections[id] || 0;
+        const selected = fixedSelectedQtyForProduct(productId);
+        if (current >= variant.stock || selected >= fixedItem.quantity) return;
+        view.fixedSelections[id] = current + 1;
+        render();
+      });
+    });
+
+    container.querySelectorAll("[data-fixed-minus]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const id = el.dataset.fixedMinus;
+        const current = view.fixedSelections[id] || 0;
+        if (current <= 0) return;
+        view.fixedSelections[id] = current - 1;
+        render();
+      });
+    });
+
+    const addFixedBundleBtn = container.querySelector("#add-fixed-bundle-to-cart");
+    if (addFixedBundleBtn) {
+      addFixedBundleBtn.addEventListener("click", () => {
+        const items = product.bundle_fixed_items || [];
+        const pending = items
+          .filter((i) => fixedSelectedQtyForProduct(i.product_id) !== i.quantity)
+          .map((i) => `${i.product_name}: ${fixedSelectedQtyForProduct(i.product_id)}/${i.quantity}`);
+        if (pending.length) {
+          alert(`Completa exactamente las piezas requeridas de cada producto:\n${pending.join("\n")}`);
+          return;
+        }
+        const allFixedVariants = items.flatMap((i) => i.variants.map((v) => ({ ...v, productName: i.product_name })));
+        const desc = Object.entries(view.fixedSelections)
+          .filter(([, q]) => q > 0)
+          .map(([vid, q]) => {
+            const v = allFixedVariants.find((v) => v.id === vid);
+            return `${q}x ${v.productName} (${v.color})`;
+          })
+          .join(", ");
+        const fixedVariant = {
+          id: `fixed-${Date.now()}`,
+          color: `Contenido fijo: ${desc}`,
+          sku: `${product.variants[0]?.sku || product.slug}-FIXED`,
+          stock: 9999,
+          image_url: product.variants[0]?.image_url,
+          isFixedBundle: true,
+          selections: { ...view.fixedSelections },
+        };
+        addToCart(product, fixedVariant, 1);
+        view.fixedSelections = {};
+        navigate("/carrito");
       });
     }
 

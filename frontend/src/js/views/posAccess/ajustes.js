@@ -61,6 +61,7 @@ function shippingSettingsCardHtml(shippingSettings, categories) {
         ${numberFieldHtml("shipping_default_weight_per_piece_kg", "Peso por defecto (categoría sin dato)", shippingSettings.shipping_default_weight_per_piece_kg)}
         ${numberFieldHtml("shipping_packaging_weight_kg", "Peso de empaque (una vez por pedido)", shippingSettings.shipping_packaging_weight_kg)}
         ${numberFieldHtml("shipping_tres_guerras_fixed_cost", "Costo fijo Tres Guerras, pedidos ligeros ($)", shippingSettings.shipping_tres_guerras_fixed_cost)}
+        ${numberFieldHtml("shipping_bundle_fixed_cost", "Envío de paquetes de contenido fijo ($)", shippingSettings.shipping_bundle_fixed_cost)}
       </div>
 
       <div class="bg-brand-pink-light bg-opacity-40 rounded-xl p-4 mb-6">

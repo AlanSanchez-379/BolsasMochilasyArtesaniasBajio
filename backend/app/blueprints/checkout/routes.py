@@ -68,6 +68,24 @@ def _international_option():
     }
 
 
+BUNDLE_FIXED_SHIPPING_CARRIER = "bundle_fixed_shipping"
+
+
+def _cart_has_fixed_bundle(items_payload):
+    return any(item.get("type") == "bundle_fixed" for item in items_payload)
+
+
+def _bundle_fixed_shipping_option(settings):
+    """Los paquetes de contenido fijo nunca se cotizan con Skydropx/tarifa por zona --
+    la dueña definió un precio manual propio para esos envíos."""
+    return {
+        "carrier": BUNDLE_FIXED_SHIPPING_CARRIER,
+        "label": "Envío de paquete",
+        "cost": settings["bundle_fixed_shipping_cost"],
+        "eta": "3-5 días hábiles",
+    }
+
+
 def _cost_price(product):
     return float(product.cost_price) if product.cost_price is not None else None
 
@@ -199,6 +217,17 @@ def quote():
         return jsonify({"message": "Código postal inválido. Debe tener 5 dígitos."}), 400
 
     settings = get_shipping_settings_dict()
+
+    if _cart_has_fixed_bundle(items_payload):
+        return jsonify(
+            {
+                "options": [_bundle_fixed_shipping_option(settings)],
+                "skydropx_unavailable": False,
+                "bulk_promo_available": settings["bulk_promo_active"],
+                "international": False,
+            }
+        )
+
     weight_kg = _estimate_cart_weight_kg(items_payload)
     bulk_promo_forced = _bulk_promo_forced(data, settings)
 
@@ -229,7 +258,7 @@ def _build_order(items_payload, shipping, payment_method):
                 variant_ids.add(item["variant_id"])
             if item.get("product_id"):
                 product_ids.add(item["product_id"])
-        elif item_type in ("bundle_random", "bundle_custom"):
+        elif item_type in ("bundle_random", "bundle_custom", "bundle_fixed"):
             if item.get("product_id"):
                 product_ids.add(item["product_id"])
             for sel in item.get("selections", []):
@@ -336,11 +365,13 @@ def _build_order(items_payload, shipping, payment_method):
                 sel_qty = int(sel.get("quantity") or 0)
                 if variant is None or sel_qty < 1:
                     raise CheckoutError(f"Selección inválida en el paquete {product.name}.")
-                # Un producto solo entra en el paquete si coincide con su "categoría de
-                # paquete" (yute/animado 3D) o si el paquete es "Mixto" (cualquiera).
+                # Un producto solo entra en el paquete si su subcategoría está en la
+                # lista de elegibles de SU categoría (vacía/ausente = cualquier
+                # subcategoría permitida en esa categoría).
                 if variant.product.is_bundle:
                     raise CheckoutError(f"Un paquete no puede contener otro paquete ({product.name}).")
-                if product.subcategory != "Mixto" and variant.product.subcategory != product.subcategory:
+                eligible_subs = (product.bundle_eligible_subcategories or {}).get(variant.product.category.name)
+                if eligible_subs and variant.product.subcategory not in eligible_subs:
                     raise CheckoutError(f"Un producto elegido no pertenece al paquete {product.name}.")
                 if variant.stock < sel_qty:
                     raise CheckoutError(
@@ -402,6 +433,75 @@ def _build_order(items_payload, shipping, payment_method):
                     )
                 )
 
+        elif item_type == "bundle_fixed":
+            if not product.is_bundle or not product.bundle_fixed_items:
+                raise CheckoutError(f"{product.name} no es un paquete de contenido fijo.")
+            package_qty = int(item.get("quantity") or 1)
+            if package_qty < 1:
+                raise CheckoutError(f"Cantidad inválida para {product.name}.")
+
+            # El admin solo fija QUÉ PRODUCTO y CUÁNTAS piezas -- el cliente elige la
+            # variante/color exacta al comprar, igual que en "Elegir mis diseños".
+            fixed_by_product = {fi["product_id"]: fi["quantity"] for fi in product.bundle_fixed_items}
+            selections = item.get("selections") or []
+
+            resolved = []  # (variant, sel_qty)
+            selected_by_product = {}
+            for sel in selections:
+                variant = lock_variant(sel.get("variant_id"))
+                sel_qty = int(sel.get("quantity") or 0)
+                if variant is None or sel_qty < 1:
+                    raise CheckoutError(f"Selección inválida en el paquete {product.name}.")
+                if str(variant.product_id) not in fixed_by_product:
+                    raise CheckoutError(f"Un producto elegido no pertenece al paquete {product.name}.")
+                if variant.stock < sel_qty:
+                    raise CheckoutError(
+                        f"Stock insuficiente para completar el paquete {product.name} "
+                        f"({variant.color}). Disponible: {variant.stock}."
+                    )
+                selected_by_product[str(variant.product_id)] = selected_by_product.get(str(variant.product_id), 0) + sel_qty
+                resolved.append((variant, sel_qty))
+
+            for fixed_product_id, qty_per_package in fixed_by_product.items():
+                required = qty_per_package * package_qty
+                got = selected_by_product.get(fixed_product_id, 0)
+                if got != required:
+                    raise CheckoutError(
+                        f"El paquete {product.name} requiere exactamente {required} piezas de cada "
+                        f"producto incluido ({got} enviadas de uno de ellos)."
+                    )
+
+            bundle_variant = lock_variant(product.variants[0].id) if product.variants else None
+            if bundle_variant is None:
+                raise CheckoutError(f"Paquete sin variante configurada: {product.name}.")
+            if bundle_variant.stock < package_qty:
+                raise CheckoutError(f"No hay suficientes paquetes disponibles de {product.name}.")
+
+            unit_price = apply_online_markup(float(product.price_for_quantity(1)))
+            bundle_variant.stock -= package_qty
+            parent_item = OrderItem(
+                product_id=product.id,
+                variant_id=bundle_variant.id,
+                quantity=package_qty,
+                unit_price=unit_price,
+                cost_price=_cost_price(product),
+            )
+            order_items.append(parent_item)
+            subtotal += unit_price * package_qty
+
+            for variant, sel_qty in resolved:
+                variant.stock -= sel_qty
+                order_items.append(
+                    OrderItem(
+                        product_id=variant.product_id,
+                        variant_id=variant.id,
+                        quantity=sel_qty,
+                        unit_price=0,
+                        cost_price=_cost_price(variant.product),
+                        bundle_parent=parent_item,
+                    )
+                )
+
     if not order_items:
         raise CheckoutError("El carrito está vacío.")
 
@@ -419,34 +519,43 @@ def _build_order(items_payload, shipping, payment_method):
             raise CheckoutError("Código postal inválido.")
 
         settings = get_shipping_settings_dict()
-        weight_kg = _estimate_cart_weight_kg(items_payload)
-        bulk_promo_forced = _bulk_promo_forced(shipping, settings)
-        light = is_light_shipment(weight_kg, bulk_promo_forced)
 
-        if not light:
-            # Ya no se distingue paquetería en pedidos que no califican para "light" --
-            # una sola tarifa fija por zona, recalculada en el servidor (nunca confiar en
-            # el costo que mandó el cliente).
-            if carrier_code != ZONE_SHIPPING_CARRIER_PREFIX:
+        if _cart_has_fixed_bundle(items_payload):
+            # Los paquetes de contenido fijo nunca se cotizan con Skydropx/zona --
+            # tarifa manual propia, sin importar peso ni destino.
+            if carrier_code != BUNDLE_FIXED_SHIPPING_CARRIER:
                 raise CheckoutError("Esa opción de envío no está disponible para este pedido. Cotiza de nuevo.")
-            shipping_cost = zone_shipping_cost(shipping.get("postal_code"), settings)
-        elif carrier_code == TRES_GUERRAS_CARRIER_CODE:
-            shipping_cost = settings["tres_guerras_fixed_cost"]
-        elif carrier_code.startswith("skydropx:"):
-            # Nunca confiar en un precio mandado por el cliente: se vuelve a cotizar en el
-            # servidor con el mismo rate_id antes de cobrar/crear la orden.
-            rate_id = carrier_code.split(":", 1)[1]
-            try:
-                origin = get_origin_address(settings)
-                rates = get_rates(origin, _destination_address(shipping), weight_kg)
-            except (ValueError, SkydropxError):
-                raise CheckoutError("No se pudo confirmar el costo de envío. Cotiza de nuevo.")
-            matching_rate = next((r for r in rates if r["rate_id"] == rate_id), None)
-            if matching_rate is None or not carrier_is_allowed(matching_rate["carrier_name"]):
-                raise CheckoutError("La tarifa de envío elegida ya no está disponible. Cotiza de nuevo.")
-            shipping_cost = matching_rate["cost"]
+            shipping_cost = settings["bundle_fixed_shipping_cost"]
+            weight_kg = None
         else:
-            raise CheckoutError("Paquetería inválida.")
+            weight_kg = _estimate_cart_weight_kg(items_payload)
+            bulk_promo_forced = _bulk_promo_forced(shipping, settings)
+            light = is_light_shipment(weight_kg, bulk_promo_forced)
+
+            if not light:
+                # Ya no se distingue paquetería en pedidos que no califican para "light" --
+                # una sola tarifa fija por zona, recalculada en el servidor (nunca confiar en
+                # el costo que mandó el cliente).
+                if carrier_code != ZONE_SHIPPING_CARRIER_PREFIX:
+                    raise CheckoutError("Esa opción de envío no está disponible para este pedido. Cotiza de nuevo.")
+                shipping_cost = zone_shipping_cost(shipping.get("postal_code"), settings)
+            elif carrier_code == TRES_GUERRAS_CARRIER_CODE:
+                shipping_cost = settings["tres_guerras_fixed_cost"]
+            elif carrier_code.startswith("skydropx:"):
+                # Nunca confiar en un precio mandado por el cliente: se vuelve a cotizar en el
+                # servidor con el mismo rate_id antes de cobrar/crear la orden.
+                rate_id = carrier_code.split(":", 1)[1]
+                try:
+                    origin = get_origin_address(settings)
+                    rates = get_rates(origin, _destination_address(shipping), weight_kg)
+                except (ValueError, SkydropxError):
+                    raise CheckoutError("No se pudo confirmar el costo de envío. Cotiza de nuevo.")
+                matching_rate = next((r for r in rates if r["rate_id"] == rate_id), None)
+                if matching_rate is None or not carrier_is_allowed(matching_rate["carrier_name"]):
+                    raise CheckoutError("La tarifa de envío elegida ya no está disponible. Cotiza de nuevo.")
+                shipping_cost = matching_rate["cost"]
+            else:
+                raise CheckoutError("Paquetería inválida.")
 
     total = subtotal + shipping_cost
 

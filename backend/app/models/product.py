@@ -47,6 +47,16 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     bundle_limit = db.Column(db.Integer, nullable=True)  # suma de bundle_category_limits
     # Límite exacto de piezas por categoría, ej. {"Bolsas": 5, "Mochilas": 2}. Solo categorías > 0.
     bundle_category_limits = db.Column(JSONB, nullable=True)
+    # Restricción adicional para "Elegir mis diseños", POR categoría: qué subcategorías
+    # reales (Estampado animado / Estampado en yute / Tricombo) son elegibles dentro de
+    # cada categoría con límite. Ej. {"Bolsas": ["Estampado en yute"], "Mochilas": []}.
+    # Categoría ausente o lista vacía = cualquier subcategoría permitida en esa categoría.
+    bundle_eligible_subcategories = db.Column(JSONB, nullable=True)
+    # Tercer tipo de paquete: contenido fijo que la dueña arma al crear el paquete
+    # (variante + cantidad exactas), sin que el cliente elija ni le toque al azar.
+    # [{"variant_id": "...", "quantity": 2}, ...]. Si tiene datos, el producto opera
+    # SOLO en modo "fijo" (no ofrece Surtido al azar ni Elegir mis diseños).
+    bundle_fixed_items = db.Column(JSONB, nullable=True)
 
     category = db.relationship("Category", back_populates="products", lazy="selectin")
     variants = db.relationship(

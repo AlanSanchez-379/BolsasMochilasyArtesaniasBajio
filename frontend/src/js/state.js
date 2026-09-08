@@ -111,6 +111,17 @@ export function buildCheckoutItems() {
         })),
       };
     }
+    if (item.variant.isFixedBundle) {
+      return {
+        type: "bundle_fixed",
+        product_id: item.product.id,
+        quantity: 1,
+        selections: Object.entries(item.variant.selections).map(([variant_id, quantity]) => ({
+          variant_id,
+          quantity,
+        })),
+      };
+    }
     if (item.product.is_bundle) {
       return { type: "bundle_random", product_id: item.product.id, quantity: item.quantity };
     }
