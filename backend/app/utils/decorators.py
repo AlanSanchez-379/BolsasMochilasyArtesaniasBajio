@@ -83,6 +83,11 @@ def pos_access_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         token = request.cookies.get(POS_ACCESS_COOKIE_NAME)
+        if not token:
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                token = auth_header.split(" ", 1)[1]
+
         role = verify_pos_access_token(token)
         if not role:
             return jsonify({"message": "Ingresa el PIN de la tienda."}), 401

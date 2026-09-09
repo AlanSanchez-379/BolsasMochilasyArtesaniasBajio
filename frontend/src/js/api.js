@@ -85,9 +85,15 @@ export const api = {
 // se retiró por completo). No usa request()/handleUnauthorized() porque un 401 aquí
 // debe regresar al prompt de PIN, no mandar al login de clientes.
 async function posAccessFetch(path, options = {}) {
+  const headers = { "Content-Type": "application/json" };
+  const token = localStorage.getItem("pos_token");
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: "include",
-    headers: { "Content-Type": "application/json" },
+    headers: { ...headers, ...(options.headers || {}) },
     ...options,
   });
   const body = await res.json().catch(() => ({}));
@@ -100,9 +106,16 @@ async function posAccessFetch(path, options = {}) {
 }
 
 async function posAccessUpload(path, formData) {
+  const headers = {};
+  const token = localStorage.getItem("pos_token");
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     credentials: "include",
+    headers,
     body: formData, // sin Content-Type manual: el navegador arma el boundary del multipart
   });
   const body = await res.json().catch(() => ({}));

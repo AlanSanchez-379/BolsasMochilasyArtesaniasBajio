@@ -63,6 +63,9 @@ export async function renderPosAccess(container) {
       submitBtn.textContent = "Verificando...";
       try {
         const res = await posAccessApi.login(input.value);
+        if (res.token) {
+          localStorage.setItem("pos_token", res.token);
+        }
         userRole = res.role || "admin";
         window.posRole = userRole;
         renderMain();
@@ -134,6 +137,7 @@ export async function renderPosAccess(container) {
       });
 
       container.querySelector("#logout-btn").addEventListener("click", async () => {
+        localStorage.removeItem("pos_token");
         await posAccessApi.logout();
         renderGate();
       });

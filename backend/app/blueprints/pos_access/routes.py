@@ -62,7 +62,8 @@ def login():
         return jsonify({"message": "PIN incorrecto."}), 401
 
     _failed_attempts.pop(ip, None)
-    response = make_response(jsonify({"ok": True, "role": role}))
+    token = issue_pos_access_token(role)
+    response = make_response(jsonify({"ok": True, "role": role, "token": token}))
     response.set_cookie(
         POS_ACCESS_COOKIE_NAME,
         issue_pos_access_token(role),
