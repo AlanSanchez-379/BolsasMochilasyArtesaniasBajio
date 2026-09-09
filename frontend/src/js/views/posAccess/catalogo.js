@@ -108,7 +108,7 @@ export function createCatalogoSection(onUnauthorized) {
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
             ${visible.map((p) => {
               const stock = p.variants.reduce((sum, v) => sum + v.stock, 0);
-              const imageUrl = p.variants[0]?.image_paths?.[0] || '';
+              const imageUrl = p.variants[0]?.image_url || '';
               return `
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group relative hover:shadow-md transition-shadow">
                   <div class="aspect-square bg-gray-50 relative">

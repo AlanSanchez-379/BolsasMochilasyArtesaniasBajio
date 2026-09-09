@@ -85,7 +85,7 @@ export function createPaquetesSection(onUnauthorized) {
           ` : `
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
             ${bundles.length === 0 ? `<p class="col-span-full text-center text-gray-400 py-8">Todavía no hay paquetes creados.</p>` : bundles.map((b) => {
-              const imageUrl = b.variants[0]?.image_paths?.[0] || '';
+              const imageUrl = b.variants[0]?.image_url || '';
               return `
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group relative hover:shadow-md transition-shadow">
                   <div class="aspect-square bg-gray-50 relative">
