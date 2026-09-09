@@ -145,10 +145,10 @@ function posAccessCardHtml(posAccessSettings) {
         ${posAccessSettings.pin_configured ? "ya hay uno configurado." : "todavía no hay uno configurado."}
       </p>
       <label class="block text-xs font-semibold text-gray-600 mb-1">Nuevo PIN de Admin (mínimo 4 caracteres)</label>
-      <input type="text" id="pos-pin-input" class="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2" placeholder="Dejar en blanco para no cambiar" />
+      <input type="text" inputmode="numeric" autocomplete="off" id="pos-pin-input" class="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2" placeholder="Dejar en blanco para no cambiar" />
       
       <label class="block text-xs font-semibold text-gray-600 mb-1 mt-4">PIN de Empleados (Mínimo 4 caracteres)</label>
-      <input type="text" id="pos-emp-pin-input" class="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2" placeholder="${posAccessSettings.emp_pin_configured ? 'Ya configurado (escribe para cambiar)' : 'No configurado'}" />
+      <input type="text" inputmode="numeric" autocomplete="off" id="pos-emp-pin-input" class="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2" placeholder="${posAccessSettings.emp_pin_configured ? 'Ya configurado (escribe para cambiar)' : 'No configurado'}" />
       
       <p data-pos-pin-error class="text-red-500 text-sm mb-2 hidden"></p>
       <p data-pos-pin-success class="text-green-600 text-sm mb-2 hidden">PINs actualizados.</p>

@@ -46,6 +46,7 @@ def login():
         return jsonify({"message": "PIN no configurado. Pídele al administrador que lo configure en Ajustes."}), 400
 
     password = (request.get_json() or {}).get("password") or ""
+    password = str(password).strip()
     
     role = None
     if check_password_hash(admin_setting.value, password):
