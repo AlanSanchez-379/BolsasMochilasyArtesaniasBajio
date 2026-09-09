@@ -45,13 +45,14 @@ def login():
     if not admin_setting or not admin_setting.value:
         return jsonify({"message": "PIN no configurado. Pídele al administrador que lo configure en Ajustes."}), 400
 
-    password = (request.get_json() or {}).get("password") or ""
-    password = str(password).strip()
+    password_raw = str((request.get_json() or {}).get("password") or "")
+    password_stripped = password_raw.strip()
+    password_space = password_stripped + " "
     
     role = None
-    if check_password_hash(admin_setting.value, password):
+    if check_password_hash(admin_setting.value, password_stripped) or check_password_hash(admin_setting.value, password_raw) or check_password_hash(admin_setting.value, password_space):
         role = "admin"
-    elif emp_setting and emp_setting.value and check_password_hash(emp_setting.value, password):
+    elif emp_setting and emp_setting.value and (check_password_hash(emp_setting.value, password_stripped) or check_password_hash(emp_setting.value, password_raw) or check_password_hash(emp_setting.value, password_space)):
         role = "employee"
 
     if not role:
