@@ -264,13 +264,13 @@ export function createSaleSection(onUnauthorized) {
           </div>
 
           <!-- Carrito -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col flex-1 min-h-[400px]">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col">
             <div class="px-5 py-4 border-b border-gray-50 flex items-center justify-between bg-white rounded-t-2xl">
               <h3 class="font-display font-bold text-gray-900 text-base"><i class="fa-solid fa-cart-shopping text-brand-mexican mr-2"></i>Venta Actual</h3>
               ${totalsLabel ? `<span class="text-[10px] font-bold uppercase tracking-widest bg-brand-pink-light/30 text-brand-mexican px-3 py-1.5 rounded-full" title="Mayoreo solo combina piezas de la misma línea">${totalsLabel}</span>` : ""}
             </div>
             
-            <div class="flex-1 overflow-y-auto bg-gray-50/30 p-2 space-y-2 max-h-[50vh]">
+            <div class="overflow-y-auto hide-scrollbar bg-gray-50/30 p-2 space-y-2 max-h-[350px] lg:max-h-[500px]">
               ${
                 cart.length === 0
                   ? `<div class="flex flex-col items-center justify-center h-full py-16 text-gray-300">
