@@ -29,6 +29,7 @@ export function createCatalogoSection(onUnauthorized) {
 
       let filterCategory = "Todas";
       let filterSubcategory = "Todas";
+      let viewMode = "list";
 
       function filteredProducts() {
         return products.filter(
@@ -53,12 +54,19 @@ export function createCatalogoSection(onUnauthorized) {
                 ${subcategories.map((s) => `<option value="${s}" ${filterSubcategory === s ? "selected" : ""}>${s}</option>`).join("")}
               </select>
             </div>
-            <button id="new-product-btn" class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
-              <i class="fa-solid fa-plus mr-2"></i>Nuevo Producto
-            </button>
+            <div class="flex items-center gap-3">
+              <div class="bg-gray-100 p-1 rounded-lg flex items-center gap-1">
+                <button id="view-list-btn" class="${viewMode === 'list' ? 'bg-white shadow-sm text-brand-mexican' : 'text-gray-500 hover:text-gray-700'} px-3 py-1.5 rounded-md text-sm transition-all"><i class="fa-solid fa-list"></i></button>
+                <button id="view-grid-btn" class="${viewMode === 'grid' ? 'bg-white shadow-sm text-brand-mexican' : 'text-gray-500 hover:text-gray-700'} px-3 py-1.5 rounded-md text-sm transition-all"><i class="fa-solid fa-border-all"></i></button>
+              </div>
+              <button id="new-product-btn" class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
+                <i class="fa-solid fa-plus mr-2"></i>Nuevo Producto
+              </button>
+            </div>
           </div>
-          <p class="text-gray-500 mb-2">${visible.length} de ${products.length} productos</p>
+          <p class="text-gray-500 mb-4 text-sm font-medium">${visible.length} de ${products.length} productos</p>
 
+          ${viewMode === "list" ? `
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto mb-8">
             <table class="w-full text-left">
               <thead class="bg-gray-50 text-sm uppercase text-gray-600">
@@ -78,16 +86,16 @@ export function createCatalogoSection(onUnauthorized) {
                   .map((p) => {
                     const stock = p.variants.reduce((sum, v) => sum + v.stock, 0);
                     return `
-                    <tr class="border-t border-gray-100">
-                      <td class="px-4 py-3 font-semibold">${p.name}${p.is_on_sale ? ' <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded ml-1">OFERTA</span>' : ""}</td>
+                    <tr class="border-t border-gray-100 hover:bg-gray-50/50 transition-colors">
+                      <td class="px-4 py-3 font-semibold">${p.name}${p.is_on_sale ? ' <span class="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded ml-1">OFERTA</span>' : ""}</td>
                       <td class="px-4 py-3 text-sm">${p.category}</td>
                       <td class="px-4 py-3 text-sm">${p.subcategory}</td>
                       ${window.posRole !== "employee" ? `<td class="px-4 py-3 text-sm text-gray-500">${p.cost_price != null ? money(p.cost_price) : "—"}</td>` : ''}
-                      <td class="px-4 py-3">${p.is_on_sale ? `<span class="line-through text-gray-400">${money(p.price_normal)}</span> <span class="text-red-500 font-bold">${money(p.sale_price)}</span>` : money(p.price_normal)}</td>
+                      <td class="px-4 py-3">${p.is_on_sale ? `<span class="line-through text-gray-400 text-xs">${money(p.price_normal)}</span> <span class="text-red-500 font-bold">${money(p.sale_price)}</span>` : money(p.price_normal)}</td>
                       ${window.posRole !== "employee" ? `<td class="px-4 py-3">${marginHtml(p)}</td>` : ''}
-                      <td class="px-4 py-3">${stock === 0 ? '<span class="text-red-500 font-bold">AGOTADO</span>' : stock}</td>
+                      <td class="px-4 py-3">${stock === 0 ? '<span class="text-red-500 font-bold text-xs">AGOTADO</span>' : stock}</td>
                       <td class="px-4 py-3 text-right">
-                        <button data-edit="${p.id}" class="text-brand-mexican font-semibold hover:underline mr-3">Editar</button>
+                        <button data-edit="${p.id}" class="text-brand-mexican font-semibold hover:underline mr-3 text-sm">Editar</button>
                         <button data-delete="${p.id}" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash-can"></i></button>
                       </td>
                     </tr>`;
@@ -96,6 +104,40 @@ export function createCatalogoSection(onUnauthorized) {
               </tbody>
             </table>
           </div>
+          ` : `
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+            ${visible.map((p) => {
+              const stock = p.variants.reduce((sum, v) => sum + v.stock, 0);
+              const imageUrl = p.variants[0]?.image_paths?.[0] || '';
+              return `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group relative hover:shadow-md transition-shadow">
+                  <div class="aspect-square bg-gray-50 relative">
+                    ${imageUrl ? `<img src="${imageUrl}" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform" />` : '<div class="flex items-center justify-center h-full text-gray-300"><i class="fa-solid fa-image text-3xl"></i></div>'}
+                    ${p.is_on_sale ? '<span class="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-rose-600 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-sm">OFERTA</span>' : ''}
+                    ${stock === 0 ? '<span class="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center font-black text-gray-800 tracking-widest text-xs uppercase">Agotado</span>' : ''}
+                    <div class="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button data-edit="${p.id}" class="w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow flex items-center justify-center text-brand-mexican hover:bg-white"><i class="fa-solid fa-pen text-xs"></i></button>
+                      <button data-delete="${p.id}" class="w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow flex items-center justify-center text-red-500 hover:bg-white hover:text-red-600"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    </div>
+                  </div>
+                  <div class="p-3 flex flex-col flex-1">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">${p.category}</p>
+                    <h4 class="font-bold text-gray-900 text-xs leading-tight mb-2 flex-1">${p.name}</h4>
+                    <div class="flex justify-between items-end mt-auto pt-2 border-t border-gray-50">
+                      <div>
+                        ${p.is_on_sale ? `<p class="text-[9px] text-gray-400 line-through">${money(p.price_normal)}</p><p class="text-red-500 font-bold text-sm">${money(p.sale_price)}</p>` : `<p class="font-bold text-gray-900 text-sm">${money(p.price_normal)}</p>`}
+                      </div>
+                      <div class="text-right">
+                        <p class="text-[10px] ${stock === 0 ? 'text-red-500 font-bold' : 'text-gray-500 font-medium'}">${stock === 0 ? 'AGOTADO' : `${stock} pzas`}</p>
+                        ${window.posRole !== "employee" && p.cost_price != null ? `<p class="text-[9px] text-gray-400 font-bold mt-0.5" title="Costo">C: ${money(p.cost_price)}</p>` : ''}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+          `}
         `;
 
         container.querySelector("#filter-category").addEventListener("change", (e) => {
@@ -104,6 +146,14 @@ export function createCatalogoSection(onUnauthorized) {
         });
         container.querySelector("#filter-subcategory").addEventListener("change", (e) => {
           filterSubcategory = e.target.value;
+          render();
+        });
+        container.querySelector("#view-list-btn").addEventListener("click", () => {
+          viewMode = "list";
+          render();
+        });
+        container.querySelector("#view-grid-btn").addEventListener("click", () => {
+          viewMode = "grid";
           render();
         });
 

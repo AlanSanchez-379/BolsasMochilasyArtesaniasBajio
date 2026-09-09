@@ -133,7 +133,7 @@ export const posAccessApi = {
   me: () => posAccessFetch("/pos-access/me"),
   listProducts: () => posAccessFetch("/pos-access/products"),
   sale: (payload) => posAccessFetch("/pos-access/sale", { method: "POST", body: JSON.stringify(payload) }),
-  stats: () => posAccessFetch("/pos-access/stats"),
+  stats: (period) => posAccessFetch(period ? `/pos-access/stats?period=${period}` : "/pos-access/stats"),
   updateOrderStatus: (id, status) =>
     posAccessFetch(`/orders/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
 

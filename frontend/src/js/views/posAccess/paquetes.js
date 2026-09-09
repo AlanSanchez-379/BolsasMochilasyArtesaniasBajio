@@ -30,15 +30,24 @@ export function createPaquetesSection(onUnauthorized) {
         return;
       }
 
+      let viewMode = "list";
+
       function render() {
         container.innerHTML = `
           <div class="flex justify-between items-center mb-4">
-            <p class="text-gray-500">${bundles.length} paquete${bundles.length === 1 ? "" : "s"}</p>
-            <button id="new-bundle-btn" class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
-              <i class="fa-solid fa-plus mr-2"></i>Nuevo Paquete
-            </button>
+            <p class="text-gray-500 font-medium">${bundles.length} paquete${bundles.length === 1 ? "" : "s"}</p>
+            <div class="flex items-center gap-3">
+              <div class="bg-gray-100 p-1 rounded-lg flex items-center gap-1">
+                <button id="view-list-btn" class="${viewMode === 'list' ? 'bg-white shadow-sm text-brand-mexican' : 'text-gray-500 hover:text-gray-700'} px-3 py-1.5 rounded-md text-sm transition-all"><i class="fa-solid fa-list"></i></button>
+                <button id="view-grid-btn" class="${viewMode === 'grid' ? 'bg-white shadow-sm text-brand-mexican' : 'text-gray-500 hover:text-gray-700'} px-3 py-1.5 rounded-md text-sm transition-all"><i class="fa-solid fa-border-all"></i></button>
+              </div>
+              <button id="new-bundle-btn" class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
+                <i class="fa-solid fa-plus mr-2"></i>Nuevo Paquete
+              </button>
+            </div>
           </div>
 
+          ${viewMode === "list" ? `
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto mb-8">
             <table class="w-full text-left">
               <thead class="bg-gray-50 text-sm uppercase text-gray-600">
@@ -57,13 +66,13 @@ export function createPaquetesSection(onUnauthorized) {
                     : bundles
                         .map(
                           (b) => `
-                    <tr class="border-t border-gray-100">
+                    <tr class="border-t border-gray-100 hover:bg-gray-50/50 transition-colors">
                       <td class="px-4 py-3 font-semibold">${b.name}</td>
                       <td class="px-4 py-3 text-sm">${b.bundle_fixed_items?.length ? "Contenido fijo" : "Elegir mis diseños"}</td>
                       <td class="px-4 py-3">${money(b.price_normal)}</td>
                       <td class="px-4 py-3">${b.bundle_limit ?? "-"}</td>
                       <td class="px-4 py-3 text-right">
-                        <button data-edit="${b.id}" class="text-brand-mexican font-semibold hover:underline mr-3">Editar</button>
+                        <button data-edit="${b.id}" class="text-brand-mexican font-semibold hover:underline mr-3 text-sm">Editar</button>
                         <button data-delete="${b.id}" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash-can"></i></button>
                       </td>
                     </tr>`
@@ -73,7 +82,46 @@ export function createPaquetesSection(onUnauthorized) {
               </tbody>
             </table>
           </div>
+          ` : `
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+            ${bundles.length === 0 ? `<p class="col-span-full text-center text-gray-400 py-8">Todavía no hay paquetes creados.</p>` : bundles.map((b) => {
+              const imageUrl = b.variants[0]?.image_paths?.[0] || '';
+              return `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group relative hover:shadow-md transition-shadow">
+                  <div class="aspect-square bg-gray-50 relative">
+                    ${imageUrl ? `<img src="${imageUrl}" class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform" />` : '<div class="flex items-center justify-center h-full text-gray-300"><i class="fa-solid fa-box text-3xl"></i></div>'}
+                    <div class="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button data-edit="${b.id}" class="w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow flex items-center justify-center text-brand-mexican hover:bg-white"><i class="fa-solid fa-pen text-xs"></i></button>
+                      <button data-delete="${b.id}" class="w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow flex items-center justify-center text-red-500 hover:bg-white hover:text-red-600"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    </div>
+                  </div>
+                  <div class="p-3 flex flex-col flex-1">
+                    <p class="text-[9px] font-bold text-brand-blue uppercase tracking-widest mb-1 truncate">${b.bundle_fixed_items?.length ? "Contenido fijo" : "Elegir diseños"}</p>
+                    <h4 class="font-bold text-gray-900 text-xs leading-tight mb-2 flex-1">${b.name}</h4>
+                    <div class="flex justify-between items-end mt-auto pt-2 border-t border-gray-50">
+                      <div>
+                        <p class="font-bold text-gray-900 text-sm">${money(b.price_normal)}</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-[10px] text-gray-500 font-medium">${b.bundle_limit ?? "-"} pzas</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+          `}
         `;
+
+        container.querySelector("#view-list-btn").addEventListener("click", () => {
+          viewMode = "list";
+          render();
+        });
+        container.querySelector("#view-grid-btn").addEventListener("click", () => {
+          viewMode = "grid";
+          render();
+        });
 
         container.querySelector("#new-bundle-btn").addEventListener("click", () => {
           openBundleModal(null);

@@ -1,3 +1,5 @@
+import datetime
+from sqlalchemy.sql import func
 from app.extensions import db
 from app.models import (
     Order,
@@ -26,11 +28,30 @@ def _profit_sum(order_query):
     )
 
 
-def get_admin_stats_data():
+def get_admin_stats_data(period="all"):
     """Estadísticas del negocio: ganancias/utilidad totales y por canal, alertas de
     stock bajo, pedidos pendientes de validar, y pedidos recientes. Compartido entre
     el panel de admin completo y el dashboard de la liga de venta local (/venta-local)."""
+    
     successful = Order.query.filter(Order.status.in_(SUCCESSFUL_ORDER_STATUSES))
+    
+    # Filtrar por periodo si se especifica
+    if period != "all":
+        now = datetime.datetime.utcnow()
+        if period == "day":
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        elif period == "week":
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=now.weekday())
+        elif period == "month":
+            start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        elif period == "year":
+            start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        else:
+            start_date = None
+            
+        if start_date:
+            successful = successful.filter(Order.created_at >= start_date)
+
     total_earnings = successful.with_entities(db.func.coalesce(db.func.sum(Order.total), 0)).scalar()
     total_sales = successful.count()
     total_profit = _profit_sum(successful)
@@ -56,10 +77,21 @@ def get_admin_stats_data():
 
     recent_orders = Order.query.order_by(Order.created_at.desc()).limit(8).all()
 
+    # Costo total de inventario físico
+    inventory_cost = (
+        db.session.query(db.func.sum(ProductVariant.stock * db.func.coalesce(Product.cost_price, 0)))
+        .select_from(ProductVariant)
+        .join(Product)
+        .filter(ProductVariant.stock > 0)
+        .scalar() or 0
+    )
+
     return {
+        "period": period,
         "total_earnings": float(total_earnings),
         "total_profit": float(total_profit),
         "total_sales": total_sales,
+        "inventory_cost": float(inventory_cost),
         "pending_orders": len(pending_orders),
         "online": {"earnings": float(online_earnings), "profit": float(online_profit), "sales": online_q.count()},
         "in_store": {

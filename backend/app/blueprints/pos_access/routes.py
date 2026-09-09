@@ -103,7 +103,8 @@ def list_products():
 @pos_access_bp.get("/stats")
 @pos_access_required
 def stats():
-    return jsonify(get_admin_stats_data())
+    period = request.args.get("period", "all")
+    return jsonify(get_admin_stats_data(period=period))
 
 
 @pos_access_bp.post("/sale")

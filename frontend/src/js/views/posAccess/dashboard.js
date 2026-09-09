@@ -5,6 +5,8 @@ import { money, timeAgo } from "./shared.js";
 export function createDashboardSection(onUnauthorized) {
   let stats = null;
   let error = null;
+  let period = "all";
+  let isLoading = true;
 
   function statCard(icon, label, value, sub, colorClass) {
     return `
@@ -56,19 +58,36 @@ export function createDashboardSection(onUnauthorized) {
 
   function html() {
     if (error) return `<p class="text-red-500 text-center py-12">${error}</p>`;
-    if (!stats) return `<div class="text-center py-12 text-gray-400">Cargando dashboard...</div>`;
+    if (isLoading && !stats) return `<div class="text-center py-12 text-gray-400">Cargando dashboard...</div>`;
 
     const pending = stats.pending_validation_orders;
 
     return `
       <div class="fade-in space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="flex flex-wrap justify-between items-end gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+          <div>
+            <h2 class="text-lg font-bold">Resumen de Ventas</h2>
+            <p class="text-xs text-gray-500">Filtrar estadísticas por periodo</p>
+          </div>
+          <div class="flex bg-gray-100 p-1 rounded-lg">
+            <button data-period="day" class="px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${period === 'day' ? 'bg-white shadow-sm text-brand-mexican' : 'text-gray-500 hover:text-gray-800'}">Hoy</button>
+            <button data-period="week" class="px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${period === 'week' ? 'bg-white shadow-sm text-brand-mexican' : 'text-gray-500 hover:text-gray-800'}">Semana</button>
+            <button data-period="month" class="px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${period === 'month' ? 'bg-white shadow-sm text-brand-mexican' : 'text-gray-500 hover:text-gray-800'}">Mes</button>
+            <button data-period="year" class="px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${period === 'year' ? 'bg-white shadow-sm text-brand-mexican' : 'text-gray-500 hover:text-gray-800'}">Año</button>
+            <button data-period="all" class="px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${period === 'all' ? 'bg-white shadow-sm text-brand-mexican' : 'text-gray-500 hover:text-gray-800'}">Histórico</button>
+          </div>
+        </div>
+        
+        ${isLoading ? `<div class="text-center py-8 text-gray-400 text-sm">Actualizando datos...</div>` : `
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           ${statCard("fa-sack-dollar", "Ganancias Totales", money(stats.total_earnings), `${stats.total_sales} ventas`, "bg-brand-teal bg-opacity-30 text-teal-700")}
           ${statCard("fa-chart-line", "Utilidad Estimada", money(stats.total_profit), "ingresos − costo", "bg-brand-teal bg-opacity-30 text-teal-700")}
+          ${statCard("fa-boxes-stacked", "Valor de Inventario Físico", money(stats.inventory_cost), "capital invertido", "bg-brand-pink-light text-brand-mexican")}
           ${statCard("fa-globe", "Ventas Online", money(stats.online.earnings), `${stats.online.sales} pedidos`, "bg-brand-blue bg-opacity-30 text-brand-blue-dark")}
-          ${statCard("fa-store", "Ventas Tienda Física", money(stats.in_store.earnings), `${stats.in_store.sales} ventas`, "bg-brand-cream text-orange-700")}
+          ${statCard("fa-store", "Ventas Tienda", money(stats.in_store.earnings), `${stats.in_store.sales} ventas`, "bg-brand-cream text-orange-700")}
           ${statCard("fa-hourglass-half", "Por Validar", pending.length, "pagos pendientes", "bg-brand-salmon bg-opacity-30 text-orange-700")}
         </div>
+        `}
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -161,6 +180,13 @@ export function createDashboardSection(onUnauthorized) {
     el.querySelectorAll("[data-cancel-pending]").forEach((btn) => {
       btn.addEventListener("click", () => updateOrder(btn.dataset.cancelPending, "Cancelado / Reembolsado", btn, rerender));
     });
+    el.querySelectorAll("[data-period]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (period === btn.dataset.period) return;
+        period = btn.dataset.period;
+        fetchStats(rerender);
+      });
+    });
   }
 
   async function updateOrder(orderId, status, btn, rerender) {
@@ -180,23 +206,29 @@ export function createDashboardSection(onUnauthorized) {
     }
   }
 
+  async function fetchStats(rerender) {
+    isLoading = true;
+    rerender();
+    try {
+      stats = await posAccessApi.stats(period);
+    } catch (err) {
+      if (err.status === 401 && onUnauthorized) {
+        onUnauthorized();
+        return;
+      }
+      error = err.message;
+    }
+    isLoading = false;
+    rerender();
+  }
+
   return {
     async mount(el) {
       const rerender = () => {
         el.innerHTML = html();
         bind(el, rerender);
       };
-      rerender();
-      try {
-        stats = await posAccessApi.stats();
-      } catch (err) {
-        if (err.status === 401 && onUnauthorized) {
-          onUnauthorized();
-          return;
-        }
-        error = err.message;
-      }
-      rerender();
+      fetchStats(rerender);
     },
   };
 }
