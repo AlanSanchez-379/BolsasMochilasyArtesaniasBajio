@@ -17,7 +17,7 @@ from app.models import (
     BUNDLE_SUBCATEGORIES,
     MAX_VARIANT_IMAGES,
 )
-from app.utils.decorators import role_required, pos_admin_required
+from app.utils.decorators import role_required, pos_admin_required, pos_access_required
 from app.utils.serializers import serialize_product
 from app.utils.slugify import unique_slug
 from app.utils.supabase_client import get_supabase_admin
@@ -30,6 +30,7 @@ BRANDING_FOLDER = "branding"
 PRODUCT_IMAGES_FOLDER = "products"
 ALLOWED_SETTING_TYPES = {"logo": "logo_url", "banner": "banner_url"}
 PAYMENT_SETTING_KEYS = {"paypal_receiving_email", "spei_clabe"}
+TICKET_SETTING_KEYS = {"ticket_logo_url", "ticket_store_name", "ticket_footer_message"}
 
 
 def _public_asset_url_is_valid(url):
@@ -186,6 +187,39 @@ def update_payment_settings():
     invalid = set(data) - PAYMENT_SETTING_KEYS
     if invalid:
         return jsonify({"message": f"Claves inválidas: {', '.join(invalid)}"}), 400
+
+    for key, value in data.items():
+        setting = Setting.query.get(key) or Setting(key=key)
+        setting.value = str(value) if value is not None else None
+        db.session.add(setting)
+    db.session.commit()
+
+    rows = Setting.query.filter(Setting.key.in_(data.keys())).all()
+    return jsonify({s.key: s.value for s in rows})
+
+
+@admin_bp.get("/ticket-settings")
+@pos_access_required
+def get_ticket_settings():
+    # Lectura disponible para ambos roles -- un cajero (empleado) también imprime
+    # tickets y necesita el logo/mensaje personalizados, aunque no pueda editarlos.
+    rows = Setting.query.filter(Setting.key.in_(TICKET_SETTING_KEYS)).all()
+    return jsonify({s.key: s.value for s in rows})
+
+
+@admin_bp.patch("/ticket-settings")
+@pos_admin_required
+def update_ticket_settings():
+    """Body: { <key>: <value>, ... } — uno o varios de TICKET_SETTING_KEYS a la vez.
+    Personalización del ticket de venta impreso (Cobrar): logo, nombre de tienda que se
+    muestra, y mensaje de pie de página."""
+    data = request.get_json() or {}
+    invalid = set(data) - TICKET_SETTING_KEYS
+    if invalid:
+        return jsonify({"message": f"Claves inválidas: {', '.join(invalid)}"}), 400
+
+    if "ticket_logo_url" in data and data["ticket_logo_url"] and not _public_asset_url_is_valid(data["ticket_logo_url"]):
+        return jsonify({"message": "ticket_logo_url debe ser una imagen ya subida a este sitio."}), 400
 
     for key, value in data.items():
         setting = Setting.query.get(key) or Setting(key=key)

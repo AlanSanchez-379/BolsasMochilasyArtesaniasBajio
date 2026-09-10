@@ -6,7 +6,7 @@ import { printSaleTicket } from "../../components/saleTicket.js";
 // Modal de confirmación tras una venta exitosa: resume el folio/total y ofrece
 // imprimir el ticket (58mm, vía el diálogo de impresión del navegador -- ver
 // components/saleTicket.js) antes de volver a la pantalla de cobro.
-function showSaleCompleteModal(order) {
+function showSaleCompleteModal(order, ticketSettings) {
   const overlay = document.createElement("div");
   overlay.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center fade-in";
   overlay.style.zIndex = "9999";
@@ -34,7 +34,7 @@ function showSaleCompleteModal(order) {
     if (e.target === overlay) close();
   });
   overlay.querySelector("#sale-modal-close").addEventListener("click", close);
-  overlay.querySelector("#sale-modal-print").addEventListener("click", () => printSaleTicket(order));
+  overlay.querySelector("#sale-modal-print").addEventListener("click", () => printSaleTicket(order, ticketSettings));
 }
 
 // --- Sección "Cobrar": estilo caja registradora (ticket + catálogo rápido). ---
@@ -51,6 +51,7 @@ export function createSaleSection(onUnauthorized) {
   let shippingCost = "";
   let error = null;
   let busy = false;
+  let ticketSettings = {};
 
   // Mayoreo combinado: solo suma piezas de productos normales de la MISMA línea
   // (subcategory) -- no se puede combinar animado con yute para alcanzar el mínimo.
@@ -590,7 +591,7 @@ export function createSaleSection(onUnauthorized) {
           shippingCost = "";
           await loadProducts();
           busy = false;
-          showSaleCompleteModal(order);
+          showSaleCompleteModal(order, ticketSettings);
           rerender();
         } catch (err) {
           busy = false;
@@ -618,6 +619,9 @@ export function createSaleSection(onUnauthorized) {
         el.innerHTML = `<p class="text-red-500 text-center py-12">${err.message}</p>`;
         return;
       }
+      // No bloquea el cobro si falla -- el ticket simplemente se imprime con los
+      // valores por default (sin logo/mensaje personalizado).
+      posAccessApi.getTicketSettings().then((s) => { ticketSettings = s; }).catch(() => {});
       const rerender = () => {
         el.innerHTML = html();
         bind(el, rerender);

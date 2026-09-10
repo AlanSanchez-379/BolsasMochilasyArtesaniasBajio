@@ -3,8 +3,24 @@
 // de ancho -- funciona con cualquier impresora térmica ya instalada como impresora de
 // Windows (incluida la ZKP5803, USB 58mm), sin necesidad de WebUSB ni driver especial.
 
-const STORE_NAME = "Bolsas, Mochilas Y Artesanías del Bajío";
+const DEFAULT_STORE_NAME = "Bolsas, Mochilas Y Artesanías del Bajío";
+const DEFAULT_FOOTER_MESSAGE = "¡Gracias por tu compra!";
 const CONTACT_EMAIL = "bolsasdelbajio67@gmail.com";
+
+// Pedido de ejemplo para la vista previa de personalización -- nunca se manda al
+// backend, solo se usa para renderizar buildSaleTicketHtml() en pantalla.
+export function sampleOrderForPreview() {
+  return {
+    order_number: "ORD-000000",
+    created_at: new Date().toISOString(),
+    payment_method: "cash",
+    total: 645,
+    items: [
+      { id: "1", product_name: "Bolsa Cuadrada Animada", variant_color: "Rojo", quantity: 2, unit_price: 185 },
+      { id: "2", product_name: "Monedero Yute", variant_color: "Café", quantity: 5, unit_price: 55 },
+    ],
+  };
+}
 
 const PAYMENT_METHOD_LABELS = {
   cash: "Efectivo",
@@ -58,7 +74,7 @@ function ticketItemsHtml(order) {
     .join("");
 }
 
-export function buildSaleTicketHtml(order) {
+export function buildSaleTicketHtml(order, ticketSettings = {}) {
   const date = new Date(order.created_at || Date.now()).toLocaleString("es-MX", {
     day: "numeric",
     month: "short",
@@ -67,6 +83,9 @@ export function buildSaleTicketHtml(order) {
     minute: "2-digit",
   });
   const paymentLabel = PAYMENT_METHOD_LABELS[order.payment_method] || order.payment_method;
+  const storeName = ticketSettings.ticket_store_name || DEFAULT_STORE_NAME;
+  const footerMessage = ticketSettings.ticket_footer_message || DEFAULT_FOOTER_MESSAGE;
+  const logoUrl = ticketSettings.ticket_logo_url || "";
 
   return `<!doctype html>
 <html>
@@ -86,6 +105,7 @@ export function buildSaleTicketHtml(order) {
     color: #000;
   }
   .ticket-center { text-align: center; }
+  .ticket-logo { max-width: 40mm; max-height: 20mm; margin: 0 auto 4px; display: block; }
   .ticket-store-name { font-weight: bold; font-size: 13px; }
   .ticket-divider { border-top: 1px dashed #000; margin: 6px 0; }
   .ticket-item { margin-bottom: 4px; }
@@ -98,7 +118,8 @@ export function buildSaleTicketHtml(order) {
 </head>
 <body>
   <div class="ticket-center">
-    <div class="ticket-store-name">${escapeHtml(STORE_NAME)}</div>
+    ${logoUrl ? `<img class="ticket-logo" src="${escapeHtml(logoUrl)}" alt="Logo" />` : ""}
+    <div class="ticket-store-name">${escapeHtml(storeName)}</div>
     <div class="ticket-small">${escapeHtml(CONTACT_EMAIL)}</div>
   </div>
   <div class="ticket-divider"></div>
@@ -114,7 +135,7 @@ export function buildSaleTicketHtml(order) {
   </div>
   <div class="ticket-divider"></div>
   <div class="ticket-center ticket-small">
-    ¡Gracias por tu compra!
+    ${escapeHtml(footerMessage)}
   </div>
 </body>
 </html>`;
@@ -122,8 +143,10 @@ export function buildSaleTicketHtml(order) {
 
 // Imprime el ticket usando un iframe oculto (no un popup, para evitar bloqueadores de
 // ventanas emergentes) y llama a window.print() del navegador -- el usuario elige la
-// impresora térmica ya instalada en el diálogo de impresión de Windows.
-export function printSaleTicket(order) {
+// impresora térmica ya instalada en el diálogo de impresión de Windows. Nunca genera
+// un PDF descargable: el tamaño de página (58mm, ver @page arriba) y la impresora los
+// decide directamente el diálogo de impresión de Windows sobre la impresora térmica.
+export function printSaleTicket(order, ticketSettings = {}) {
   const iframe = document.createElement("iframe");
   iframe.style.position = "fixed";
   iframe.style.right = "0";
@@ -150,5 +173,5 @@ export function printSaleTicket(order) {
     }
   };
 
-  iframe.srcdoc = buildSaleTicketHtml(order);
+  iframe.srcdoc = buildSaleTicketHtml(order, ticketSettings);
 }

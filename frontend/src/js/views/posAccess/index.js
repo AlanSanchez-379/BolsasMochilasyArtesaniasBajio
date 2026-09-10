@@ -5,6 +5,7 @@ import { createCatalogoSection } from "./catalogo.js";
 import { createPaquetesSection } from "./paquetes.js";
 import { createPedidosSection } from "./pedidos.js";
 import { createAjustesSection } from "./ajustes.js";
+import { createTicketSection } from "./ticket.js";
 
 function gateHtml() {
   return `
@@ -36,6 +37,7 @@ const SECTIONS = [
   { id: "catalogo", label: "Catálogo", icon: "fa-box", create: createCatalogoSection },
   { id: "paquetes", label: "Paquetes", icon: "fa-gift", create: createPaquetesSection },
   { id: "pedidos", label: "Pedidos", icon: "fa-truck", create: createPedidosSection },
+  { id: "ticket", label: "Ticket", icon: "fa-receipt", create: createTicketSection },
   { id: "ajustes", label: "Ajustes", icon: "fa-gear", create: createAjustesSection },
 ];
 
@@ -88,7 +90,7 @@ export async function renderPosAccess(container) {
     let activeSection = "cobrar";
     let sectionToken = 0;
     const allowedSections = SECTIONS.filter(s => {
-      if (userRole === "employee" && (s.id === "dashboard" || s.id === "ajustes")) {
+      if (userRole === "employee" && (s.id === "dashboard" || s.id === "ajustes" || s.id === "ticket")) {
         return false;
       }
       return true;
