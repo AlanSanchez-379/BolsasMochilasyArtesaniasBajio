@@ -113,28 +113,6 @@ function shippingSettingsCardHtml(shippingSettings, categories) {
   `;
 }
 
-function paymentSettingsCardHtml(paymentSettings) {
-  return `
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-      <h3 class="text-xl font-bold mb-1">Pagos manuales (PayPal / SPEI)</h3>
-      <p class="text-sm text-gray-500 mb-4">
-        Datos que ve el cliente en el checkout al elegir PayPal o transferencia SPEI (no hay integración
-        con ninguna API de pagos ahí). El pedido queda "Pendiente de pago" hasta que confirmes que llegó.
-      </p>
-      <label class="block text-xs font-semibold text-gray-600 mb-1">Correo de PayPal</label>
-      <input type="email" id="paypal-email-input" value="${paymentSettings.paypal_receiving_email ?? ""}"
-        class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-mexican mb-4" />
-      <label class="block text-xs font-semibold text-gray-600 mb-1">CLABE para SPEI</label>
-      <input type="text" id="spei-clabe-input" value="${paymentSettings.spei_clabe ?? ""}"
-        class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-mexican mb-2" />
-      <p data-paypal-error class="text-red-500 text-sm mb-2 hidden"></p>
-      <p data-paypal-success class="text-green-600 text-sm mb-2 hidden">Guardado.</p>
-      <button data-save-paypal-settings class="bg-brand-mexican text-white px-5 py-2 rounded-full font-semibold hover:opacity-90">
-        <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar
-      </button>
-    </div>
-  `;
-}
 
 function posAccessCardHtml(posAccessSettings) {
   return `
@@ -196,14 +174,13 @@ export function createAjustesSection(onUnauthorized) {
     async mount(container) {
       container.innerHTML = `<div class="text-center py-12 text-gray-400">Cargando ajustes...</div>`;
 
-      let settings, shippingSettings, categories, posAccessSettings, paymentSettings;
+      let settings, shippingSettings, categories, posAccessSettings;
       try {
-        [settings, shippingSettings, { categories }, posAccessSettings, paymentSettings] = await Promise.all([
+        [settings, shippingSettings, { categories }, posAccessSettings] = await Promise.all([
           posAccessApi.getAdminSettings(),
           posAccessApi.getShippingSettings(),
           getCategories(),
           posAccessApi.getPosAccessSettings(),
-          posAccessApi.getPaymentSettings(),
         ]);
       } catch (err) {
         if (err.status === 401 && onUnauthorized) {
@@ -220,7 +197,6 @@ export function createAjustesSection(onUnauthorized) {
             ${uploadCardHtml("logo", "Logotipo", settings.logo_url, "Se muestra en la barra de navegación. Recomendado: PNG con fondo transparente.")}
             ${uploadCardHtml("banner", "Banner Principal", settings.banner_url, "Se muestra en el banner del Home. Recomendado: JPG horizontal, ancho.")}
             ${posAccessCardHtml(posAccessSettings)}
-            ${paymentSettingsCardHtml(paymentSettings)}
             ${shippingSettingsCardHtml(shippingSettings, categories)}
           </div>
         `;
@@ -256,39 +232,6 @@ export function createAjustesSection(onUnauthorized) {
           }
         });
 
-        container.querySelector("[data-save-paypal-settings]").addEventListener("click", async () => {
-          const btn = container.querySelector("[data-save-paypal-settings]");
-          const emailInput = container.querySelector("#paypal-email-input");
-          const clabeInput = container.querySelector("#spei-clabe-input");
-          const errorEl = container.querySelector("[data-paypal-error]");
-          const successEl = container.querySelector("[data-paypal-success]");
-          errorEl.classList.add("hidden");
-          successEl.classList.add("hidden");
-
-          btn.disabled = true;
-          const originalText = btn.innerHTML;
-          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>Guardando...`;
-          try {
-            paymentSettings = {
-              ...paymentSettings,
-              ...(await posAccessApi.updatePaymentSettings({
-                paypal_receiving_email: emailInput.value.trim(),
-                spei_clabe: clabeInput.value.trim(),
-              })),
-            };
-            successEl.classList.remove("hidden");
-          } catch (err) {
-            if (err.status === 401 && onUnauthorized) {
-              onUnauthorized();
-              return;
-            }
-            errorEl.textContent = err.message;
-            errorEl.classList.remove("hidden");
-          } finally {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-          }
-        });
 
         container.querySelector("[data-save-shipping-settings]").addEventListener("click", async () => {
           const btn = container.querySelector("[data-save-shipping-settings]");

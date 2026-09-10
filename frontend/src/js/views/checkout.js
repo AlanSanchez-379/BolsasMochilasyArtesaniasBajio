@@ -4,7 +4,7 @@ import {
   cartTotal,
   cartSavings,
   priceForQuantity,
-  combinedQtyForSubcategory,
+  combinedQtyForProductLine,
   buildCheckoutItems,
   clearCart,
 } from "../state.js";
@@ -95,7 +95,7 @@ export function renderCheckout(container) {
         </p>
         ${appState.cart
           .map((item) => {
-            const qty = item.product.is_bundle ? item.quantity : combinedQtyForSubcategory(item.product.subcategory);
+            const qty = item.product.is_bundle ? item.quantity : combinedQtyForProductLine(item.product);
             const price = priceForQuantity(item.product, qty);
             return `
             <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
@@ -335,9 +335,6 @@ export function renderCheckout(container) {
           <button data-method="spei" class="method-btn flex-1 py-4 rounded font-semibold border-2 ${
             flow.paymentMethod === "spei" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
           }"><i class="fa-solid fa-building-columns mr-2"></i>Transferencia SPEI</button>
-          <button data-method="paypal" class="method-btn flex-1 py-4 rounded font-semibold border-2 ${
-            flow.paymentMethod === "paypal" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
-          }"><i class="fa-brands fa-paypal mr-2"></i>PayPal</button>
           <button data-method="mercado_pago" class="method-btn flex-1 py-4 rounded font-semibold border-2 ${
             flow.paymentMethod === "mercado_pago" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
           }"><i class="fa-solid fa-wallet mr-2"></i>Mercado Pago</button>
@@ -348,25 +345,12 @@ export function renderCheckout(container) {
             ? `<div class="bg-orange-50 border border-orange-200 rounded p-4 mb-6 text-sm text-orange-800">
                 <p class="font-bold mb-1"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Atención</p>
                 Tu pedido se creará como <strong>Pendiente de pago</strong>. Tendrás <strong>2 horas</strong> para
-                realizar el depósito SPEI ${money(total)} a esta CLABE
-                ${
-                  settings.spei_clabe
-                    ? `<strong>${settings.spei_clabe}</strong>`
-                    : "(te la confirmamos por WhatsApp)"
-                }
-                y subir tu comprobante, o el inventario se liberará automáticamente.
-              </div>`
-            : flow.paymentMethod === "paypal"
-            ? `<div class="bg-orange-50 border border-orange-200 rounded p-4 mb-6 text-sm text-orange-800">
-                <p class="font-bold mb-1"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Atención</p>
-                Tu pedido se creará como <strong>Pendiente de pago</strong>. Tendrás <strong>2 horas</strong> para enviar
-                ${money(total)} por PayPal a
-                ${
-                  settings.paypal_receiving_email
-                    ? `<strong>${settings.paypal_receiving_email}</strong>`
-                    : "la cuenta de PayPal de la tienda (te la confirmamos por WhatsApp)"
-                }
-                o el inventario se liberará automáticamente.
+                realizar el depósito SPEI por ${money(total)} a cualquiera de estas cuentas y subir tu comprobante, o el inventario se liberará automáticamente:
+                <ul class="list-disc pl-5 mt-2 font-mono text-xs font-semibold">
+                  <li>Banco Azteca: 1272 2501 3540 365808</li>
+                  <li>Mercado Pago W: 722969010810246052</li>
+                  <li>BanCoppel: 137225104582902160</li>
+                </ul>
               </div>`
             : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-4 mb-6 text-sm text-gray-700">
                 <p class="font-bold mb-1"><i class="fa-solid fa-circle-info mr-2"></i>Cómo funciona</p>
@@ -449,10 +433,8 @@ export function renderCheckout(container) {
 
 async function renderSuccess(container, order, justQuoted = false) {
   const isSpei = order.payment_method === "spei";
-  const isPaypal = order.payment_method === "paypal";
   const isMercadoPago = order.payment_method === "mercado_pago";
   const isIntlPending = order.shipping.carrier === "international_pending";
-  const settings = (isPaypal || isSpei) && !isIntlPending ? await getSettings() : null;
 
   container.innerHTML = `
     <div class="max-w-xl mx-auto px-4 py-16 text-center fade-in">
@@ -485,11 +467,12 @@ async function renderSuccess(container, order, justQuoted = false) {
                 ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
                     <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-clock mr-2"></i>Realiza tu transferencia SPEI antes de:</p>
                     <p class="text-lg text-orange-800 mb-2">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
-                    ${
-                      settings?.spei_clabe
-                        ? `<p class="text-sm text-orange-800">A esta CLABE: <strong>${settings.spei_clabe}</strong></p>`
-                        : ""
-                    }
+                    <p class="text-sm text-orange-800">A cualquiera de estas cuentas:</p>
+                    <ul class="list-disc pl-5 mt-1 font-mono text-xs font-semibold text-orange-800">
+                      <li>Banco Azteca: 1272 2501 3540 365808</li>
+                      <li>Mercado Pago W: 722969010810246052</li>
+                      <li>BanCoppel: 137225104582902160</li>
+                    </ul>
                     <div class="mt-4 pt-4 border-t border-orange-200">
                       <p class="text-sm font-semibold text-orange-800 mb-2">Sube tu comprobante de depósito:</p>
                       <div class="flex gap-2">
@@ -498,16 +481,6 @@ async function renderSuccess(container, order, justQuoted = false) {
                       </div>
                       <p id="voucher-status" class="text-xs mt-2"></p>
                     </div>
-                  </div>`
-                : isPaypal
-                ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
-                    <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-clock mr-2"></i>Envía tu pago por PayPal antes de:</p>
-                    <p class="text-lg text-orange-800 mb-2">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
-                    ${
-                      settings?.paypal_receiving_email
-                        ? `<p class="text-sm text-orange-800">A este correo de PayPal: <strong>${settings.paypal_receiving_email}</strong></p>`
-                        : ""
-                    }
                   </div>`
                 : isMercadoPago
                 ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">

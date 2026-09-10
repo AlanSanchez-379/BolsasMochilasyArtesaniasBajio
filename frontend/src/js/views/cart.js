@@ -5,7 +5,7 @@ import {
   cartTotal,
   cartSavings,
   priceForQuantity,
-  combinedQtyForSubcategory,
+  combinedQtyForProductLine,
 } from "../state.js";
 import { bindNavLinks } from "../dom.js";
 import { navigate } from "../router.js";
@@ -16,12 +16,13 @@ function money(n) {
   return currencyFormatter.format(n);
 }
 
-function subcategoryTotals() {
+function productLineTotals() {
   const totals = {};
   appState.cart
     .filter((item) => !item.product.is_bundle)
     .forEach((item) => {
-      totals[item.product.subcategory] = (totals[item.product.subcategory] || 0) + item.quantity;
+      const key = `${item.product.category} ${item.product.print_type}`;
+      totals[key] = (totals[key] || 0) + item.quantity;
     });
   return totals;
 }
@@ -29,7 +30,7 @@ function subcategoryTotals() {
 function lineHtml(item) {
   const price = priceForQuantity(
     item.product,
-    item.product.is_bundle ? item.quantity : combinedQtyForSubcategory(item.product.subcategory)
+    item.product.is_bundle ? item.quantity : combinedQtyForProductLine(item.product)
   );
   const lineTotal = price * item.quantity;
   const isCustomBundle = item.variant.isCustom;
@@ -79,7 +80,7 @@ export function renderCart(container) {
       return;
     }
 
-    const totals = subcategoryTotals();
+    const totals = productLineTotals();
     const totalPieces = Object.values(totals).reduce((sum, n) => sum + n, 0);
     const total = cartTotal();
     const savings = cartSavings();
@@ -94,7 +95,7 @@ export function renderCart(container) {
                 El precio de mayoreo se aplica combinando piezas de la <strong>misma línea</strong>
                 (no se puede combinar animado con yute, por ejemplo):
                 ${Object.entries(totals)
-                  .map(([subcategory, qty]) => `<strong>${qty}</strong> ${subcategory}`)
+                  .map(([line, qty]) => `<strong>${qty}</strong> ${line}`)
                   .join(" · ")}
               </div>`
             : ""

@@ -9,12 +9,8 @@ const SPECIAL_CATEGORIES = { Ofertas: "Ofertas", Paquetes: "Paquetes Emprendedor
 // Subcategorías vigentes por categoría (Bolsas/Mochilas admiten Tricombo, el resto no).
 // Para categorías fuera de este mapa (p. ej. "Todos") se derivan de los productos cargados.
 const SUBCATEGORY_OPTIONS_BY_CATEGORY = {
-  Bolsas: ["Estampado animado", "Estampado en yute", "Tricombo"],
-  Mochilas: ["Estampado animado", "Estampado en yute", "Tricombo"],
-  Carteras: ["Estampado animado", "Estampado en yute"],
-  Cosmetiqueras: ["Estampado animado", "Estampado en yute"],
-  Monederos: ["Estampado animado", "Estampado en yute"],
-  "Porta Celular": ["Estampado animado", "Estampado en yute"],
+  Mochilas: ["Mini Mochila"],
+  Monederos: ["Cuadrado", "Redondo"],
 };
 
 function categoryIconClass(name) {
@@ -67,11 +63,12 @@ function getBaseColor(colorName) {
   return firstWord.charAt(0).toUpperCase() + firstWord.slice(1);
 }
 
-function applyFilters(products, { search, subcategory, color, maxPrice }) {
+function applyFilters(products, { search, subcategory, printType, color, maxPrice }) {
   const words = search.trim().toLowerCase().split(/\s+/).filter(Boolean);
   
   return products.filter((p) => {
-    const matchesSubcategory = subcategory === "Todas" || p.subcategory === subcategory;
+    const matchesSubcategory = subcategory === "Todas" || (p.subcategory || "") === subcategory;
+    const matchesPrintType = printType === "Todos" || (p.print_type || "") === printType;
     const matchesColor = color === "Todos" || p.variants.some((v) => getBaseColor(v.color) === color);
     const matchesPrice = maxPrice == null || Number(p.price_normal) <= maxPrice;
     
@@ -83,7 +80,7 @@ function applyFilters(products, { search, subcategory, color, maxPrice }) {
              p.variants.some((v) => (v.sku || "").toLowerCase().includes(word) || (v.color || "").toLowerCase().includes(word));
     });
     
-    return matchesSubcategory && matchesColor && matchesPrice && matchesSearch;
+    return matchesSubcategory && matchesPrintType && matchesColor && matchesPrice && matchesSearch;
   });
 }
 
@@ -177,8 +174,12 @@ function categoryShell(categories, activeCategory) {
             </div>
 
             <div class="mb-4 border-t border-gray-100 pt-4">
-              <label class="block font-semibold text-sm text-gray-900 mb-2">Tipo / Estampado</label>
+              <label class="block font-semibold text-sm text-gray-900 mb-2">Subcategoría</label>
               <select id="filter-subcategory" class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink"></select>
+            </div>
+            <div class="mb-4">
+              <label class="block font-semibold text-sm text-gray-900 mb-2">Tipo de Estampado</label>
+              <select id="filter-print-type" class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink"></select>
             </div>
             <div class="mb-4">
               <label class="block font-semibold text-sm text-gray-900 mb-2">Color disponible</label>
@@ -287,6 +288,7 @@ export async function renderCategory(container, categoryName, query = null) {
     searchInput.value = query.get("q");
   }
   const subcategorySelect = container.querySelector("#filter-subcategory");
+  const printTypeSelect = container.querySelector("#filter-print-type");
   const colorSelect = container.querySelector("#filter-color");
   const priceInput = container.querySelector("#filter-price");
   const priceValueLabel = container.querySelector("#filter-price-value");
@@ -321,7 +323,15 @@ export async function renderCategory(container, categoryName, query = null) {
 
   const availableSubcategories = [
     "Todas",
-    ...(SUBCATEGORY_OPTIONS_BY_CATEGORY[activeCategory] || [...new Set(categoryProducts.map((p) => p.subcategory))]),
+    ...new Set([
+      ...(SUBCATEGORY_OPTIONS_BY_CATEGORY[activeCategory] || []),
+      ...categoryProducts.map((p) => p.subcategory).filter(Boolean)
+    ]),
+  ];
+
+  const availablePrintTypes = [
+    "Todos",
+    ...new Set(categoryProducts.map((p) => p.print_type).filter(Boolean))
   ];
   
   const rawColors = new Set(
@@ -334,6 +344,7 @@ export async function renderCategory(container, categoryName, query = null) {
   const availableColors = ["Todos", ...Array.from(rawColors).sort((a, b) => a.localeCompare(b))];
 
   subcategorySelect.innerHTML = availableSubcategories.map((s) => `<option value="${s}">${s}</option>`).join("");
+  printTypeSelect.innerHTML = availablePrintTypes.map((p) => `<option value="${p}">${p}</option>`).join("");
   colorSelect.innerHTML = availableColors.map((c) => `<option value="${c}">${c}</option>`).join("");
 
   const highestPrice = categoryProducts.reduce((max, p) => Math.max(max, Number(p.price_normal)), 0);
@@ -348,6 +359,7 @@ export async function renderCategory(container, categoryName, query = null) {
     const filtered = applyFilters(categoryProducts, {
       search: term,
       subcategory: subcategorySelect.value,
+      printType: printTypeSelect.value,
       color: selectedColor,
       maxPrice: Number(priceInput.value),
     });
@@ -356,6 +368,7 @@ export async function renderCategory(container, categoryName, query = null) {
 
   searchInput.addEventListener("input", refresh);
   subcategorySelect.addEventListener("change", refresh);
+  printTypeSelect.addEventListener("change", refresh);
   colorSelect.addEventListener("change", refresh);
   priceInput.addEventListener("input", () => {
     priceValueLabel.textContent = `$${priceInput.value}`;

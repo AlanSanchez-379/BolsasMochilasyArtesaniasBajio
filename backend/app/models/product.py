@@ -2,7 +2,6 @@ from sqlalchemy.dialects.postgresql import UUID, JSONB
 
 from app.extensions import db
 from .mixins import UUIDPrimaryKeyMixin, TimestampMixin
-from .category import SUBCATEGORIES
 
 MAX_VARIANT_IMAGES = 3
 
@@ -10,7 +9,6 @@ MAX_VARIANT_IMAGES = 3
 class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "products"
     __table_args__ = (
-        db.CheckConstraint(f"subcategory IN {tuple(SUBCATEGORIES)}", name="ck_products_subcategory"),
         db.CheckConstraint(
             "(is_bundle = false) OR (bundle_limit IS NOT NULL AND bundle_limit > 0)",
             name="ck_products_bundle_limit",
@@ -22,7 +20,8 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     category_id = db.Column(UUID(as_uuid=True), db.ForeignKey("categories.id"), nullable=False)
-    subcategory = db.Column(db.String(50), nullable=False)
+    subcategory = db.Column(db.String(50), nullable=True)
+    print_type = db.Column(db.String(50), nullable=True)
 
     name = db.Column(db.String(255), nullable=False)
     slug = db.Column(db.String(255), unique=True, nullable=False)
@@ -62,6 +61,8 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     bundle_eligible_products = db.Column(JSONB, nullable=True)
     # Límite exacto por modelo, ej. {"uuid-del-producto": 2}.
     bundle_model_limits = db.Column(JSONB, nullable=True)
+    # Modelos que el cliente está obligado a seleccionar. ej. ["uuid-del-producto", ...].
+    bundle_mandatory_models = db.Column(JSONB, nullable=True)
     # Tercer tipo de paquete: contenido fijo que la dueña arma al crear el paquete
     # (variante + cantidad exactas), sin que el cliente elija ni le toque al azar.
     # [{"variant_id": "...", "quantity": 2}, ...]. Si tiene datos, el producto opera

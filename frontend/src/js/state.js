@@ -64,8 +64,7 @@ export function cartItemsCount() {
 }
 
 // Mayoreo combinado (Mix & Match): el precio por volumen se decide por el total de
-// piezas de productos normales de la MISMA línea (subcategory) en el carrito -- no se
-// puede combinar, por ejemplo, animado con yute para alcanzar el mínimo de mayoreo.
+// piezas de productos normales de la MISMA línea (Categoría + Tipo de Estampado) en el carrito.
 // Los paquetes tienen precio fijo y no participan en esta suma.
 export function priceForQuantity(product, quantity) {
   if (quantity >= product.super_wholesale_min_qty) return product.price_super_wholesale;
@@ -74,15 +73,15 @@ export function priceForQuantity(product, quantity) {
   return product.price_normal;
 }
 
-export function combinedQtyForSubcategory(subcategory) {
+export function combinedQtyForProductLine(product) {
   return state.cart
-    .filter((item) => !item.product.is_bundle && item.product.subcategory === subcategory)
+    .filter((item) => !item.product.is_bundle && item.product.category_id === product.category_id && item.product.print_type === product.print_type)
     .reduce((sum, item) => sum + item.quantity, 0);
 }
 
 export function cartTotal() {
   return state.cart.reduce((total, item) => {
-    const qty = item.product.is_bundle ? item.quantity : combinedQtyForSubcategory(item.product.subcategory);
+    const qty = item.product.is_bundle ? item.quantity : combinedQtyForProductLine(item.product);
     const price = priceForQuantity(item.product, qty);
     return total + price * item.quantity;
   }, 0);
@@ -93,7 +92,7 @@ export function cartTotal() {
 export function cartSavings() {
   return state.cart.reduce((total, item) => {
     if (item.product.is_bundle) return total;
-    const qty = combinedQtyForSubcategory(item.product.subcategory);
+    const qty = combinedQtyForProductLine(item.product);
     const price = priceForQuantity(item.product, qty);
     return total + (Number(item.product.price_normal) - price) * item.quantity;
   }, 0);

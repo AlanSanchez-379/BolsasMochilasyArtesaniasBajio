@@ -6,7 +6,7 @@ import { printSaleTicket } from "../../components/saleTicket.js";
 // Modal de confirmación tras una venta exitosa: resume el folio/total y ofrece
 // imprimir el ticket (58mm, vía el diálogo de impresión del navegador -- ver
 // components/saleTicket.js) antes de volver a la pantalla de cobro.
-function showSaleCompleteModal(order, ticketSettings) {
+function showSaleCompleteModal(order, ticketSettings, posContext = null) {
   const overlay = document.createElement("div");
   overlay.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center fade-in";
   overlay.style.zIndex = "9999";
@@ -34,7 +34,7 @@ function showSaleCompleteModal(order, ticketSettings) {
     if (e.target === overlay) close();
   });
   overlay.querySelector("#sale-modal-close").addEventListener("click", close);
-  overlay.querySelector("#sale-modal-print").addEventListener("click", () => printSaleTicket(order, ticketSettings));
+  overlay.querySelector("#sale-modal-print").addEventListener("click", () => printSaleTicket(order, ticketSettings, posContext));
 }
 
 // --- Sección "Cobrar": estilo caja registradora (ticket + catálogo rápido). ---
@@ -54,19 +54,19 @@ export function createSaleSection(onUnauthorized) {
   let ticketSettings = {};
 
   // Mayoreo combinado: solo suma piezas de productos normales de la MISMA línea
-  // (subcategory) -- no se puede combinar animado con yute para alcanzar el mínimo.
-  function combinedQtyForSubcategory(subcategory) {
+  function combinedQtyForProductLine(product) {
     return cart
-      .filter((item) => !item.product.is_bundle && item.product.subcategory === subcategory)
+      .filter((item) => !item.product.is_bundle && item.product.category_id === product.category_id && item.product.print_type === product.print_type)
       .reduce((sum, item) => sum + item.quantity, 0);
   }
 
-  function subcategoryTotals() {
+  function productLineTotals() {
     const totals = {};
     cart
       .filter((item) => !item.product.is_bundle)
       .forEach((item) => {
-        totals[item.product.subcategory] = (totals[item.product.subcategory] || 0) + item.quantity;
+        const key = `${item.product.category_id}_${item.product.print_type}`;
+        totals[key] = (totals[key] || 0) + item.quantity;
       });
     return totals;
   }
@@ -80,7 +80,7 @@ export function createSaleSection(onUnauthorized) {
     if (item.priceOverride === "medio") return Number(item.product.price_medio);
     if (item.priceOverride === "wholesale") return Number(item.product.price_wholesale);
     if (item.priceOverride === "super_wholesale") return Number(item.product.price_super_wholesale);
-    return priceForQuantity(item.product, combinedQtyForSubcategory(item.product.subcategory));
+    return priceForQuantity(item.product, combinedQtyForProductLine(item.product));
   }
 
   function itemsTotal() {
@@ -274,9 +274,9 @@ export function createSaleSection(onUnauthorized) {
   }
 
   function html() {
-    const totals = subcategoryTotals();
+    const totals = productLineTotals();
     const totalsLabel = Object.entries(totals)
-      .map(([subcategory, n]) => `${n} ${subcategory}`)
+      .map(([line, n]) => `${n} ${line}`)
       .join(" · ");
     const savings = itemsSavings();
     const categories = catalogCategories();
@@ -583,6 +583,14 @@ export function createSaleSection(onUnauthorized) {
             payload.shipping_cost = shippingCostValue();
           }
           const { order } = await posAccessApi.sale(payload);
+          const totalOriginal = cart.reduce((acc, item) => acc + item.variant.price * item.quantity, 0) + shippingCostValue();
+          const savings = totalOriginal - order.total;
+          const paid = parseFloat(amountPaid) || order.total;
+          const posContext = {
+            amountPaid: paid,
+            change: paid - order.total,
+            savings: savings > 0 ? savings : 0
+          };
           cart = [];
           amountPaid = "";
           customerName = "";
@@ -591,7 +599,7 @@ export function createSaleSection(onUnauthorized) {
           shippingCost = "";
           await loadProducts();
           busy = false;
-          showSaleCompleteModal(order, ticketSettings);
+          showSaleCompleteModal(order, ticketSettings, posContext);
           rerender();
         } catch (err) {
           busy = false;

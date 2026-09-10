@@ -10,6 +10,8 @@ from app.models import (
     Setting,
     SUBCATEGORIES,
     BUNDLE_SUBCATEGORIES,
+    PRINT_TYPES,
+    SUBCATEGORIES_BY_CATEGORY,
     SUCCESSFUL_ORDER_STATUSES,
 )
 from app.utils.serializers import serialize_product
@@ -38,6 +40,8 @@ def list_categories():
             "categories": [{"id": str(c.id), "name": c.name, "slug": c.slug} for c in categories],
             "subcategories": SUBCATEGORIES,
             "bundle_subcategories": BUNDLE_SUBCATEGORIES,
+            "print_types": PRINT_TYPES,
+            "subcategories_by_category": SUBCATEGORIES_BY_CATEGORY,
         }
     )
 

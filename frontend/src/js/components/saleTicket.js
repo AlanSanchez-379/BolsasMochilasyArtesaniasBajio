@@ -26,7 +26,6 @@ const PAYMENT_METHOD_LABELS = {
   cash: "Efectivo",
   card: "Tarjeta (Terminal)",
   spei: "Transferencia SPEI",
-  paypal: "PayPal",
   mercado_pago: "Mercado Pago",
 };
 
@@ -74,7 +73,7 @@ function ticketItemsHtml(order) {
     .join("");
 }
 
-export function buildSaleTicketHtml(order, ticketSettings = {}) {
+export function buildSaleTicketHtml(order, ticketSettings = {}, posContext = null) {
   const date = new Date(order.created_at || Date.now()).toLocaleString("es-MX", {
     day: "numeric",
     month: "short",
@@ -120,6 +119,10 @@ export function buildSaleTicketHtml(order, ticketSettings = {}) {
   <div class="ticket-center">
     ${logoUrl ? `<img class="ticket-logo" src="${escapeHtml(logoUrl)}" alt="Logo" />` : ""}
     <div class="ticket-store-name">${escapeHtml(storeName)}</div>
+    <div class="ticket-small">Tel: 4778142318</div>
+    <div class="ticket-small">Blvd. Hilario Medina 715</div>
+    <div class="ticket-small">Col. Killian, CP 37260</div>
+    <div class="ticket-small">León de los Aldama, Gto.</div>
     <div class="ticket-small">${escapeHtml(CONTACT_EMAIL)}</div>
   </div>
   <div class="ticket-divider"></div>
@@ -133,10 +136,31 @@ export function buildSaleTicketHtml(order, ticketSettings = {}) {
     <span>TOTAL</span>
     <span>${money(order.total)}</span>
   </div>
+  ${posContext && posContext.amountPaid !== undefined ? `
+  <div class="ticket-item-row ticket-item-price" style="margin-top: 4px;">
+    <span>Su Pago:</span>
+    <span>${money(posContext.amountPaid)}</span>
+  </div>
+  <div class="ticket-item-row ticket-item-price">
+    <span>Su Cambio:</span>
+    <span>${money(posContext.change || 0)}</span>
+  </div>
+  ` : ""}
+  ${posContext && posContext.savings ? `
+  <div class="ticket-item-row ticket-item-price" style="font-weight: bold; margin-top: 4px; border-top: 1px dotted #ccc; padding-top: 2px;">
+    <span>Su Ahorro:</span>
+    <span>${money(posContext.savings)}</span>
+  </div>
+  ` : ""}
   <div class="ticket-divider"></div>
   <div class="ticket-center ticket-small">
     ${escapeHtml(footerMessage)}
   </div>
+  ${ticketSettings.ticket_qr_url ? `
+  <div class="ticket-center" style="margin-top: 8px;">
+    <img style="display: block; margin: 0 auto; max-width: 30mm; max-height: 30mm;" src="${escapeHtml(ticketSettings.ticket_qr_url)}" alt="QR" />
+  </div>
+  ` : ""}
 </body>
 </html>`;
 }
@@ -146,7 +170,7 @@ export function buildSaleTicketHtml(order, ticketSettings = {}) {
 // impresora térmica ya instalada en el diálogo de impresión de Windows. Nunca genera
 // un PDF descargable: el tamaño de página (58mm, ver @page arriba) y la impresora los
 // decide directamente el diálogo de impresión de Windows sobre la impresora térmica.
-export function printSaleTicket(order, ticketSettings = {}) {
+export function printSaleTicket(order, ticketSettings = {}, posContext = null) {
   const iframe = document.createElement("iframe");
   iframe.style.position = "fixed";
   iframe.style.right = "0";
@@ -173,5 +197,5 @@ export function printSaleTicket(order, ticketSettings = {}) {
     }
   };
 
-  iframe.srcdoc = buildSaleTicketHtml(order, ticketSettings);
+  iframe.srcdoc = buildSaleTicketHtml(order, ticketSettings, posContext);
 }

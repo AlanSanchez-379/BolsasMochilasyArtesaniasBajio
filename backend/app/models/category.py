@@ -1,18 +1,17 @@
 from app.extensions import db
 from .mixins import UUIDPrimaryKeyMixin
 
-# Fijas y compartidas por todas las categorías (Documento de Requerimientos secc. 2)
-SUBCATEGORIES = [
-    "Estampado animado",
-    "Estampado en yute",
-    "Tricombo",
-]
+PRINT_TYPES = ["YUTE", "ANIMADO"]
 
-# "Categoría de paquete": qué tipo de productos puede elegir el cliente dentro de un
-# Paquete Emprendedor. Reutiliza dos valores de SUBCATEGORIES (así un paquete de "yute"
-# solo admite productos con subcategory="Estampado en yute") más "Mixto", que admite
-# cualquier producto sin importar su subcategoría.
-BUNDLE_SUBCATEGORIES = ["Estampado en yute", "Estampado animado 3D", "Mixto"]
+SUBCATEGORIES_BY_CATEGORY = {
+    "Mochilas": ["Mini Mochila"],
+    "Monederos": ["Cuadrado", "Redondo"],
+}
+
+# Flat list for any generic dropdowns
+SUBCATEGORIES = ["Mini Mochila", "Cuadrado", "Redondo"]
+
+BUNDLE_SUBCATEGORIES = ["YUTE", "ANIMADO", "MIXTO"]
 
 
 class Category(db.Model, UUIDPrimaryKeyMixin):

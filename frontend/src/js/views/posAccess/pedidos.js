@@ -1,5 +1,6 @@
-﻿import { posAccessApi } from "../../api.js";
+import { posAccessApi } from "../../api.js";
 import { money } from "./shared.js";
+import { printSaleTicket } from "../../components/saleTicket.js";
 
 const STATUSES = [
   "Pendiente de pago",
@@ -62,12 +63,22 @@ function paymentReviewHtml(order) {
   `;
 }
 
-function whatsappUrl(order) {
+function whatsappUrls(order) {
   const digits = String(order.shipping.phone || "").replace(/\D/g, "");
-  if (!digits) return null;
+  if (!digits) return { pending: null, confirmed: null, mercadoPago: null };
   const phone = digits.length === 10 ? `52${digits}` : digits;
-  const message = encodeURIComponent(`Hola, te contactamos sobre tu pedido ${order.order_number} de Bolsas, Mochilas y Artesanías del Bajío. Te enviaremos aquí tu enlace de Mercado Pago.`);
-  return `https://wa.me/${phone}?text=${message}`;
+  
+  const msgPending = encodeURIComponent(`Hola, somos Bolsas, Mochilas y Artesanías del Bajío. Te escribimos sobre tu pedido ${order.order_number} que se encuentra Pendiente de pago. Por favor indícanos si tienes alguna duda con el pago o envíanos tu comprobante por aquí.`);
+  
+  const msgConfirmed = encodeURIComponent(`Hola, somos Bolsas, Mochilas y Artesanías del Bajío. Confirmamos que hemos recibido el pago de tu pedido ${order.order_number}. Pronto te daremos más detalles sobre el envío.`);
+
+  const msgMercadoPago = encodeURIComponent(`Hola, te contactamos sobre tu pedido ${order.order_number} de Bolsas, Mochilas y Artesanías del Bajío. Te enviaremos aquí tu enlace de Mercado Pago.`);
+
+  return {
+    pending: `https://wa.me/${phone}?text=${msgPending}`,
+    confirmed: `https://wa.me/${phone}?text=${msgConfirmed}`,
+    mercadoPago: `https://wa.me/${phone}?text=${msgMercadoPago}`,
+  };
 }
 
 function orderDetailHtml(o) {
@@ -138,6 +149,21 @@ function orderDetailHtml(o) {
       </div>
     </div>
     ${paymentReviewHtml(o)}
+    <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-200 pt-4">
+      <button data-print-ticket="${o.id}" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded text-sm font-semibold flex items-center shadow-sm">
+        <i class="fa-solid fa-print mr-2"></i>Imprimir Ticket
+      </button>
+      ${
+        o.channel !== "in_store" && whatsappUrls(o).pending
+          ? `<a href="${whatsappUrls(o).pending}" target="_blank" rel="noopener" class="bg-green-100 hover:bg-green-200 text-green-800 px-4 py-2 rounded text-sm font-semibold flex items-center shadow-sm">
+              <i class="fa-brands fa-whatsapp mr-2 text-green-600"></i>WhatsApp (Pedir Pago)
+             </a>
+             <a href="${whatsappUrls(o).confirmed}" target="_blank" rel="noopener" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded text-sm font-semibold flex items-center shadow-sm">
+              <i class="fa-brands fa-whatsapp mr-2 text-emerald-600"></i>WhatsApp (Confirmado)
+             </a>`
+          : ""
+      }
+    </div>
   `;
 }
 
@@ -319,8 +345,8 @@ export function createPedidosSection(onUnauthorized) {
                     </td>
                     <td class="px-4 py-3 text-right whitespace-nowrap">
                       ${
-                        o.payment_method === "mercado_pago" && whatsappUrl(o)
-                          ? `<a href="${whatsappUrl(o)}" target="_blank" rel="noopener" class="text-green-700 font-semibold text-sm hover:underline mr-3">
+                        o.payment_method === "mercado_pago" && whatsappUrls(o).mercadoPago
+                          ? `<a href="${whatsappUrls(o).mercadoPago}" target="_blank" rel="noopener" class="text-green-700 font-semibold text-sm hover:underline mr-3">
                               <i class="fa-brands fa-whatsapp mr-1"></i>Enviar por WhatsApp
                             </a>`
                           : ""
@@ -447,6 +473,30 @@ export function createPedidosSection(onUnauthorized) {
             });
           }
         }
+
+        container.querySelectorAll("[data-print-ticket]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const orderId = btn.dataset.printTicket;
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>Cargando...`;
+            btn.disabled = true;
+            try {
+              const settings = await posAccessApi.getTicketSettings();
+              printSaleTicket(order, settings, {
+                amountPaid: order.total,
+                change: 0,
+                savings: 0,
+              });
+            } catch (err) {
+              alert("Error al cargar configuración del ticket: " + err.message);
+            } finally {
+              btn.innerHTML = originalHtml;
+              btn.disabled = false;
+            }
+          });
+        });
 
         container.querySelectorAll("[data-save-shipping-cost]").forEach((btn) => {
           btn.addEventListener("click", async () => {

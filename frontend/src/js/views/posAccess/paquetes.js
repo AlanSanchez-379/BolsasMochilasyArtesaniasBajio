@@ -53,7 +53,7 @@ export function createPaquetesSection(onUnauthorized) {
               <thead class="bg-gray-50 text-sm uppercase text-gray-600">
                 <tr>
                   <th class="px-4 py-3">Nombre</th>
-                  <th class="px-4 py-3">Modo</th>
+                  <th class="px-4 py-3">Estampado</th>
                   <th class="px-4 py-3">Precio</th>
                   <th class="px-4 py-3">Piezas totales</th>
                   <th class="px-4 py-3"></th>
@@ -68,7 +68,7 @@ export function createPaquetesSection(onUnauthorized) {
                           (b) => `
                     <tr class="border-t border-gray-100 hover:bg-gray-50/50 transition-colors">
                       <td class="px-4 py-3 font-semibold">${b.name}</td>
-                      <td class="px-4 py-3 text-sm">${b.bundle_fixed_items?.length ? "Contenido fijo" : "Elegir mis diseños"}</td>
+                      <td class="px-4 py-3 text-sm">${b.print_type || "Yute"}</td>
                       <td class="px-4 py-3">${money(b.price_normal)}</td>
                       <td class="px-4 py-3">${b.bundle_limit ?? "-"}</td>
                       <td class="px-4 py-3 text-right">
@@ -96,7 +96,7 @@ export function createPaquetesSection(onUnauthorized) {
                     </div>
                   </div>
                   <div class="p-3 flex flex-col flex-1">
-                    <p class="text-[9px] font-bold text-brand-blue uppercase tracking-widest mb-1 truncate">${b.bundle_fixed_items?.length ? "Contenido fijo" : "Elegir diseños"}</p>
+                    <p class="text-[9px] font-bold text-brand-blue uppercase tracking-widest mb-1 truncate">${b.print_type || "Yute"}</p>
                     <h4 class="font-bold text-gray-900 text-xs leading-tight mb-2 flex-1">${b.name}</h4>
                     <div class="flex justify-between items-end mt-auto pt-2 border-t border-gray-50">
                       <div>
@@ -167,13 +167,10 @@ export function createPaquetesSection(onUnauthorized) {
         const isNew = !bundle;
         const newVariants = [];
         const initialTotal = bundle?.bundle_limit ?? 0;
-        let contentMode = bundle?.bundle_fixed_items?.length ? "fixed" : "custom";
-        const fixedItems = (bundle?.bundle_fixed_items || []).map((i) => ({ product_id: i.product_id, quantity: i.quantity }));
+        let printType = bundle?.print_type?.toUpperCase() || "YUTE";
         const eligibleProductIds = new Set(bundle?.bundle_eligible_products || []);
         const initialModelLimits = bundle?.bundle_model_limits || {};
-        let pickerOpen = false;
-        let pickerSearch = "";
-        let pickerProduct = null;
+        const mandatoryModelIds = new Set(bundle?.bundle_mandatory_models || []);
 
         el.innerHTML = `
           <div class="p-6">
@@ -197,14 +194,14 @@ export function createPaquetesSection(onUnauthorized) {
               </div>
 
               <div class="sm:col-span-2 border-t pt-4 mt-2">
-                <label class="block text-sm font-bold text-gray-700 mb-2">Cómo se arma el contenido del paquete</label>
+                <label class="block text-sm font-bold text-gray-700 mb-2">Tipo de Estampado</label>
                 <div class="flex gap-3 mb-4">
-                  <button type="button" data-content-mode="custom" class="content-mode-btn flex-1 py-2 rounded-lg border-2 font-semibold text-sm ${
-                    contentMode === "custom" ? "border-brand-mexican bg-brand-pink-light text-brand-mexican" : "border-gray-200 text-gray-500"
-                  }">Elegir mis diseños</button>
-                  <button type="button" data-content-mode="fixed" class="content-mode-btn flex-1 py-2 rounded-lg border-2 font-semibold text-sm ${
-                    contentMode === "fixed" ? "border-brand-mexican bg-brand-pink-light text-brand-mexican" : "border-gray-200 text-gray-500"
-                  }">Contenido fijo</button>
+                  <button type="button" data-print-type="YUTE" class="print-type-btn flex-1 py-2 rounded-lg border-2 font-semibold text-sm ${
+                    printType === "YUTE" ? "border-brand-mexican bg-brand-pink-light text-brand-mexican" : "border-gray-200 text-gray-500"
+                  }">Yute</button>
+                  <button type="button" data-print-type="ANIMADO" class="print-type-btn flex-1 py-2 rounded-lg border-2 font-semibold text-sm ${
+                    printType === "ANIMADO" ? "border-brand-mexican bg-brand-pink-light text-brand-mexican" : "border-gray-200 text-gray-500"
+                  }">Animado</button>
                 </div>
                 <div id="bundle-content-config"></div>
               </div>
@@ -237,52 +234,48 @@ export function createPaquetesSection(onUnauthorized) {
         const contentConfigEl = el.querySelector("#bundle-content-config");
 
         function renderContentConfig() {
-          if (contentMode === "custom") {
             const total = Object.values(bundle?.bundle_category_limits || {}).reduce((a, b) => a + b, 0);
-            const eligibleSubsByCategory = bundle?.bundle_eligible_subcategories || {};
+            const filteredProducts = normalProducts.filter(p => (p.print_type?.toUpperCase() || "YUTE") === printType);
+
             contentConfigEl.innerHTML = `
               <div class="border border-gray-200 rounded-lg p-3 mb-4">
                 <label class="block text-sm font-bold text-gray-700 mb-1">Modelos permitidos</label>
-                <p class="text-xs text-gray-500 mb-2">Sin selección se permiten todos los modelos no exclusivos. Los modelos exclusivos solo funcionan si los agregas aquí.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                  ${normalProducts.map((p) => `
-                    <label class="flex items-center gap-2 text-xs text-gray-700 border border-gray-100 rounded px-2 py-1.5">
-                      <input type="checkbox" data-eligible-product="${p.id}" ${eligibleProductIds.has(p.id) ? "checked" : ""} class="w-3.5 h-3.5" />
-                      <span class="flex-1 truncate">${p.name}${p.is_bundle_exclusive ? " (exclusivo)" : ""}</span>
-                      <input type="number" min="1" data-model-limit="${p.id}" value="${initialModelLimits[p.id] ?? ""}" placeholder="límite" class="w-16 px-1.5 py-1 border border-gray-200 rounded text-xs" />
-                    </label>`).join("")}
+                <p class="text-xs text-gray-500 mb-2">Selecciona qué modelos entran en el paquete. Puedes definir límites y si es obligatorio.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 max-h-64 overflow-y-auto pr-1">
+                  ${filteredProducts.map((p) => {
+                    const isChecked = eligibleProductIds.has(p.id);
+                    return `
+                    <div class="flex flex-col gap-1 border ${isChecked ? 'border-brand-mexican bg-brand-pink-light/30' : 'border-gray-100'} rounded p-2 text-xs">
+                      <label class="flex items-center gap-2 text-gray-700 cursor-pointer">
+                        <input type="checkbox" data-eligible-product="${p.id}" ${isChecked ? "checked" : ""} class="w-3.5 h-3.5 accent-brand-mexican" />
+
+                        <span class="flex-1 font-semibold truncate" title="${p.name}">${p.name}</span>
+                      </label>
+                      <div class="flex items-center gap-2 pl-5 mt-1 ${isChecked ? '' : 'hidden'}" id="product-options-${p.id}">
+                        <input type="number" min="1" data-model-limit="${p.id}" value="${initialModelLimits[p.id] ?? ""}" placeholder="Límite" class="w-16 px-1.5 py-1 border border-gray-200 rounded" />
+                        <label class="flex items-center gap-1 cursor-pointer">
+                          <input type="checkbox" data-mandatory-model="${p.id}" ${mandatoryModelIds.has(p.id) ? "checked" : ""} class="w-3.5 h-3.5 accent-brand-mexican" />
+                          <span class="text-gray-600">Obligatorio</span>
+                        </label>
+                      </div>
+                    </div>`;
+                  }).join("")}
+                  ${filteredProducts.length === 0 ? `<p class="text-gray-400 p-2 col-span-full text-center">No hay productos de ${printType} creados.</p>` : ''}
                 </div>
               </div>
               <label class="block text-sm font-bold text-gray-700 mb-2">Límite exacto de piezas por categoría</label>
-              <p class="text-xs text-gray-500 mb-2">Por cada categoría, puedes además limitar a subcategorías específicas -- sin marcar ninguna, admite cualquiera.</p>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
                 ${categories
-                  .map((c) => {
-                    const catEligibleSubs = eligibleSubsByCategory[c.name] || [];
-                    return `
+                  .map((c) => `
                   <div class="border border-gray-200 rounded-lg p-3">
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">${c.name}</label>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 truncate">${c.name}</label>
                     <input type="number" min="0" data-category-limit="${c.name}"
                       value="${bundle?.bundle_category_limits?.[c.name] ?? 0}"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" />
-                    <div class="flex flex-wrap gap-3">
-                      ${subcategories
-                        .map(
-                          (s) => `
-                        <label class="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
-                          <input type="checkbox" data-eligible-subcategory="${c.name}::${s}" ${catEligibleSubs.includes(s) ? "checked" : ""} class="w-3.5 h-3.5 accent-brand-mexican" />
-                          ${s}
-                        </label>`
-                        )
-                        .join("")}
-                    </div>
-                  </div>`;
-                  })
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+                  </div>`)
                   .join("")}
               </div>
-              <p class="text-sm text-gray-500">El sistema calcula el total automáticamente: <span id="bundle-total-display" class="font-bold text-brand-mexican">${
-                contentMode === "custom" ? total : initialTotal
-              }</span> piezas</p>
+              <p class="text-sm text-gray-500">El sistema calcula el total automáticamente: <span id="bundle-total-display" class="font-bold text-brand-mexican">${total > 0 ? total : initialTotal}</span> piezas</p>
             `;
             const totalDisplay = contentConfigEl.querySelector("#bundle-total-display");
             contentConfigEl.querySelectorAll("[data-category-limit]").forEach((input) => {
@@ -294,186 +287,34 @@ export function createPaquetesSection(onUnauthorized) {
                 totalDisplay.textContent = t;
               });
             });
-          } else {
-            renderFixedMode();
-          }
-        }
 
-        function renderFixedMode() {
-          const total = fixedItems.reduce((sum, i) => sum + (i.quantity || 0), 0);
-
-          if (pickerOpen) {
-            contentConfigEl.innerHTML = pickerProduct ? pickerQuantityHtml() : pickerGridHtml();
-            bindPickerEvents();
-            return;
-          }
-
-          contentConfigEl.innerHTML = `
-            <p class="text-sm text-gray-500 mb-3">
-              Elige qué producto y cuántas piezas incluye el paquete -- el cliente elige el color/modelo exacto al comprar.
-            </p>
-            <div id="fixed-items-list" class="space-y-2 mb-3"></div>
-            <button type="button" id="add-fixed-item" class="text-brand-blue-dark font-semibold text-sm hover:underline">
-              <i class="fa-solid fa-plus mr-1"></i>Agregar producto
-            </button>
-            <p class="text-sm text-gray-500 mt-2">Total: <span id="fixed-items-total" class="font-bold text-brand-mexican">${total}</span> piezas</p>
-          `;
-
-          const listEl = contentConfigEl.querySelector("#fixed-items-list");
-
-          function renderFixedItemsList() {
-            listEl.innerHTML = fixedItems.length
-              ? fixedItems
-                  .map((item, idx) => {
-                    const p = normalProducts.find((p) => p.id === item.product_id);
-                    return `
-                  <div class="flex gap-2 items-center bg-white border border-gray-200 rounded-lg px-3 py-2">
-                    <img src="${p?.variants[0]?.image_url || ""}" class="w-10 h-10 rounded object-cover border border-gray-200 ${p?.variants[0]?.image_url ? "" : "invisible"}" />
-                    <span class="flex-1 text-sm text-gray-700">${p ? p.name : "Producto no encontrado"}</span>
-                    <input type="number" min="1" data-fixed-item-qty="${idx}" value="${item.quantity || 1}"
-                      class="w-20 px-2 py-2 border border-gray-300 rounded-lg text-sm" />
-                    <button type="button" data-remove-fixed-item="${idx}" class="text-red-400 hover:text-red-600">
-                      <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                  </div>`;
-                  })
-                  .join("")
-              : `<p class="text-sm text-gray-400">Todavía no agregas ningún producto.</p>`;
-
-            listEl.querySelectorAll("[data-fixed-item-qty]").forEach((input) => {
-              input.addEventListener("input", () => {
-                fixedItems[Number(input.dataset.fixedItemQty)].quantity = parseInt(input.value, 10) || 0;
-                refreshTotal();
+            contentConfigEl.querySelectorAll("[data-eligible-product]").forEach((input) => {
+              input.addEventListener("change", (e) => {
+                const id = e.target.dataset.eligibleProduct;
+                if (e.target.checked) eligibleProductIds.add(id);
+                else eligibleProductIds.delete(id);
+                // No re-renderizamos todo, solo mostramos/ocultamos opciones
+                const optionsDiv = contentConfigEl.querySelector(`#product-options-${id}`);
+                if (optionsDiv) {
+                  optionsDiv.classList.toggle("hidden", !e.target.checked);
+                }
+                const container = e.target.closest('.border');
+                if (container) {
+                  container.classList.toggle('border-brand-mexican', e.target.checked);
+                  container.classList.toggle('bg-brand-pink-light/30', e.target.checked);
+                  container.classList.toggle('border-gray-100', !e.target.checked);
+                }
               });
             });
-            listEl.querySelectorAll("[data-remove-fixed-item]").forEach((btn) => {
-              btn.addEventListener("click", () => {
-                fixedItems.splice(Number(btn.dataset.removeFixedItem), 1);
-                renderFixedItemsList();
-                refreshTotal();
-              });
-            });
-          }
-
-          function refreshTotal() {
-            const t = fixedItems.reduce((sum, i) => sum + (i.quantity || 0), 0);
-            const totalEl = contentConfigEl.querySelector("#fixed-items-total");
-            if (totalEl) totalEl.textContent = t;
-          }
-
-          renderFixedItemsList();
-
-          contentConfigEl.querySelector("#add-fixed-item").addEventListener("click", () => {
-            pickerOpen = true;
-            pickerSearch = "";
-            pickerProduct = null;
-            renderFixedMode();
-          });
-        }
-
-        function pickerGridHtml() {
-          const query = pickerSearch.trim().toLowerCase();
-          const pickerProducts = eligibleProductIds.size ? normalProducts.filter((p) => eligibleProductIds.has(p.id) || fixedItems.some((item) => item.product_id === p.id)) : normalProducts;
-          const filtered = query ? pickerProducts.filter((p) => p.name.toLowerCase().includes(query)) : pickerProducts;
-          return `
-            <div class="flex items-center gap-2 mb-4">
-              <button type="button" id="picker-cancel" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-arrow-left"></i></button>
-              <input type="text" id="picker-search" placeholder="Buscar producto..." value="${pickerSearch}"
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            </div>
-            <div class="grid grid-cols-4 gap-3 max-h-96 overflow-y-auto pr-1">
-              ${
-                filtered.length
-                  ? filtered
-                      .map(
-                        (p) => `
-                <button type="button" data-picker-product="${p.id}" class="border border-gray-200 rounded-lg p-2 hover:border-brand-mexican text-left">
-                  <img src="${p.variants[0]?.image_url || ""}" class="w-full aspect-square rounded object-cover border border-gray-100 mb-1 bg-gray-50" />
-                  <p class="text-xs font-semibold text-gray-800 line-clamp-2">${p.name}</p>
-                  <p class="text-xs text-brand-mexican font-bold">${money(p.price_normal)}</p>
-                </button>`
-                      )
-                      .join("")
-                  : `<p class="col-span-4 text-sm text-gray-400 text-center py-6">Sin resultados.</p>`
-              }
-            </div>
-          `;
-        }
-
-        function pickerQuantityHtml() {
-          const p = pickerProduct;
-          const totalStock = p.variants.reduce((sum, v) => sum + v.stock, 0);
-          return `
-            <div class="flex items-center gap-2 mb-4">
-              <button type="button" id="picker-back" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-arrow-left"></i></button>
-              <img src="${p.variants[0]?.image_url || ""}" class="w-10 h-10 rounded object-cover border border-gray-100 bg-gray-50" />
-              <p class="font-bold text-gray-900">${p.name}</p>
-            </div>
-            <p class="text-sm text-gray-500 mb-3">
-              ${p.variants.length} modelo${p.variants.length === 1 ? "" : "s"} disponible${p.variants.length === 1 ? "" : "s"} (stock total ${totalStock}) --
-              el cliente elige cuál al comprar.
-            </p>
-            <label class="block text-sm font-bold text-gray-700 mb-1">¿Cuántas piezas de este producto incluye el paquete?</label>
-            <div class="flex gap-2">
-              <input type="number" min="1" value="1" id="picker-quantity" class="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-              <button type="button" id="picker-confirm" class="bg-brand-mexican text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90">
-                Agregar al paquete
-              </button>
-            </div>
-          `;
-        }
-
-        function bindPickerEvents() {
-          const cancelBtn = contentConfigEl.querySelector("#picker-cancel");
-          if (cancelBtn) {
-            cancelBtn.addEventListener("click", () => {
-              pickerOpen = false;
-              renderFixedMode();
-            });
-          }
-          const searchInput = contentConfigEl.querySelector("#picker-search");
-          if (searchInput) {
-            searchInput.addEventListener("input", () => {
-              pickerSearch = searchInput.value;
-              renderFixedMode();
-              contentConfigEl.querySelector("#picker-search")?.focus();
-            });
-          }
-          contentConfigEl.querySelectorAll("[data-picker-product]").forEach((btn) => {
-            btn.addEventListener("click", () => {
-              pickerProduct = normalProducts.find((p) => p.id === btn.dataset.pickerProduct);
-              renderFixedMode();
-            });
-          });
-          const backBtn = contentConfigEl.querySelector("#picker-back");
-          if (backBtn) {
-            backBtn.addEventListener("click", () => {
-              pickerProduct = null;
-              renderFixedMode();
-            });
-          }
-          const confirmBtn = contentConfigEl.querySelector("#picker-confirm");
-          if (confirmBtn) {
-            confirmBtn.addEventListener("click", () => {
-              const qtyInput = contentConfigEl.querySelector("#picker-quantity");
-              const qty = parseInt(qtyInput.value, 10) || 1;
-              const existing = fixedItems.find((i) => i.product_id === pickerProduct.id);
-              if (existing) existing.quantity += qty;
-              else fixedItems.push({ product_id: pickerProduct.id, quantity: qty });
-              pickerOpen = false;
-              pickerProduct = null;
-              renderFixedMode();
-            });
-          }
         }
 
         renderContentConfig();
 
-        el.querySelectorAll(".content-mode-btn").forEach((btn) => {
+        el.querySelectorAll(".print-type-btn").forEach((btn) => {
           btn.addEventListener("click", () => {
-            contentMode = btn.dataset.contentMode;
-            el.querySelectorAll(".content-mode-btn").forEach((b) => {
-              const active = b.dataset.contentMode === contentMode;
+            printType = btn.dataset.printType;
+            el.querySelectorAll(".print-type-btn").forEach((b) => {
+              const active = b.dataset.printType === printType;
               b.classList.toggle("border-brand-mexican", active);
               b.classList.toggle("bg-brand-pink-light", active);
               b.classList.toggle("text-brand-mexican", active);
@@ -497,45 +338,35 @@ export function createPaquetesSection(onUnauthorized) {
           const fd = new FormData(form);
 
           const categoryLimits = {};
-          const eligibleSubcategoriesByCategory = {};
           const eligibleProductIdsPayload = [...el.querySelectorAll("[data-eligible-product]:checked")].map((input) => input.dataset.eligibleProduct);
           const modelLimits = {};
+          const mandatoryModelsPayload = [];
+          
           el.querySelectorAll("[data-model-limit]").forEach((input) => {
             const value = parseInt(input.value, 10) || 0;
             if (value > 0) modelLimits[input.dataset.modelLimit] = value;
           });
-          let cleanFixedItems = [];
 
-          if (contentMode === "custom") {
-            el.querySelectorAll("[data-category-limit]").forEach((input) => {
-              const val = parseInt(input.value, 10) || 0;
-              if (val > 0) categoryLimits[input.dataset.categoryLimit] = val;
-            });
-            if (Object.values(categoryLimits).reduce((a, b) => a + b, 0) === 0) {
-              errorEl.textContent = "Asigna un límite mayor a cero a por lo menos una categoría.";
-              errorEl.classList.remove("hidden");
-              return;
-            }
-            el.querySelectorAll("[data-eligible-subcategory]").forEach((input) => {
-              if (!input.checked) return;
-              const [categoryName, subcategory] = input.dataset.eligibleSubcategory.split("::");
-              (eligibleSubcategoriesByCategory[categoryName] ||= []).push(subcategory);
-            });
-          } else {
-            cleanFixedItems = fixedItems.filter((i) => i.product_id && i.quantity > 0);
-            if (cleanFixedItems.length === 0) {
-              errorEl.textContent = "Agrega al menos un producto al contenido fijo del paquete.";
-              errorEl.classList.remove("hidden");
-              return;
-            }
+          el.querySelectorAll("[data-mandatory-model]:checked").forEach((input) => {
+            mandatoryModelsPayload.push(input.dataset.mandatoryModel);
+          });
+
+          el.querySelectorAll("[data-category-limit]").forEach((input) => {
+            const val = parseInt(input.value, 10) || 0;
+            if (val > 0) categoryLimits[input.dataset.categoryLimit] = val;
+          });
+
+          if (Object.values(categoryLimits).reduce((a, b) => a + b, 0) === 0) {
+            errorEl.textContent = "Asigna un límite mayor a cero a por lo menos una categoría.";
+            errorEl.classList.remove("hidden");
+            return;
           }
 
           const price = parseFloat(fd.get("price_normal"));
           const payload = {
             name: fd.get("name"),
-            // "Mixto" satisface la restricción de la base de datos -- la elegibilidad
-            // real ahora se maneja con bundle_eligible_subcategories.
-            subcategory: "Mixto",
+            subcategory: "MIXTO",
+            print_type: printType,
             description: fd.get("description"),
             price_normal: price,
             price_medio: price,
@@ -545,13 +376,12 @@ export function createPaquetesSection(onUnauthorized) {
             wholesale_min_qty: 1,
             super_wholesale_min_qty: 1,
             is_bundle: true,
-            // Se manda siempre el conjunto completo (aunque quede vacío) para poder
-            // limpiar el modo que se dejó de usar si el admin cambia de modo al editar.
-            bundle_category_limits: contentMode === "custom" ? categoryLimits : {},
-            bundle_eligible_subcategories: contentMode === "custom" ? eligibleSubcategoriesByCategory : {},
-            bundle_eligible_products: contentMode === "custom" ? eligibleProductIdsPayload : cleanFixedItems.map((item) => item.product_id),
-            bundle_model_limits: contentMode === "custom" ? modelLimits : {},
-            bundle_fixed_items: contentMode === "fixed" ? cleanFixedItems : [],
+            bundle_category_limits: categoryLimits,
+            bundle_eligible_subcategories: {},
+            bundle_eligible_products: eligibleProductIdsPayload,
+            bundle_model_limits: modelLimits,
+            bundle_mandatory_models: mandatoryModelsPayload,
+            bundle_fixed_items: [],
           };
           if (isNew) payload.category_id = categories[0]?.id;
 

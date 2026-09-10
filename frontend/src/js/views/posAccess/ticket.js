@@ -24,6 +24,7 @@ export function createTicketSection(onUnauthorized) {
         ticket_logo_url: settings.ticket_logo_url || "",
         ticket_store_name: settings.ticket_store_name || "",
         ticket_footer_message: settings.ticket_footer_message || "",
+        ticket_qr_url: settings.ticket_qr_url || "",
       };
       const sampleOrder = sampleOrderForPreview();
 
@@ -54,6 +55,24 @@ export function createTicketSection(onUnauthorized) {
                 }
               </div>
               <p id="ticket-logo-error" class="text-red-500 text-sm mb-3 hidden"></p>
+
+              <label class="block text-sm font-bold text-gray-700 mb-1 mt-4">Código QR (Redes Sociales)</label>
+              <div class="mb-2 bg-slate-50 rounded-xl p-4 flex items-center justify-center" style="min-height: 90px">
+                ${
+                  draft.ticket_qr_url
+                    ? `<img src="${draft.ticket_qr_url}" alt="QR del ticket" class="max-h-20 max-w-full object-contain" />`
+                    : `<span class="text-gray-400 text-sm">Sin QR configurado (opcional)</span>`
+                }
+              </div>
+              <div class="flex items-center gap-2 mb-4">
+                <input type="file" id="ticket-qr-file" accept="image/png,image/jpeg,image/webp" class="flex-1 text-sm" />
+                ${
+                  draft.ticket_qr_url
+                    ? `<button type="button" id="ticket-qr-remove" class="text-red-400 hover:text-red-600 text-sm font-semibold">Quitar</button>`
+                    : ""
+                }
+              </div>
+              <p id="ticket-qr-error" class="text-red-500 text-sm mb-3 hidden"></p>
 
               <label class="block text-sm font-bold text-gray-700 mb-1">Nombre de la tienda en el ticket</label>
               <input type="text" id="ticket-store-name" value="${draft.ticket_store_name}"
@@ -114,6 +133,33 @@ export function createTicketSection(onUnauthorized) {
           try {
             const { url } = await posAccessApi.uploadImage(file);
             draft.ticket_logo_url = url;
+            render();
+          } catch (err) {
+            if (err.status === 401 && onUnauthorized) {
+              onUnauthorized();
+              return;
+            }
+            errorEl.textContent = err.message;
+            errorEl.classList.remove("hidden");
+          }
+        });
+
+        const qrRemoveBtn = container.querySelector("#ticket-qr-remove");
+        if (qrRemoveBtn) {
+          qrRemoveBtn.addEventListener("click", () => {
+            draft.ticket_qr_url = "";
+            render();
+          });
+        }
+
+        container.querySelector("#ticket-qr-file").addEventListener("change", async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const errorEl = container.querySelector("#ticket-qr-error");
+          errorEl.classList.add("hidden");
+          try {
+            const { url } = await posAccessApi.uploadImage(file);
+            draft.ticket_qr_url = url;
             render();
           } catch (err) {
             if (err.status === 401 && onUnauthorized) {

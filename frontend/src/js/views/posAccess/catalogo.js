@@ -11,9 +11,9 @@ export function createCatalogoSection(onUnauthorized) {
     async mount(container) {
       container.innerHTML = `<div class="text-center py-12 text-gray-400">Cargando catálogo...</div>`;
 
-      let categories, subcategories, products, allProducts;
+      let categories, subcategories, print_types, products, allProducts;
       try {
-        [{ categories, subcategories }, { products: allProducts }] = await Promise.all([
+        [{ categories, subcategories, print_types }, { products: allProducts }] = await Promise.all([
           getCategories(),
           posAccessApi.listProducts(),
         ]);
@@ -29,13 +29,15 @@ export function createCatalogoSection(onUnauthorized) {
 
       let filterCategory = "Todas";
       let filterSubcategory = "Todas";
+      let filterPrintType = "Todos";
       let viewMode = "list";
 
       function filteredProducts() {
         return products.filter(
           (p) =>
             (filterCategory === "Todas" || p.category === filterCategory) &&
-            (filterSubcategory === "Todas" || p.subcategory === filterSubcategory)
+            (filterSubcategory === "Todas" || (p.subcategory || "Ninguna") === filterSubcategory) &&
+            (filterPrintType === "Todos" || p.print_type === filterPrintType)
         );
       }
 
@@ -51,7 +53,12 @@ export function createCatalogoSection(onUnauthorized) {
               </select>
               <select id="filter-subcategory" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
                 <option value="Todas">Todas las subcategorías</option>
+                <option value="Ninguna">(Ninguna)</option>
                 ${subcategories.map((s) => `<option value="${s}" ${filterSubcategory === s ? "selected" : ""}>${s}</option>`).join("")}
+              </select>
+              <select id="filter-print-type" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                <option value="Todos">Todos los estampados</option>
+                ${print_types.map((p) => `<option value="${p}" ${filterPrintType === p ? "selected" : ""}>${p}</option>`).join("")}
               </select>
             </div>
             <div class="flex items-center gap-3">
@@ -74,6 +81,7 @@ export function createCatalogoSection(onUnauthorized) {
                   <th class="px-4 py-3">Nombre</th>
                   <th class="px-4 py-3">Categoría</th>
                   <th class="px-4 py-3">Subcategoría</th>
+                  <th class="px-4 py-3">Estampado</th>
                   ${window.posRole !== "employee" ? '<th class="px-4 py-3">Costo</th>' : ''}
                   <th class="px-4 py-3">Precio</th>
                   ${window.posRole !== "employee" ? '<th class="px-4 py-3">Margen</th>' : ''}
@@ -89,7 +97,8 @@ export function createCatalogoSection(onUnauthorized) {
                     <tr class="border-t border-gray-100 hover:bg-gray-50/50 transition-colors">
                       <td class="px-4 py-3 font-semibold">${p.name}${p.is_on_sale ? ' <span class="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded ml-1">OFERTA</span>' : ""}</td>
                       <td class="px-4 py-3 text-sm">${p.category}</td>
-                      <td class="px-4 py-3 text-sm">${p.subcategory}</td>
+                      <td class="px-4 py-3 text-sm">${p.subcategory || "—"}</td>
+                      <td class="px-4 py-3 text-sm">${p.print_type || "—"}</td>
                       ${window.posRole !== "employee" ? `<td class="px-4 py-3 text-sm text-gray-500">${p.cost_price != null ? money(p.cost_price) : "—"}</td>` : ''}
                       <td class="px-4 py-3">${p.is_on_sale ? `<span class="line-through text-gray-400 text-xs">${money(p.price_normal)}</span> <span class="text-red-500 font-bold">${money(p.sale_price)}</span>` : money(p.price_normal)}</td>
                       ${window.posRole !== "employee" ? `<td class="px-4 py-3">${marginHtml(p)}</td>` : ''}
@@ -146,6 +155,10 @@ export function createCatalogoSection(onUnauthorized) {
         });
         container.querySelector("#filter-subcategory").addEventListener("change", (e) => {
           filterSubcategory = e.target.value;
+          render();
+        });
+        container.querySelector("#filter-print-type")?.addEventListener("change", (e) => {
+          filterPrintType = e.target.value;
           render();
         });
         container.querySelector("#view-list-btn").addEventListener("click", () => {
@@ -220,9 +233,16 @@ export function createCatalogoSection(onUnauthorized) {
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Subcategoría</label>
-                <select name="subcategory" required class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Subcategoría <span class="font-normal text-gray-400">(Opcional)</span></label>
+                <select name="subcategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                  <option value="">(Ninguna)</option>
                   ${subcategories.map((s) => `<option value="${s}" ${product?.subcategory === s ? "selected" : ""}>${s}</option>`).join("")}
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Tipo de Estampado</label>
+                <select name="print_type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                  ${print_types.map((p) => `<option value="${p}" ${product?.print_type === p ? "selected" : ""}>${p}</option>`).join("")}
                 </select>
               </div>
               <div class="sm:col-span-2">

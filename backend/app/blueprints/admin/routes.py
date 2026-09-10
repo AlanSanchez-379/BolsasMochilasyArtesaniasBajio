@@ -15,6 +15,7 @@ from app.models import (
     Setting,
     SUBCATEGORIES,
     BUNDLE_SUBCATEGORIES,
+    PRINT_TYPES,
     MAX_VARIANT_IMAGES,
 )
 from app.utils.decorators import role_required, pos_admin_required, pos_access_required
@@ -30,7 +31,7 @@ BRANDING_FOLDER = "branding"
 PRODUCT_IMAGES_FOLDER = "products"
 ALLOWED_SETTING_TYPES = {"logo": "logo_url", "banner": "banner_url"}
 PAYMENT_SETTING_KEYS = {"paypal_receiving_email", "spei_clabe"}
-TICKET_SETTING_KEYS = {"ticket_logo_url", "ticket_store_name", "ticket_footer_message"}
+TICKET_SETTING_KEYS = {"ticket_logo_url", "ticket_store_name", "ticket_footer_message", "ticket_qr_url"}
 
 
 def _public_asset_url_is_valid(url):
@@ -220,6 +221,8 @@ def update_ticket_settings():
 
     if "ticket_logo_url" in data and data["ticket_logo_url"] and not _public_asset_url_is_valid(data["ticket_logo_url"]):
         return jsonify({"message": "ticket_logo_url debe ser una imagen ya subida a este sitio."}), 400
+    if "ticket_qr_url" in data and data["ticket_qr_url"] and not _public_asset_url_is_valid(data["ticket_qr_url"]):
+        return jsonify({"message": "ticket_qr_url debe ser una imagen ya subida a este sitio."}), 400
 
     for key, value in data.items():
         setting = Setting.query.get(key) or Setting(key=key)
@@ -298,6 +301,7 @@ PRODUCT_FIELDS = [
     "description",
     "category_id",
     "subcategory",
+    "print_type",
     "price_normal",
     "price_medio",
     "medio_min_qty",
@@ -348,6 +352,9 @@ def _apply_product_fields(product, data):
             if int(limit or 0) > 0
         }
         product.bundle_model_limits = model_limits or None
+
+    if "bundle_mandatory_models" in data:
+        product.bundle_mandatory_models = [str(product_id) for product_id in (data["bundle_mandatory_models"] or [])] or None
 
     # Paquete de contenido fijo (tercer tipo): producto + cantidad exactas que la
     # dueña arma al crear el paquete -- el cliente elige la variante/color al comprar.
@@ -425,11 +432,12 @@ def _validate_bundle_fixed_items(data):
 
 
 def _validate_bundle_product_selection(data):
-    if "bundle_eligible_products" not in data and "bundle_model_limits" not in data:
+    if "bundle_eligible_products" not in data and "bundle_model_limits" not in data and "bundle_mandatory_models" not in data:
         return None
     product_ids = set(str(product_id) for product_id in (data.get("bundle_eligible_products") or []))
     model_limits = data.get("bundle_model_limits") or {}
     product_ids.update(str(product_id) for product_id in model_limits)
+    product_ids.update(str(product_id) for product_id in (data.get("bundle_mandatory_models") or []))
     if not product_ids:
         return None
     for product_id in product_ids:
@@ -447,15 +455,21 @@ def _validate_bundle_product_selection(data):
 
 
 def _validate_subcategory(data):
-    """La 'categoría de paquete' (yute / animado 3D / mixto) y la subcategoría de un
-    producto normal comparten columna pero son listas de valores distintas."""
-    if "subcategory" not in data:
+    if "subcategory" not in data or not data["subcategory"]:
         return None
     is_bundle = data.get("is_bundle", False)
     allowed = BUNDLE_SUBCATEGORIES if is_bundle else SUBCATEGORIES
     if data["subcategory"] not in allowed:
         kind = "de paquete" if is_bundle else ""
-        return f"Categoría {kind} inválida. Válidas: {', '.join(allowed)}"
+        return f"Subcategoría {kind} inválida. Válidas: {', '.join(allowed)}"
+    return None
+
+
+def _validate_print_type(data):
+    if "print_type" not in data or not data["print_type"]:
+        return None
+    if data["print_type"] not in PRINT_TYPES:
+        return f"Tipo de estampado inválido. Válidos: {', '.join(PRINT_TYPES)}"
     return None
 
 
@@ -470,7 +484,7 @@ def list_products():
 @pos_admin_required
 def create_product():
     data = request.get_json() or {}
-    required = ["name", "category_id", "subcategory", "price_normal", "price_medio", "price_wholesale", "price_super_wholesale"]
+    required = ["name", "category_id", "price_normal", "price_medio", "price_wholesale", "price_super_wholesale"]
     missing = [f for f in required if f not in data]
     if missing:
         return jsonify({"message": f"Faltan campos: {', '.join(missing)}"}), 400
@@ -481,6 +495,10 @@ def create_product():
     subcategory_error = _validate_subcategory(data)
     if subcategory_error:
         return jsonify({"message": subcategory_error}), 400
+
+    print_type_error = _validate_print_type(data)
+    if print_type_error:
+        return jsonify({"message": print_type_error}), 400
 
     sale_price_error = _validate_sale_price(data)
     if sale_price_error:
@@ -529,6 +547,10 @@ def update_product(product_id):
     subcategory_error = _validate_subcategory({**data, "is_bundle": data.get("is_bundle", product.is_bundle)})
     if subcategory_error:
         return jsonify({"message": subcategory_error}), 400
+
+    print_type_error = _validate_print_type(data)
+    if print_type_error:
+        return jsonify({"message": print_type_error}), 400
 
     sale_price_error = _validate_sale_price(data, product=product)
     if sale_price_error:
