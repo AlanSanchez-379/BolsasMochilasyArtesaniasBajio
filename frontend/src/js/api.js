@@ -51,8 +51,6 @@ export const api = {
     return request(`/products${qs ? `?${qs}` : ""}`);
   },
   getProduct: (slug) => request(`/products/${slug}`),
-  // raw=true pide los precios base (sin el impuesto fantasma de Stripe+IVA de la
-  // tienda en línea) -- lo usa /venta-local para su "Top 5 Más Vendido".
   getBestsellers: (limit = 4, raw = false) => request(`/products/bestsellers?limit=${limit}${raw ? "&raw=true" : ""}`),
 
   register: (email, password, fullName) =>
@@ -67,6 +65,11 @@ export const api = {
   checkoutQuote: (shipping, items) =>
     request("/checkout/quote", { method: "POST", body: JSON.stringify({ ...shipping, items }) }),
   createOrder: (payload) => request("/checkout", { method: "POST", body: JSON.stringify(payload) }),
+  uploadOrderVoucher: (orderId, file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return upload(`/orders/${orderId}/voucher`, formData);
+  },
 
   myOrders: () => request("/orders"),
   getOrder: (id) => request(`/orders/${id}`),

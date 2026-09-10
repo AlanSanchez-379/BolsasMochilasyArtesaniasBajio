@@ -70,6 +70,7 @@ export function cartItemsCount() {
 export function priceForQuantity(product, quantity) {
   if (quantity >= product.super_wholesale_min_qty) return product.price_super_wholesale;
   if (quantity >= product.wholesale_min_qty) return product.price_wholesale;
+  if (quantity >= product.medio_min_qty) return product.price_medio;
   return product.price_normal;
 }
 

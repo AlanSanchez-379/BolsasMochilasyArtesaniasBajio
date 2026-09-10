@@ -29,6 +29,23 @@ function carrierLabel(carrier) {
   return carrier.toUpperCase();
 }
 
+function voucherWidgetHtml(order) {
+  if (order.payment_method !== "spei" || !["Pendiente de pago", "Pago en validación"].includes(order.status)) return "";
+  return `
+    <div class="mt-4 pt-4 border-t border-orange-200 bg-orange-50 rounded p-4">
+      <p class="text-sm font-semibold text-orange-800 mb-2">
+        <i class="fa-solid fa-file-arrow-up mr-1"></i>${order.payment_voucher_url ? "Comprobante enviado" : "Sube tu comprobante SPEI"}
+      </p>
+      ${order.payment_voucher_url ? `<p class="text-xs text-orange-800 mb-2">Tu comprobante está en revisión. Puedes reemplazarlo si es necesario.</p>` : ""}
+      <div class="flex flex-wrap gap-2 items-center">
+        <input type="file" data-voucher-file="${order.id}" accept="image/*,.pdf" class="flex-1 min-w-[12rem] text-sm text-orange-800" />
+        <button data-voucher-upload="${order.id}" class="bg-orange-800 text-white text-sm font-semibold px-4 py-2 rounded hover:opacity-90">Subir</button>
+      </div>
+      <p data-voucher-status="${order.id}" class="text-xs mt-2"></p>
+    </div>
+  `;
+}
+
 function orderCardHtml(order) {
   const badge = STATUS_COLORS[order.status] || "bg-gray-100 text-gray-700";
   return `
@@ -57,6 +74,7 @@ function orderCardHtml(order) {
             </p>`
           : ""
       }
+          ${voucherWidgetHtml(order)}
       ${
         order.shipping.carrier === "international_pending"
           ? `<p class="text-sm text-brand-mexican font-semibold mt-2">
@@ -113,4 +131,31 @@ export async function renderMyOrders(container) {
       ${orders.map(orderCardHtml).join("")}
     </div>
   `;
+
+  container.querySelectorAll("[data-voucher-upload]").forEach((uploadButton) => {
+    uploadButton.addEventListener("click", async () => {
+      const orderId = uploadButton.dataset.voucherUpload;
+      const fileInput = container.querySelector(`[data-voucher-file="${orderId}"]`);
+      const statusEl = container.querySelector(`[data-voucher-status="${orderId}"]`);
+      const file = fileInput.files[0];
+      if (!file) {
+        statusEl.textContent = "Selecciona un archivo primero.";
+        statusEl.className = "text-xs mt-2 text-red-600 font-semibold";
+        return;
+      }
+      uploadButton.disabled = true;
+      uploadButton.textContent = "Subiendo...";
+      try {
+        await api.uploadOrderVoucher(orderId, file);
+        statusEl.textContent = "Comprobante recibido. Lo revisaremos y confirmaremos tu pago.";
+        statusEl.className = "text-xs mt-2 text-emerald-700 font-semibold";
+        uploadButton.textContent = "Subido";
+      } catch (err) {
+        statusEl.textContent = err.message;
+        statusEl.className = "text-xs mt-2 text-red-600 font-semibold";
+        uploadButton.disabled = false;
+        uploadButton.textContent = "Subir";
+      }
+    });
+  });
 }

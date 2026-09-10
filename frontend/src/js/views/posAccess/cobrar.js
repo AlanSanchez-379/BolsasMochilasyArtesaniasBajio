@@ -1,6 +1,41 @@
 import { api, posAccessApi } from "../../api.js";
 import { priceForQuantity } from "../../state.js";
 import { money } from "./shared.js";
+import { printSaleTicket } from "../../components/saleTicket.js";
+
+// Modal de confirmación tras una venta exitosa: resume el folio/total y ofrece
+// imprimir el ticket (58mm, vía el diálogo de impresión del navegador -- ver
+// components/saleTicket.js) antes de volver a la pantalla de cobro.
+function showSaleCompleteModal(order) {
+  const overlay = document.createElement("div");
+  overlay.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center fade-in";
+  overlay.style.zIndex = "9999";
+  const pending = order.status === "Pendiente de pago";
+  overlay.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6 text-center">
+      <div class="w-16 h-16 mx-auto rounded-full ${pending ? "bg-amber-100" : "bg-emerald-100"} flex items-center justify-center mb-4">
+        <i class="fa-solid ${pending ? "fa-clock text-amber-500" : "fa-circle-check text-emerald-500"} text-2xl"></i>
+      </div>
+      <h3 class="text-xl font-bold mb-1">${pending ? "Venta registrada" : "Venta completada"}</h3>
+      <p class="text-gray-500 text-sm mb-1">Folio <strong>${order.order_number}</strong></p>
+      <p class="text-2xl font-black text-gray-900 mb-4">${money(order.total)}</p>
+      ${pending ? `<p class="text-xs text-amber-600 font-semibold mb-4">Queda pendiente hasta confirmar el depósito en el Dashboard.</p>` : ""}
+      <div class="flex gap-3">
+        <button id="sale-modal-close" class="flex-1 border-2 border-gray-300 rounded-full py-3 font-semibold hover:bg-gray-50">Cerrar</button>
+        <button id="sale-modal-print" class="flex-1 bg-brand-mexican text-white rounded-full py-3 font-semibold hover:opacity-90">
+          <i class="fa-solid fa-print mr-1"></i>Imprimir ticket
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+  overlay.querySelector("#sale-modal-close").addEventListener("click", close);
+  overlay.querySelector("#sale-modal-print").addEventListener("click", () => printSaleTicket(order));
+}
 
 // --- Sección "Cobrar": estilo caja registradora (ticket + catálogo rápido). ---
 export function createSaleSection(onUnauthorized) {
@@ -41,6 +76,7 @@ export function createSaleSection(onUnauthorized) {
   function lineUnitPrice(item) {
     if (item.product.is_bundle) return Number(item.product.price_normal);
     if (item.priceOverride === "normal") return Number(item.product.price_normal);
+    if (item.priceOverride === "medio") return Number(item.product.price_medio);
     if (item.priceOverride === "wholesale") return Number(item.product.price_wholesale);
     if (item.priceOverride === "super_wholesale") return Number(item.product.price_super_wholesale);
     return priceForQuantity(item.product, combinedQtyForSubcategory(item.product.subcategory));
@@ -293,6 +329,7 @@ export function createSaleSection(onUnauthorized) {
                         : `<select data-price-tier="${item.variant.id}" class="mt-2 w-full sm:w-auto text-[11px] font-semibold border border-gray-200 bg-gray-50 rounded-lg px-2 py-1.5 text-gray-600 outline-none focus:border-brand-pink focus:ring-2 focus:ring-brand-pink/10 transition-all cursor-pointer appearance-none">
                             <option value="" ${!item.priceOverride ? "selected" : ""}>Automático (por cantidad)</option>
                             <option value="normal" ${item.priceOverride === "normal" ? "selected" : ""}>Menudeo</option>
+                            <option value="medio" ${item.priceOverride === "medio" ? "selected" : ""}>Medio</option>
                             <option value="wholesale" ${item.priceOverride === "wholesale" ? "selected" : ""}>Mayoreo</option>
                             <option value="super_wholesale" ${item.priceOverride === "super_wholesale" ? "selected" : ""}>Súper Mayoreo</option>
                           </select>`
@@ -553,11 +590,7 @@ export function createSaleSection(onUnauthorized) {
           shippingCost = "";
           await loadProducts();
           busy = false;
-          alert(
-            order.status === "Pendiente de pago"
-              ? `Venta registrada (Folio ${order.order_number}). Queda pendiente hasta confirmar el depósito en el Dashboard.`
-              : `Venta completada. Folio ${order.order_number} — Total ${money(order.total)}`
-          );
+          showSaleCompleteModal(order);
           rerender();
         } catch (err) {
           busy = false;

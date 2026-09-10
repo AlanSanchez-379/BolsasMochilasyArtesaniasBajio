@@ -12,10 +12,6 @@ class Config:
     SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
     SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
-    STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
-    STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
-    STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
-
     # Skydropx Pro (cotización y guías de envío), OAuth2 client_credentials. Producción
     # = pro.skydropx.com, sandbox = sb-pro.skydropx.com (ver app/utils/skydropx_client.py
     # para el detalle de campos que todavía falta confirmar). Mientras SKYDROPX_MOCK_MODE

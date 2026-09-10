@@ -30,6 +30,9 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
 
     # Precios por volumen (Documento de Requerimientos secc. 2)
     price_normal = db.Column(db.Numeric(10, 2), nullable=False)
+    # Nivel intermedio entre normal y mayoreo (ej. "llévate 3-5 piezas a precio medio").
+    price_medio = db.Column(db.Numeric(10, 2), nullable=False)
+    medio_min_qty = db.Column(db.Integer, nullable=False, default=3)
     price_wholesale = db.Column(db.Numeric(10, 2), nullable=False)
     price_super_wholesale = db.Column(db.Numeric(10, 2), nullable=False)
     wholesale_min_qty = db.Column(db.Integer, nullable=False, default=6)
@@ -41,6 +44,8 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     # Página de Ofertas (etiqueta de descuento manual del dueño de la tienda).
     is_on_sale = db.Column(db.Boolean, nullable=False, default=False)
     sale_price = db.Column(db.Numeric(10, 2), nullable=True)
+    # Producto que solo puede venderse como parte de un paquete.
+    is_bundle_exclusive = db.Column(db.Boolean, nullable=False, default=False)
 
     # Paquete Emprendedor (Documento de Requerimientos secc. 3)
     is_bundle = db.Column(db.Boolean, nullable=False, default=False)
@@ -52,6 +57,11 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     # cada categoría con límite. Ej. {"Bolsas": ["Estampado en yute"], "Mochilas": []}.
     # Categoría ausente o lista vacía = cualquier subcategoría permitida en esa categoría.
     bundle_eligible_subcategories = db.Column(JSONB, nullable=True)
+    # Modelos permitidos dentro de este paquete. Si es nulo, se conserva el
+    # comportamiento anterior basado únicamente en categoría/subcategoría.
+    bundle_eligible_products = db.Column(JSONB, nullable=True)
+    # Límite exacto por modelo, ej. {"uuid-del-producto": 2}.
+    bundle_model_limits = db.Column(JSONB, nullable=True)
     # Tercer tipo de paquete: contenido fijo que la dueña arma al crear el paquete
     # (variante + cantidad exactas), sin que el cliente elija ni le toque al azar.
     # [{"variant_id": "...", "quantity": 2}, ...]. Si tiene datos, el producto opera
@@ -68,6 +78,8 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
             return self.price_super_wholesale
         if quantity >= self.wholesale_min_qty:
             return self.price_wholesale
+        if quantity >= self.medio_min_qty:
+            return self.price_medio
         if self.is_on_sale and self.sale_price is not None:
             return self.sale_price
         return self.price_normal

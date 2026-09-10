@@ -169,6 +169,8 @@ export function createPaquetesSection(onUnauthorized) {
         const initialTotal = bundle?.bundle_limit ?? 0;
         let contentMode = bundle?.bundle_fixed_items?.length ? "fixed" : "custom";
         const fixedItems = (bundle?.bundle_fixed_items || []).map((i) => ({ product_id: i.product_id, quantity: i.quantity }));
+        const eligibleProductIds = new Set(bundle?.bundle_eligible_products || []);
+        const initialModelLimits = bundle?.bundle_model_limits || {};
         let pickerOpen = false;
         let pickerSearch = "";
         let pickerProduct = null;
@@ -239,6 +241,18 @@ export function createPaquetesSection(onUnauthorized) {
             const total = Object.values(bundle?.bundle_category_limits || {}).reduce((a, b) => a + b, 0);
             const eligibleSubsByCategory = bundle?.bundle_eligible_subcategories || {};
             contentConfigEl.innerHTML = `
+              <div class="border border-gray-200 rounded-lg p-3 mb-4">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Modelos permitidos</label>
+                <p class="text-xs text-gray-500 mb-2">Sin selección se permiten todos los modelos no exclusivos. Los modelos exclusivos solo funcionan si los agregas aquí.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                  ${normalProducts.map((p) => `
+                    <label class="flex items-center gap-2 text-xs text-gray-700 border border-gray-100 rounded px-2 py-1.5">
+                      <input type="checkbox" data-eligible-product="${p.id}" ${eligibleProductIds.has(p.id) ? "checked" : ""} class="w-3.5 h-3.5" />
+                      <span class="flex-1 truncate">${p.name}${p.is_bundle_exclusive ? " (exclusivo)" : ""}</span>
+                      <input type="number" min="1" data-model-limit="${p.id}" value="${initialModelLimits[p.id] ?? ""}" placeholder="límite" class="w-16 px-1.5 py-1 border border-gray-200 rounded text-xs" />
+                    </label>`).join("")}
+                </div>
+              </div>
               <label class="block text-sm font-bold text-gray-700 mb-2">Límite exacto de piezas por categoría</label>
               <p class="text-xs text-gray-500 mb-2">Por cada categoría, puedes además limitar a subcategorías específicas -- sin marcar ninguna, admite cualquiera.</p>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
@@ -359,7 +373,8 @@ export function createPaquetesSection(onUnauthorized) {
 
         function pickerGridHtml() {
           const query = pickerSearch.trim().toLowerCase();
-          const filtered = query ? normalProducts.filter((p) => p.name.toLowerCase().includes(query)) : normalProducts;
+          const pickerProducts = eligibleProductIds.size ? normalProducts.filter((p) => eligibleProductIds.has(p.id) || fixedItems.some((item) => item.product_id === p.id)) : normalProducts;
+          const filtered = query ? pickerProducts.filter((p) => p.name.toLowerCase().includes(query)) : pickerProducts;
           return `
             <div class="flex items-center gap-2 mb-4">
               <button type="button" id="picker-cancel" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-arrow-left"></i></button>
@@ -483,6 +498,12 @@ export function createPaquetesSection(onUnauthorized) {
 
           const categoryLimits = {};
           const eligibleSubcategoriesByCategory = {};
+          const eligibleProductIdsPayload = [...el.querySelectorAll("[data-eligible-product]:checked")].map((input) => input.dataset.eligibleProduct);
+          const modelLimits = {};
+          el.querySelectorAll("[data-model-limit]").forEach((input) => {
+            const value = parseInt(input.value, 10) || 0;
+            if (value > 0) modelLimits[input.dataset.modelLimit] = value;
+          });
           let cleanFixedItems = [];
 
           if (contentMode === "custom") {
@@ -517,8 +538,10 @@ export function createPaquetesSection(onUnauthorized) {
             subcategory: "Mixto",
             description: fd.get("description"),
             price_normal: price,
+            price_medio: price,
             price_wholesale: price,
             price_super_wholesale: price,
+            medio_min_qty: 1,
             wholesale_min_qty: 1,
             super_wholesale_min_qty: 1,
             is_bundle: true,
@@ -526,6 +549,8 @@ export function createPaquetesSection(onUnauthorized) {
             // limpiar el modo que se dejó de usar si el admin cambia de modo al editar.
             bundle_category_limits: contentMode === "custom" ? categoryLimits : {},
             bundle_eligible_subcategories: contentMode === "custom" ? eligibleSubcategoriesByCategory : {},
+            bundle_eligible_products: contentMode === "custom" ? eligibleProductIdsPayload : cleanFixedItems.map((item) => item.product_id),
+            bundle_model_limits: contentMode === "custom" ? modelLimits : {},
             bundle_fixed_items: contentMode === "fixed" ? cleanFixedItems : [],
           };
           if (isNew) payload.category_id = categories[0]?.id;

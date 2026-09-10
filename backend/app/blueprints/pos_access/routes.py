@@ -97,7 +97,7 @@ def me():
 @pos_access_required
 def list_products():
     products = Product.query.order_by(Product.name).all()
-    return jsonify({"products": [serialize_product(p) for p in products]})
+    return jsonify({"products": [serialize_product(p, include_cost_price=True) for p in products]})
 
 
 @pos_access_bp.get("/stats")

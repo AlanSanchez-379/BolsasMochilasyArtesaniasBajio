@@ -1,14 +1,17 @@
 from flask import jsonify, request, g
 
 from app.extensions import db
-from app.models import Order, OrderStatus, UserRole
+from app.models import Order, OrderStatus, PaymentMethod, UserRole
 from app.utils.decorators import login_required, pos_access_required
 from app.utils.serializers import serialize_order
 from app.utils.stock import set_order_status
 from app.utils.shipping_estimate import get_shipping_settings_dict, get_origin_address
 from app.utils.skydropx_client import get_rates, purchase_label, SkydropxError
+from app.utils.uploads import ALLOWED_VOUCHER_MIMETYPES, upload_image_file
 
 from . import orders_bp
+
+ORDER_VOUCHERS_FOLDER = "order-vouchers"
 
 
 @orders_bp.get("")
@@ -28,6 +31,31 @@ def get_order(order_id):
     order = Order.query.get_or_404(order_id)
     if not _can_view(order):
         return jsonify({"message": "No autorizado."}), 403
+    return jsonify({"order": serialize_order(order)})
+
+
+@orders_bp.post("/<order_id>/voucher")
+@login_required
+def upload_payment_voucher(order_id):
+    """El cliente sube su comprobante de depósito SPEI desde "Mis Pedidos" -- la
+    dueña lo revisa y confirma el pago manualmente desde el panel (PATCH .../status)."""
+    order = Order.query.get_or_404(order_id)
+    if str(order.user_id) != str(g.user.id):
+        return jsonify({"message": "No autorizado."}), 403
+    if order.payment_method != PaymentMethod.SPEI:
+        return jsonify({"message": "Este pedido no se paga por transferencia SPEI."}), 400
+    if order.status not in (OrderStatus.PENDING_PAYMENT, OrderStatus.PAYMENT_IN_VALIDATION):
+        return jsonify({"message": "Este pedido ya no admite comprobante."}), 400
+
+    public_url, error = upload_image_file(
+        request.files.get("file"), ORDER_VOUCHERS_FOLDER, ALLOWED_VOUCHER_MIMETYPES
+    )
+    if error:
+        return error
+
+    order.payment_voucher_url = public_url
+    order.status = OrderStatus.PAYMENT_IN_VALIDATION
+    db.session.commit()
     return jsonify({"order": serialize_order(order)})
 
 

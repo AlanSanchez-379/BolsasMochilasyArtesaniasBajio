@@ -16,6 +16,7 @@ class PosSaleError(Exception):
 # solo lleva 2 piezas, a criterio del cajero.
 PRICE_TIER_FIELDS = {
     "normal": "price_normal",
+    "medio": "price_medio",
     "wholesale": "price_wholesale",
     "super_wholesale": "price_super_wholesale",
 }

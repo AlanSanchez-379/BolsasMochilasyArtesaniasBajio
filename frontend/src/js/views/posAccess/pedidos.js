@@ -40,6 +40,35 @@ function internationalShippingHtml(o) {
   `;
 }
 
+function paymentReviewHtml(order) {
+  if (order.payment_method !== "spei" || !order.payment_voucher_url) return "";
+  return `
+    <div class="mt-5 pt-4 border-t border-amber-200 bg-amber-50 rounded p-4">
+      <p class="text-sm font-bold text-amber-900 mb-1"><i class="fa-solid fa-file-invoice mr-1"></i>Comprobante SPEI</p>
+      <p class="text-xs text-amber-800 mb-3">Revisa el archivo antes de confirmar que el pago fue recibido.</p>
+      <div class="flex flex-wrap gap-2">
+        <a href="${order.payment_voucher_url}" target="_blank" rel="noopener" class="border border-amber-700 text-amber-900 px-3 py-2 rounded text-sm font-semibold hover:bg-amber-100">
+          <i class="fa-solid fa-eye mr-1"></i>Ver comprobante
+        </a>
+        <button data-voucher-status="${order.id}" data-status-value="Pago confirmado" class="bg-emerald-700 text-white px-3 py-2 rounded text-sm font-semibold hover:bg-emerald-800">
+          <i class="fa-solid fa-check mr-1"></i>Aceptar pago
+        </button>
+        <button data-voucher-status="${order.id}" data-status-value="Pendiente de pago" class="border border-red-300 text-red-700 px-3 py-2 rounded text-sm font-semibold hover:bg-red-50">
+          <i class="fa-solid fa-rotate-left mr-1"></i>Rechazar comprobante
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function whatsappUrl(order) {
+  const digits = String(order.shipping.phone || "").replace(/\D/g, "");
+  if (!digits) return null;
+  const phone = digits.length === 10 ? `52${digits}` : digits;
+  const message = encodeURIComponent(`Hola, te contactamos sobre tu pedido ${order.order_number} de Bolsas, Mochilas y Artesanías del Bajío. Te enviaremos aquí tu enlace de Mercado Pago.`);
+  return `https://wa.me/${phone}?text=${message}`;
+}
+
 function orderDetailHtml(o) {
   // Los paquetes personalizados guardan un OrderItem "padre" (el paquete en sí, con su
   // precio) y uno "hijo" por cada producto que el cliente eligió dentro (precio $0,
@@ -107,6 +136,7 @@ function orderDetailHtml(o) {
         }
       </div>
     </div>
+    ${paymentReviewHtml(o)}
   `;
 }
 
@@ -283,6 +313,13 @@ export function createPedidosSection(onUnauthorized) {
                     </td>
                     <td class="px-4 py-3 text-right whitespace-nowrap">
                       ${
+                        o.payment_method === "mercado_pago" && whatsappUrl(o)
+                          ? `<a href="${whatsappUrl(o)}" target="_blank" rel="noopener" class="text-green-700 font-semibold text-sm hover:underline mr-3">
+                              <i class="fa-brands fa-whatsapp mr-1"></i>Enviar por WhatsApp
+                            </a>`
+                          : ""
+                      }
+                      ${
                         o.channel !== "in_store" && !o.shipping.tracking_number
                           ? `<button data-prepare-shipment="${o.id}" class="text-gray-700 font-semibold text-sm hover:underline mr-3">
                               <i class="fa-solid fa-box mr-1"></i>Preparar envío
@@ -419,6 +456,27 @@ export function createPedidosSection(onUnauthorized) {
               const { order: updatedOrder } = await posAccessApi.updateShippingCost(orderId, cost);
               const idx = orders.findIndex((o) => o.id === orderId);
               orders[idx] = updatedOrder;
+              render();
+            } catch (err) {
+              if (err.status === 401 && onUnauthorized) {
+                onUnauthorized();
+                return;
+              }
+              alert(err.message);
+              btn.disabled = false;
+            }
+          });
+        });
+
+        container.querySelectorAll("[data-voucher-status]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const orderId = btn.dataset.voucherStatus;
+            const newStatus = btn.dataset.statusValue;
+            btn.disabled = true;
+            try {
+              const { order } = await posAccessApi.updateOrderStatus(orderId, newStatus);
+              const idx = orders.findIndex((item) => item.id === orderId);
+              orders[idx] = order;
               render();
             } catch (err) {
               if (err.status === 401 && onUnauthorized) {

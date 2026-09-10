@@ -234,6 +234,10 @@ export function createCatalogoSection(onUnauthorized) {
                 <input type="number" step="0.01" name="price_normal" required value="${product?.price_normal ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
               </div>
               <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Medio</label>
+                <input type="number" step="0.01" name="price_medio" required value="${product?.price_medio ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              </div>
+              <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Precio Mayoreo</label>
                 <input type="number" step="0.01" name="price_wholesale" required value="${product?.price_wholesale ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
               </div>
@@ -250,6 +254,10 @@ export function createCatalogoSection(onUnauthorized) {
               ` : `
               <input type="hidden" name="cost_price" value="${product?.cost_price ?? ""}" />
               `}
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Mín. piezas Medio</label>
+                <input type="number" name="medio_min_qty" required value="${product?.medio_min_qty ?? 3}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              </div>
               <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Mín. piezas Mayoreo</label>
                 <input type="number" name="wholesale_min_qty" required value="${product?.wholesale_min_qty ?? 6}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
@@ -268,6 +276,14 @@ export function createCatalogoSection(onUnauthorized) {
                   <label class="block text-sm font-bold text-gray-700 mb-1">Precio de oferta</label>
                   <input type="number" step="0.01" name="sale_price" value="${product?.sale_price ?? ""}" class="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-lg" />
                 </div>
+              </div>
+
+              <div class="sm:col-span-2 border-t pt-4 mt-2">
+                <label class="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer">
+                  <input type="checkbox" id="is-bundle-exclusive-checkbox" ${product?.is_bundle_exclusive ? "checked" : ""} class="w-4 h-4" />
+                  Producto exclusivo para paquetes
+                </label>
+                <p class="text-xs text-gray-500 mt-1">No aparece en el catálogo general; solo puede incluirse en paquetes configurados para este modelo.</p>
               </div>
 
               ${
@@ -332,13 +348,16 @@ export function createCatalogoSection(onUnauthorized) {
             subcategory: fd.get("subcategory"),
             description: fd.get("description"),
             price_normal: parseFloat(fd.get("price_normal")),
+            price_medio: parseFloat(fd.get("price_medio")),
             price_wholesale: parseFloat(fd.get("price_wholesale")),
             price_super_wholesale: parseFloat(fd.get("price_super_wholesale")),
             cost_price: fd.get("cost_price") ? parseFloat(fd.get("cost_price")) : null,
+            medio_min_qty: parseInt(fd.get("medio_min_qty"), 10),
             wholesale_min_qty: parseInt(fd.get("wholesale_min_qty"), 10),
             super_wholesale_min_qty: parseInt(fd.get("super_wholesale_min_qty"), 10),
             is_on_sale: el.querySelector("#is-on-sale-checkbox").checked,
             sale_price: fd.get("sale_price") ? parseFloat(fd.get("sale_price")) : null,
+            is_bundle_exclusive: el.querySelector("#is-bundle-exclusive-checkbox").checked,
             is_bundle: false,
           };
 

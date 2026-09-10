@@ -9,18 +9,12 @@ import {
   clearCart,
 } from "../state.js";
 import { navigate } from "../router.js";
-import { STRIPE_PUBLISHABLE_KEY } from "../config.js";
 import { getSettings } from "../settingsCache.js";
 
 const STEPS = ["Carrito", "Envío", "Pago"];
 const currencyFormatter = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
 function money(n) {
   return currencyFormatter.format(n);
-}
-
-const DOMESTIC_COUNTRY_NAMES = new Set(["", "mexico", "méxico", "mx"]);
-function isDomesticCountry(country) {
-  return DOMESTIC_COUNTRY_NAMES.has((country || "").trim().toLowerCase());
 }
 
 function stepperHtml(current) {
@@ -69,14 +63,12 @@ export function renderCheckout(container) {
   const flow = {
     step: 1,
     shipping: { full_name: appState.currentUser.full_name || "", phone: "", street: "", colonia: "", city: "", state: "", postal_code: "", country: "México", use_bulk_promo: false },
+    isInternational: false,
     quoteOptions: null,
     bulkPromoAvailable: false,
     selectedCarrier: null,
-    paymentMethod: "card",
+    paymentMethod: "spei",
     order: null,
-    clientSecret: null,
-    stripe: null,
-    elements: null,
   };
 
   function render() {
@@ -142,9 +134,19 @@ export function renderCheckout(container) {
 
   function renderStep2(el) {
     const s = flow.shipping;
+    const isIntl = flow.isInternational;
     el.innerHTML = `
       <div class="border border-gray-200 rounded-lg p-6 mb-8 bg-white">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">Información de envío</h2>
+
+        <label class="flex items-start gap-3 cursor-pointer bg-blue-50 border border-blue-100 rounded p-4 mb-5">
+          <input type="checkbox" id="international-toggle" ${isIntl ? "checked" : ""} class="w-5 h-5 mt-0.5 accent-brand-mexican flex-shrink-0" />
+          <span class="text-sm text-blue-900">
+            <span class="font-bold block">Es un envío internacional (fuera de México)</span>
+            Solo el equipo de la tienda puede cotizar envíos internacionales. Marca esta casilla y te contactaremos para confirmar el costo real antes de enviarte tu pedido.
+          </span>
+        </label>
+
         <form id="shipping-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="sm:col-span-2">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre completo</label>
@@ -154,14 +156,18 @@ export function renderCheckout(container) {
             <label class="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
             <input name="phone" required value="${s.phone}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
           </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">País</label>
-            <input name="country" value="${s.country}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Código Postal</label>
-            <input name="postal_code" maxlength="10" value="${s.postal_code}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
-          </div>
+          ${
+            isIntl
+              ? `<div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">País</label>
+                  <input name="country" required value="${s.country === "México" ? "" : s.country}" placeholder="Ej. Estados Unidos" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
+                </div>`
+              : `<input type="hidden" name="country" value="México" />
+                 <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Código Postal</label>
+                  <input name="postal_code" maxlength="10" value="${s.postal_code}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
+                </div>`
+          }
           <div class="sm:col-span-2">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Calle y número</label>
             <input name="street" required value="${s.street}" class="w-full px-4 py-3 border border-gray-300 rounded outline-none focus:border-brand-pink" />
@@ -180,7 +186,7 @@ export function renderCheckout(container) {
           </div>
         </form>
         ${
-          !isDomesticCountry(s.country)
+          isIntl
             ? `<p class="text-xs text-brand-mexican font-semibold mt-2">
                 <i class="fa-solid fa-globe mr-1"></i>Envío fuera de México: el costo real se confirma después de tu compra, te contactaremos para cobrarlo aparte.
               </p>`
@@ -206,6 +212,15 @@ export function renderCheckout(container) {
     const quoteError = el.querySelector("#quote-error");
     const quoteOptionsEl = el.querySelector("#quote-options");
     const bulkPromoToggleEl = el.querySelector("#bulk-promo-toggle");
+
+    el.querySelector("#international-toggle").addEventListener("change", (e) => {
+      Object.assign(flow.shipping, Object.fromEntries(new FormData(form).entries()));
+      flow.isInternational = e.target.checked;
+      flow.shipping.country = flow.isInternational ? "" : "México";
+      flow.quoteOptions = null;
+      flow.selectedCarrier = null;
+      renderStep2(el);
+    });
 
     function renderBulkPromoToggle() {
       if (!flow.bulkPromoAvailable) {
@@ -278,7 +293,7 @@ export function renderCheckout(container) {
       const formData = new FormData(form);
       Object.assign(flow.shipping, Object.fromEntries(formData.entries()));
       if (!form.reportValidity()) return;
-      if (isDomesticCountry(flow.shipping.country)) {
+      if (!flow.isInternational) {
         if (!/^\d{5}$/.test(flow.shipping.postal_code || "")) {
           quoteError.textContent = "Código postal inválido. Debe tener 5 dígitos.";
           quoteError.classList.remove("hidden");
@@ -308,11 +323,6 @@ export function renderCheckout(container) {
   }
 
   async function renderStep3(el) {
-    if (flow.paymentMethod === "card" && flow.order) {
-      renderCardPaymentStep(el);
-      return;
-    }
-
     const settings = await getSettings();
     const selectedOption = flow.quoteOptions.find((o) => o.carrier === flow.selectedCarrier);
     const total = cartTotal() + selectedOption.cost;
@@ -322,15 +332,15 @@ export function renderCheckout(container) {
         <h2 class="text-xl font-semibold text-gray-900 mb-6">Método de pago</h2>
 
         <div class="flex gap-3 mb-6">
-          <button data-method="card" class="method-btn flex-1 py-4 rounded font-semibold border-2 ${
-            flow.paymentMethod === "card" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
-          }"><i class="fa-regular fa-credit-card mr-2"></i>Tarjeta</button>
           <button data-method="spei" class="method-btn flex-1 py-4 rounded font-semibold border-2 ${
             flow.paymentMethod === "spei" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
           }"><i class="fa-solid fa-building-columns mr-2"></i>Transferencia SPEI</button>
           <button data-method="paypal" class="method-btn flex-1 py-4 rounded font-semibold border-2 ${
             flow.paymentMethod === "paypal" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
           }"><i class="fa-brands fa-paypal mr-2"></i>PayPal</button>
+          <button data-method="mercado_pago" class="method-btn flex-1 py-4 rounded font-semibold border-2 ${
+            flow.paymentMethod === "mercado_pago" ? "bg-gray-900 text-white border-gray-900" : "border-gray-300 text-gray-600"
+          }"><i class="fa-solid fa-wallet mr-2"></i>Mercado Pago</button>
         </div>
 
         ${
@@ -344,7 +354,7 @@ export function renderCheckout(container) {
                     ? `<strong>${settings.spei_clabe}</strong>`
                     : "(te la confirmamos por WhatsApp)"
                 }
-                o el inventario se liberará automáticamente.
+                y subir tu comprobante, o el inventario se liberará automáticamente.
               </div>`
             : flow.paymentMethod === "paypal"
             ? `<div class="bg-orange-50 border border-orange-200 rounded p-4 mb-6 text-sm text-orange-800">
@@ -359,7 +369,9 @@ export function renderCheckout(container) {
                 o el inventario se liberará automáticamente.
               </div>`
             : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-4 mb-6 text-sm text-gray-700">
-                En el siguiente paso vas a ingresar los datos de tu tarjeta. El cargo se procesa de forma segura con Stripe.
+                <p class="font-bold mb-1"><i class="fa-solid fa-circle-info mr-2"></i>Cómo funciona</p>
+                Al confirmar, te enviaremos por WhatsApp al número que diste un link de Mercado Pago por
+                ${money(total)} para que completes tu pago.
               </div>`
         }
 
@@ -415,18 +427,11 @@ export function renderCheckout(container) {
       errorEl.classList.add("hidden");
 
       try {
-        const { order, client_secret } = await api.createOrder({
+        const { order } = await api.createOrder({
           items: buildCheckoutItems(),
           shipping: { ...flow.shipping, carrier: flow.selectedCarrier },
           payment_method: flow.paymentMethod,
         });
-
-        if (flow.paymentMethod === "card") {
-          flow.order = order;
-          flow.clientSecret = client_secret;
-          renderCardPaymentStep(el);
-          return;
-        }
 
         clearCart();
         renderSuccess(container, order);
@@ -439,67 +444,13 @@ export function renderCheckout(container) {
     });
   }
 
-  function renderCardPaymentStep(el) {
-    el.innerHTML = `
-      <div class="border border-gray-200 rounded-lg p-6 mb-8 bg-white">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Pago con tarjeta</h2>
-        <p class="text-sm text-gray-500 mb-4">Pedido <strong>${flow.order.order_number}</strong> · Total: <strong>${money(flow.order.total)}</strong></p>
-        <div id="payment-element" class="mb-4"></div>
-        <p id="payment-element-errors" class="text-red-500 text-sm mb-4 hidden"></p>
-        <button id="confirm-payment" class="w-full bg-brand-mexican hover:opacity-90 text-white px-8 py-4 rounded text-lg font-bold transition-opacity">
-          Pagar ${money(flow.order.total)}
-        </button>
-      </div>
-    `;
-
-    flow.stripe = flow.stripe || Stripe(STRIPE_PUBLISHABLE_KEY);
-    flow.elements = flow.stripe.elements({ clientSecret: flow.clientSecret });
-    flow.elements.create("payment").mount("#payment-element");
-
-    el.querySelector("#confirm-payment").addEventListener("click", async (e) => {
-      const btn = e.currentTarget;
-      btn.disabled = true;
-      btn.textContent = "Procesando...";
-      const errorEl = el.querySelector("#payment-element-errors");
-      errorEl.classList.add("hidden");
-
-      const { error: submitError } = await flow.elements.submit();
-      if (submitError) {
-        errorEl.textContent = submitError.message || "Revisa los datos de tu tarjeta.";
-        errorEl.classList.remove("hidden");
-        btn.disabled = false;
-        btn.textContent = `Pagar ${money(flow.order.total)}`;
-        return;
-      }
-
-      const { error, paymentIntent } = await flow.stripe.confirmPayment({
-        elements: flow.elements,
-        clientSecret: flow.clientSecret,
-        redirect: "if_required",
-        confirmParams: { return_url: window.location.href },
-      });
-
-      if (error) {
-        errorEl.textContent = error.message || "No se pudo procesar el pago. Intenta de nuevo.";
-        errorEl.classList.remove("hidden");
-        btn.disabled = false;
-        btn.textContent = `Pagar ${money(flow.order.total)}`;
-        return;
-      }
-
-      if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")) {
-        clearCart();
-        renderSuccess(container, flow.order);
-      }
-    });
-  }
-
   render();
 }
 
 async function renderSuccess(container, order) {
   const isSpei = order.payment_method === "spei";
   const isPaypal = order.payment_method === "paypal";
+  const isMercadoPago = order.payment_method === "mercado_pago";
   const settings = isPaypal || isSpei ? await getSettings() : null;
   container.innerHTML = `
     <div class="max-w-xl mx-auto px-4 py-16 text-center fade-in">
@@ -517,6 +468,14 @@ async function renderSuccess(container, order) {
                   ? `<p class="text-sm text-orange-800">A esta CLABE: <strong>${settings.spei_clabe}</strong></p>`
                   : ""
               }
+              <div class="mt-4 pt-4 border-t border-orange-200">
+                <p class="text-sm font-semibold text-orange-800 mb-2">Sube tu comprobante de depósito:</p>
+                <div class="flex gap-2">
+                  <input type="file" id="voucher-file" accept="image/*,.pdf" class="flex-1 text-sm text-orange-800" />
+                  <button id="voucher-upload-btn" class="bg-orange-800 text-white text-sm font-semibold px-4 py-2 rounded hover:opacity-90">Subir</button>
+                </div>
+                <p id="voucher-status" class="text-xs mt-2"></p>
+              </div>
             </div>`
           : isPaypal
           ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
@@ -527,6 +486,11 @@ async function renderSuccess(container, order) {
                   ? `<p class="text-sm text-orange-800">A este correo de PayPal: <strong>${settings.paypal_receiving_email}</strong></p>`
                   : ""
               }
+            </div>`
+          : isMercadoPago
+          ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
+              <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-wallet mr-2"></i>Pago en validación</p>
+              <p class="text-sm text-orange-800">Nos pondremos en contacto por WhatsApp al número que diste para enviarte el link de pago de Mercado Pago.</p>
             </div>`
           : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-5 mb-8 text-left">
               <p><i class="fa-solid fa-circle-check mr-2 text-brand-mexican"></i>¡Tu pago fue aprobado! Estamos preparando tu pedido.</p>
@@ -551,4 +515,31 @@ async function renderSuccess(container, order) {
     </div>
   `;
   container.querySelectorAll("[data-nav]").forEach((el) => el.addEventListener("click", () => navigate(el.dataset.nav)));
+
+  const uploadBtn = container.querySelector("#voucher-upload-btn");
+  if (uploadBtn) {
+    uploadBtn.addEventListener("click", async () => {
+      const fileInput = container.querySelector("#voucher-file");
+      const statusEl = container.querySelector("#voucher-status");
+      const file = fileInput.files[0];
+      if (!file) {
+        statusEl.textContent = "Selecciona un archivo primero.";
+        statusEl.className = "text-xs mt-2 text-red-600 font-semibold";
+        return;
+      }
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = "Subiendo...";
+      try {
+        await api.uploadOrderVoucher(order.id, file);
+        statusEl.textContent = "¡Comprobante recibido! Lo revisaremos y confirmaremos tu pago.";
+        statusEl.className = "text-xs mt-2 text-emerald-700 font-semibold";
+        uploadBtn.textContent = "Subido";
+      } catch (err) {
+        statusEl.textContent = err.message;
+        statusEl.className = "text-xs mt-2 text-red-600 font-semibold";
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = "Subir";
+      }
+    });
+  }
 }

@@ -31,9 +31,10 @@ PENDING_ORDER_STATUSES = (OrderStatus.PENDING_PAYMENT, OrderStatus.PAYMENT_IN_VA
 
 
 class PaymentMethod(str, enum.Enum):
-    CARD = "card"
+    CARD = "card"  # Solo Punto de Venta (terminal física en tienda)
     SPEI = "spei"
     PAYPAL = "paypal"  # Transferencia manual a la cuenta de PayPal de la tienda, fuera de la API de PayPal
+    MERCADO_PAGO = "mercado_pago"  # Manual: la dueña envía el link de cobro por WhatsApp, fuera de la API de Mercado Pago
     CASH = "cash"  # Solo Punto de Venta (tienda física)
 
 
@@ -87,12 +88,17 @@ class Order(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
 
     payment_method = db.Column(db.Enum(PaymentMethod, name="payment_method"), nullable=False)
     # Ventana para completar el pago antes de liberar inventario, en métodos de pago
-    # manuales (fuera de la app) -- SPEI y PayPal comparten esta misma columna.
+    # manuales (fuera de la app) -- SPEI y PayPal comparten esta misma columna. Mercado
+    # Pago no la usa (no hay cuenta fija que mostrar con un plazo -- la dueña manda el
+    # link a mano por WhatsApp).
     spei_payment_deadline = db.Column(db.DateTime(timezone=True), nullable=True)
 
-    # Stripe: ID del PaymentIntent creado al momento del checkout (payment_method=card).
-    # Se usa para relacionar los eventos del webhook con el pedido.
+    # Histórico de pedidos antiguos; ya no se escribe en pedidos nuevos.
     stripe_payment_intent_id = db.Column(db.String(255), unique=True, nullable=True)
+
+    # Comprobante de pago (SPEI) que sube el cliente desde "Mis Pedidos" -- la dueña lo
+    # revisa y confirma el pago manualmente.
+    payment_voucher_url = db.Column(db.String(500), nullable=True)
 
     # Skydropx: peso/dimensiones REALES capturados por el admin al empacar (kg, cm),
     # y el resultado de comprar la guía. shipping_cost/shipping_carrier arriba siguen

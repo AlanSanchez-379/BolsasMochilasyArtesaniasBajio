@@ -50,6 +50,9 @@ export function renderShippingPolicy(container) {
     ${h2("Dirección de entrega")}
     <p>Es tu responsabilidad proporcionar una dirección completa y correcta (calle, número, colonia, ciudad, estado y código postal). No nos hacemos responsables por retrasos o pérdidas causadas por datos de envío incorrectos o incompletos.</p>
 
+    ${h2("Responsabilidad después del envío")}
+    <p>Nuestra responsabilidad sobre tu pedido termina en el momento en que la paquetería lo recibe y sale de nuestras manos. A partir de ahí, la entrega depende de la paquetería: si el repartidor tocó la puerta en la dirección proporcionada y nadie respondió, y como consecuencia el paquete fue devuelto a la paquetería (o quedó en su sucursal sin poder entregarse), eso ya no es responsabilidad de la tienda. En estos casos te contactaremos para coordinar un reenvío, cuyo costo corre por cuenta del cliente.</p>
+
     ${h2("Dudas sobre tu envío")}
     <p>Si tienes dudas sobre el estatus de tu pedido, puedes consultarlo en <a href="#/mis-pedidos" class="text-brand-mexican font-semibold hover:underline">Mis Pedidos</a> o contactarnos:</p>
     ${contactBlockHtml()}
@@ -77,12 +80,12 @@ export function renderPrivacyPolicy(container) {
     <p>No vendemos ni rentamos tus datos personales. Los compartimos únicamente con los terceros necesarios para operar tu pedido, quienes actúan como <strong>encargados del tratamiento</strong>: reciben tus datos solo para cumplir el servicio que les corresponde, siguiendo nuestras instrucciones, y no pueden usarlos para sus propios fines comerciales ni cederlos a alguien más.</p>
     <ul class="list-disc pl-6 space-y-1">
       <li><strong>Paqueterías</strong> (Tres Guerras, Estafeta, DHL vía Skydropx) — para entregar tu pedido, solo reciben tu nombre, teléfono y dirección de envío.</li>
-      <li><strong>Stripe</strong> — para procesar pagos con tarjeta de forma segura. <strong>Nunca almacenamos los datos de tu tarjeta en nuestros servidores</strong>; Stripe los procesa directamente.</li>
+      <li><strong>Mercado Pago</strong> — para gestionar el enlace de pago que te enviamos por WhatsApp. Nosotros no almacenamos datos de tarjetas.</li>
       <li><strong>Supabase</strong> — para gestionar de forma segura tu cuenta y el inicio de sesión.</li>
     </ul>
 
     ${h2("Almacenamiento y transferencia internacional de datos")}
-    <p>Para operar el sitio usamos proveedores de infraestructura tecnológica en la nube (Supabase) y de procesamiento de pagos (Stripe) cuyos servidores pueden ubicarse fuera de México, generalmente en Estados Unidos. Al usar nuestro sitio, aceptas que tus datos puedan almacenarse y procesarse en esos servidores, bajo estándares de seguridad y confidencialidad equiparables a los exigidos por la legislación mexicana.</p>
+    <p>Para operar el sitio usamos proveedores de infraestructura tecnológica en la nube (Supabase) y servicios externos de pago y almacenamiento de comprobantes, cuyos servidores pueden ubicarse fuera de México. Al usar nuestro sitio, aceptas que tus datos puedan almacenarse y procesarse en esos servidores, bajo estándares de seguridad y confidencialidad equiparables a los exigidos por la legislación mexicana.</p>
 
     ${h2("Cookies y sesión")}
     <p>Usamos una cookie técnica para mantener tu sesión iniciada mientras navegas el sitio. No usamos cookies de rastreo publicitario.</p>
@@ -114,7 +117,7 @@ export function renderTerms(container) {
     <p><strong>Suspensión o cancelación de cuentas.</strong> Nos reservamos el derecho de suspender, cancelar o restringir el acceso a cualquier cuenta que presente actividad sospechosa, intentos de fraude, o que incumpla estos Términos, sin que ello genere responsabilidad para nosotros.</p>
 
     ${h2("Pagos")}
-    <p>Aceptamos pago con tarjeta (procesado de forma segura por Stripe) y transferencia SPEI. No nos hacemos responsables por interrupciones o fallas en la disponibilidad de estos proveedores de pago externos, ajenas a nuestro control.</p>
+    <p>Aceptamos pago mediante un enlace de Mercado Pago, que te enviamos por WhatsApp, y transferencia SPEI. Para SPEI puedes subir tu comprobante desde el checkout o desde <a href="#/mis-pedidos" class="text-brand-mexican font-semibold hover:underline">Mis Pedidos</a>. No nos hacemos responsables por interrupciones o fallas en la disponibilidad de estos proveedores de pago externos, ajenas a nuestro control.</p>
     <p>Los pedidos pagados por SPEI quedan como <strong>Pendiente de pago</strong> dentro de la ventana de tiempo indicada en el checkout. Si el depósito no se recibe dentro de ese plazo, el pedido se cancela automáticamente y el inventario reservado se libera; si llegaras a realizar el depósito después de la cancelación, contáctanos para resolverlo mediante reembolso o saldo a favor.</p>
 
     ${h2("Envíos")}

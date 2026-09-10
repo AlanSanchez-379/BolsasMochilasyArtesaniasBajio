@@ -23,12 +23,17 @@ export function marginHtml(product) {
 }
 
 export function getNextSku(products) {
+  // Solo cuenta como "número de SKU" un sufijo numérico al final del string
+  // completo (ej. "P2-014" -> 14, "SKU-1000" -> 1000) -- tomar el primer grupo de
+  // dígitos que aparezca en cualquier parte (como antes) podía agarrar un número
+  // de en medio del SKU y sugerir un siguiente que ya estaba en uso por otro
+  // producto, tronando al guardar con un error de SKU duplicado.
   let maxSku = 0;
   for (const product of products) {
     for (const variant of product.variants || []) {
-      const match = (variant.sku || "").match(/\d+/);
+      const match = (variant.sku || "").match(/(\d+)$/);
       if (match) {
-        const num = parseInt(match[0], 10);
+        const num = parseInt(match[1], 10);
         if (num > maxSku) maxSku = num;
       }
     }

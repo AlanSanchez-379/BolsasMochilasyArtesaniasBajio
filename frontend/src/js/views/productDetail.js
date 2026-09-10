@@ -17,16 +17,23 @@ function pricingTiersHtml(product, totalProposedQty) {
     <div class="absolute top-0 right-0 w-32 h-32 bg-brand-salmon rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
     <h3 class="font-display font-bold text-xl mb-2 text-center text-gray-900 tracking-tight">Niveles de Precio</h3>
     <p class="text-xs text-gray-500 text-center mb-6 font-sans">Se calculan automáticamente al sumar productos en tu carrito.</p>
-    <div class="grid grid-cols-3 gap-3 md:gap-4 text-center">
-      <div class="p-4 rounded-xl transition-all duration-300 ${tierClass(totalProposedQty < product.wholesale_min_qty)}">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 text-center">
+      <div class="p-4 rounded-xl transition-all duration-300 ${tierClass(totalProposedQty < product.medio_min_qty)}">
         <p class="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1">Menudeo</p>
-        <p class="text-[10px] font-bold text-gray-400 mb-2">${product.wholesale_min_qty > 1 ? `1-${product.wholesale_min_qty - 1} pz` : '1 pz'}</p>
+        <p class="text-[10px] font-bold text-gray-400 mb-2">${product.medio_min_qty > 1 ? `1-${product.medio_min_qty - 1} pz` : '1 pz'}</p>
         ${
           product.is_on_sale
             ? `<p class="text-[10px] text-gray-400 line-through">${money(product.price_normal)}</p>
                  <p class="text-xl md:text-2xl text-red-500 font-bold">${money(product.sale_price)}</p>`
             : `<p class="text-xl md:text-2xl text-gray-900 font-bold">${money(product.price_normal)}</p>`
         }
+      </div>
+      <div class="p-4 rounded-xl transition-all duration-300 ${tierClass(
+          totalProposedQty >= product.medio_min_qty && totalProposedQty < product.wholesale_min_qty
+        )}">
+        <p class="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1">Medio</p>
+        <p class="text-[10px] font-bold text-gray-400 mb-2">${product.medio_min_qty}-${product.wholesale_min_qty - 1} pz</p>
+        <p class="text-xl md:text-2xl text-gray-900 font-bold">${money(product.price_medio)}</p>
       </div>
       <div class="p-4 rounded-xl transition-all duration-300 ${tierClass(
           totalProposedQty >= product.wholesale_min_qty && totalProposedQty < product.super_wholesale_min_qty
@@ -67,9 +74,12 @@ export async function renderProductDetail(container, slug) {
     // subcategorías específicas DENTRO de esa misma categoría (POR categoría, no
     // global -- bundle_eligible_subcategories vacío/ausente en una categoría = admite
     // cualquier subcategoría en esa categoría).
-    const { products: allProducts } = await api.getProducts({ is_bundle: "false" });
+    const { products: allProducts } = await api.getProducts({ is_bundle: "false", include_exclusive: "true" });
     const eligibleSubsByCategory = product.bundle_eligible_subcategories || {};
+    const eligibleProductIds = product.bundle_eligible_products?.length ? new Set(product.bundle_eligible_products) : null;
     eligibleBundleProducts = allProducts.filter((p) => {
+      if (eligibleProductIds && !eligibleProductIds.has(p.id)) return false;
+      if (p.is_bundle_exclusive && !eligibleProductIds?.has(p.id)) return false;
       const allowed = eligibleSubsByCategory[p.category];
       return !allowed || !allowed.length || allowed.includes(p.subcategory);
     });

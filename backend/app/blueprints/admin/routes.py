@@ -22,14 +22,13 @@ from app.utils.serializers import serialize_product
 from app.utils.slugify import unique_slug
 from app.utils.supabase_client import get_supabase_admin
 from app.utils.shipping_estimate import SHIPPING_SETTING_KEYS
+from app.utils.uploads import SITE_ASSETS_BUCKET, upload_image_file as _upload_image_file
 
 from . import admin_bp
 
-SITE_ASSETS_BUCKET = "site-assets"
 BRANDING_FOLDER = "branding"
 PRODUCT_IMAGES_FOLDER = "products"
 ALLOWED_SETTING_TYPES = {"logo": "logo_url", "banner": "banner_url"}
-ALLOWED_IMAGE_MIMETYPES = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
 PAYMENT_SETTING_KEYS = {"paypal_receiving_email", "spei_clabe"}
 
 
@@ -42,31 +41,6 @@ def _public_asset_url_is_valid(url):
 def get_admin_settings():
     settings = {s.key: s.value for s in Setting.query.all()}
     return jsonify({"logo_url": settings.get("logo_url"), "banner_url": settings.get("banner_url")})
-
-
-def _upload_image_file(file, folder):
-    """Sube un archivo a Storage (dentro de `folder`) y devuelve (public_url, None)
-    o (None, (json, status))."""
-    if not file or not file.filename:
-        return None, (jsonify({"message": "Falta el archivo."}), 400)
-
-    ext = ALLOWED_IMAGE_MIMETYPES.get(file.mimetype)
-    if not ext:
-        return None, (jsonify({"message": "Formato no soportado. Usa JPG, PNG o WEBP."}), 400)
-
-    path = f"{folder}/{uuid.uuid4().hex}.{ext}"
-    file_bytes = file.read()
-
-    try:
-        client = get_supabase_admin()
-        client.storage.from_(SITE_ASSETS_BUCKET).upload(
-            path, file_bytes, file_options={"content-type": file.mimetype, "upsert": "true"}
-        )
-        return client.storage.from_(SITE_ASSETS_BUCKET).get_public_url(path), None
-    except RuntimeError as e:
-        return None, (jsonify({"message": str(e)}), 500)
-    except Exception as e:
-        return None, (jsonify({"message": f"Error al subir la imagen: {e}"}), 500)
 
 
 @admin_bp.post("/settings/upload")
@@ -291,6 +265,8 @@ PRODUCT_FIELDS = [
     "category_id",
     "subcategory",
     "price_normal",
+    "price_medio",
+    "medio_min_qty",
     "price_wholesale",
     "price_super_wholesale",
     "wholesale_min_qty",
@@ -298,6 +274,7 @@ PRODUCT_FIELDS = [
     "cost_price",
     "is_on_sale",
     "sale_price",
+    "is_bundle_exclusive",
     "is_bundle",
 ]
 
@@ -327,6 +304,17 @@ def _apply_product_fields(product, data):
                 per_category[category_name] = clean
         product.bundle_eligible_subcategories = per_category or None
 
+    if "bundle_eligible_products" in data:
+        product.bundle_eligible_products = [str(product_id) for product_id in (data["bundle_eligible_products"] or [])] or None
+
+    if "bundle_model_limits" in data:
+        model_limits = {
+            str(product_id): int(limit)
+            for product_id, limit in (data["bundle_model_limits"] or {}).items()
+            if int(limit or 0) > 0
+        }
+        product.bundle_model_limits = model_limits or None
+
     # Paquete de contenido fijo (tercer tipo): producto + cantidad exactas que la
     # dueña arma al crear el paquete -- el cliente elige la variante/color al comprar.
     # bundle_limit se deriva de la suma de piezas, igual que con bundle_category_limits.
@@ -347,6 +335,14 @@ def _clean_image_urls(raw):
     máximo de MAX_VARIANT_IMAGES."""
     urls = [u for u in (raw or []) if u]
     return urls[:MAX_VARIANT_IMAGES]
+
+
+def _friendly_variant_integrity_error(e):
+    """Traduce el error crudo de Postgres al guardar una variante a un mensaje
+    entendible -- el más común es SKU duplicado (columna unique)."""
+    if "product_variants_sku_key" in str(e.orig) or "sku" in str(e.orig).lower():
+        return "Ese SKU ya está en uso por otra variante. Prueba con otro."
+    return "No se pudo guardar la variante. Revisa los datos e intenta de nuevo."
 
 
 def _validate_sale_price(data, product=None):
@@ -394,6 +390,28 @@ def _validate_bundle_fixed_items(data):
     return None
 
 
+def _validate_bundle_product_selection(data):
+    if "bundle_eligible_products" not in data and "bundle_model_limits" not in data:
+        return None
+    product_ids = set(str(product_id) for product_id in (data.get("bundle_eligible_products") or []))
+    model_limits = data.get("bundle_model_limits") or {}
+    product_ids.update(str(product_id) for product_id in model_limits)
+    if not product_ids:
+        return None
+    for product_id in product_ids:
+        try:
+            uuid.UUID(product_id)
+        except (ValueError, AttributeError):
+            return "Hay un producto inválido en la configuración del paquete."
+    products = Product.query.filter(Product.id.in_(product_ids)).all()
+    found = {str(product.id): product for product in products}
+    if len(found) != len(product_ids):
+        return "Hay un producto inválido en la configuración del paquete."
+    if any(product.is_bundle for product in found.values()):
+        return "Un paquete no puede contener otro paquete."
+    return None
+
+
 def _validate_subcategory(data):
     """La 'categoría de paquete' (yute / animado 3D / mixto) y la subcategoría de un
     producto normal comparten columna pero son listas de valores distintas."""
@@ -411,14 +429,14 @@ def _validate_subcategory(data):
 @pos_access_required
 def list_products():
     products = Product.query.order_by(Product.name).all()
-    return jsonify({"products": [serialize_product(p) for p in products]})
+    return jsonify({"products": [serialize_product(p, include_cost_price=True) for p in products]})
 
 
 @admin_bp.post("/products")
 @pos_access_required
 def create_product():
     data = request.get_json() or {}
-    required = ["name", "category_id", "subcategory", "price_normal", "price_wholesale", "price_super_wholesale"]
+    required = ["name", "category_id", "subcategory", "price_normal", "price_medio", "price_wholesale", "price_super_wholesale"]
     missing = [f for f in required if f not in data]
     if missing:
         return jsonify({"message": f"Faltan campos: {', '.join(missing)}"}), 400
@@ -437,6 +455,10 @@ def create_product():
     bundle_fixed_items_error = _validate_bundle_fixed_items(data)
     if bundle_fixed_items_error:
         return jsonify({"message": bundle_fixed_items_error}), 400
+
+    bundle_product_selection_error = _validate_bundle_product_selection(data)
+    if bundle_product_selection_error:
+        return jsonify({"message": bundle_product_selection_error}), 400
 
     product = Product(slug=unique_slug(Product, data["name"]))
     _apply_product_fields(product, data)
@@ -458,7 +480,7 @@ def create_product():
         db.session.rollback()
         return jsonify({"message": f"Error al crear el producto: {e.orig}"}), 400
 
-    return jsonify({"product": serialize_product(product)}), 201
+    return jsonify({"product": serialize_product(product, include_cost_price=True)}), 201
 
 
 @admin_bp.patch("/products/<product_id>")
@@ -482,6 +504,10 @@ def update_product(product_id):
     if bundle_fixed_items_error:
         return jsonify({"message": bundle_fixed_items_error}), 400
 
+    bundle_product_selection_error = _validate_bundle_product_selection(data)
+    if bundle_product_selection_error:
+        return jsonify({"message": bundle_product_selection_error}), 400
+
     _apply_product_fields(product, data)
 
     try:
@@ -490,7 +516,7 @@ def update_product(product_id):
         db.session.rollback()
         return jsonify({"message": f"Error al actualizar: {e.orig}"}), 400
 
-    return jsonify({"product": serialize_product(product)})
+    return jsonify({"product": serialize_product(product, include_cost_price=True)})
 
 
 @admin_bp.delete("/products/<product_id>")
@@ -527,9 +553,9 @@ def create_variant(product_id):
         db.session.commit()
     except IntegrityError as e:
         db.session.rollback()
-        return jsonify({"message": f"Error al crear variante: {e.orig}"}), 400
+        return jsonify({"message": _friendly_variant_integrity_error(e)}), 400
 
-    return jsonify({"product": serialize_product(product)}), 201
+    return jsonify({"product": serialize_product(product, include_cost_price=True)}), 201
 
 
 @admin_bp.patch("/variants/<variant_id>")
@@ -547,9 +573,9 @@ def update_variant(variant_id):
         db.session.commit()
     except IntegrityError as e:
         db.session.rollback()
-        return jsonify({"message": f"Error: {e.orig}"}), 400
+        return jsonify({"message": _friendly_variant_integrity_error(e)}), 400
 
-    return jsonify({"product": serialize_product(variant.product)})
+    return jsonify({"product": serialize_product(variant.product, include_cost_price=True)})
 
 
 @admin_bp.post("/variants/<variant_id>/image")
@@ -567,7 +593,7 @@ def upload_variant_image(variant_id):
 
     variant.image_paths = existing + [public_url]
     db.session.commit()
-    return jsonify({"product": serialize_product(variant.product)})
+    return jsonify({"product": serialize_product(variant.product, include_cost_price=True)})
 
 
 @admin_bp.delete("/variants/<variant_id>")
@@ -581,7 +607,7 @@ def delete_variant(variant_id):
     except IntegrityError:
         db.session.rollback()
         return jsonify({"message": "No se puede eliminar: la variante tiene pedidos asociados."}), 400
-    return jsonify({"product": serialize_product(product)})
+    return jsonify({"product": serialize_product(product, include_cost_price=True)})
 
 
 @admin_bp.get("/users")

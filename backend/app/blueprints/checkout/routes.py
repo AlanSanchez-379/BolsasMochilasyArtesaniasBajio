@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta, timezone
 
-import stripe
 from flask import jsonify, request, g, current_app
 
 from app.extensions import db
@@ -16,7 +15,6 @@ from app.models import (
 )
 from app.utils.decorators import login_required
 from app.utils.serializers import serialize_order
-from app.utils.stock import adjust_stock
 from app.utils.shipping_estimate import (
     get_shipping_settings_dict,
     estimate_package_weight_kg,
@@ -26,7 +24,6 @@ from app.utils.shipping_estimate import (
     zone_shipping_cost,
 )
 from app.utils.skydropx_client import get_rates, SkydropxError
-from app.utils.online_pricing import apply_online_markup
 
 from . import checkout_bp
 
@@ -35,10 +32,17 @@ class CheckoutError(Exception):
     pass
 
 
-# Métodos de pago "manuales": el cliente paga fuera de la app (transferencia/PayPal) y
-# el pedido queda Pendiente de pago con una ventana antes de liberar inventario --
-# a diferencia de tarjeta, que se valida al instante vía Stripe.
+# Métodos de pago "manuales" con cuenta fija (CLABE/correo de PayPal): el cliente paga
+# fuera de la app y el pedido queda Pendiente de pago con una ventana antes de liberar
+# inventario. Mercado Pago también es manual pero NO entra aquí -- no hay una cuenta
+# fija que mostrarle al cliente, así que en vez de una ventana de pago queda "Pago en
+# validación" directamente mientras la dueña le manda el link de cobro por WhatsApp
+# (ver ONLINE_PAYMENT_METHODS y _build_order).
 MANUAL_PAYMENT_METHODS = (PaymentMethod.SPEI.value, PaymentMethod.PAYPAL.value)
+
+# Métodos de pago aceptados en el checkout en línea (no incluye CARD/CASH, que son
+# solo del Punto de Venta físico -- ver pos_sale.py).
+ONLINE_PAYMENT_METHODS = (PaymentMethod.SPEI.value, PaymentMethod.PAYPAL.value, PaymentMethod.MERCADO_PAGO.value)
 
 # Código fijo para la tarifa única por zona (ver ZONE_SHIPPING_COSTS en
 # shipping_estimate.py) -- reemplaza la distinción por paquetería en pedidos que no
@@ -317,7 +321,7 @@ def _build_order(items_payload, shipping, payment_method):
                     f"Stock insuficiente para {product.name} ({variant.color}). Disponible: {variant.stock}."
                 )
             combined_qty = combined_qty_by_subcategory.get(product.subcategory, quantity)
-            unit_price = apply_online_markup(float(product.price_for_quantity(combined_qty)))
+            unit_price = float(product.price_for_quantity(combined_qty))
             variant.stock -= quantity
             order_items.append(
                 OrderItem(
@@ -339,7 +343,7 @@ def _build_order(items_payload, shipping, payment_method):
                 raise CheckoutError(f"Paquete sin variante configurada: {product.name}.")
             if bundle_variant.stock < quantity:
                 raise CheckoutError(f"No hay suficientes paquetes disponibles de {product.name}.")
-            unit_price = apply_online_markup(float(product.price_for_quantity(1)))
+            unit_price = float(product.price_for_quantity(1))
             bundle_variant.stock -= quantity
             order_items.append(
                 OrderItem(
@@ -360,6 +364,9 @@ def _build_order(items_payload, shipping, payment_method):
 
             resolved = []  # (variant, sel_qty, category_name)
             category_totals = {}
+            model_totals = {}
+            eligible_product_ids = set(product.bundle_eligible_products or [])
+            model_limits = product.bundle_model_limits or {}
             for sel in selections:
                 variant = variants.get(sel.get("variant_id"))
                 sel_qty = int(sel.get("quantity") or 0)
@@ -370,6 +377,11 @@ def _build_order(items_payload, shipping, payment_method):
                 # subcategoría permitida en esa categoría).
                 if variant.product.is_bundle:
                     raise CheckoutError(f"Un paquete no puede contener otro paquete ({product.name}).")
+                product_id = str(variant.product_id)
+                if (variant.product.is_bundle_exclusive and product_id not in eligible_product_ids) or (
+                    eligible_product_ids and product_id not in eligible_product_ids
+                ):
+                    raise CheckoutError(f"El producto {variant.product.name} no está permitido en el paquete {product.name}.")
                 eligible_subs = (product.bundle_eligible_subcategories or {}).get(variant.product.category.name)
                 if eligible_subs and variant.product.subcategory not in eligible_subs:
                     raise CheckoutError(f"Un producto elegido no pertenece al paquete {product.name}.")
@@ -380,6 +392,7 @@ def _build_order(items_payload, shipping, payment_method):
                     )
                 category_name = variant.product.category.name
                 category_totals[category_name] = category_totals.get(category_name, 0) + sel_qty
+                model_totals[product_id] = model_totals.get(product_id, 0) + sel_qty
                 resolved.append((variant, sel_qty))
 
             if category_limits:
@@ -402,13 +415,23 @@ def _build_order(items_payload, shipping, payment_method):
                         f"({total_pieces} enviadas)."
                     )
 
+            if model_limits:
+                for product_id, limit in model_limits.items():
+                    if model_totals.get(str(product_id), 0) != int(limit):
+                        raise CheckoutError(
+                            f"El paquete {product.name} requiere exactamente {limit} piezas del modelo configurado."
+                        )
+                extra_models = set(model_totals) - {str(product_id) for product_id in model_limits}
+                if extra_models:
+                    raise CheckoutError(f"El paquete {product.name} no acepta modelos no configurados.")
+
             bundle_variant = lock_variant(product.variants[0].id) if product.variants else None
             if bundle_variant is None:
                 raise CheckoutError(f"Paquete sin variante configurada: {product.name}.")
             if bundle_variant.stock < 1:
                 raise CheckoutError(f"No hay más paquetes disponibles de {product.name}.")
 
-            unit_price = apply_online_markup(float(product.price_for_quantity(1)))
+            unit_price = float(product.price_for_quantity(1))
             bundle_variant.stock -= 1
             parent_item = OrderItem(
                 product_id=product.id,
@@ -443,6 +466,8 @@ def _build_order(items_payload, shipping, payment_method):
             # El admin solo fija QUÉ PRODUCTO y CUÁNTAS piezas -- el cliente elige la
             # variante/color exacta al comprar, igual que en "Elegir mis diseños".
             fixed_by_product = {fi["product_id"]: fi["quantity"] for fi in product.bundle_fixed_items}
+            eligible_product_ids = set(product.bundle_eligible_products or fixed_by_product)
+            model_limits = product.bundle_model_limits or {}
             selections = item.get("selections") or []
 
             resolved = []  # (variant, sel_qty)
@@ -454,6 +479,10 @@ def _build_order(items_payload, shipping, payment_method):
                     raise CheckoutError(f"Selección inválida en el paquete {product.name}.")
                 if str(variant.product_id) not in fixed_by_product:
                     raise CheckoutError(f"Un producto elegido no pertenece al paquete {product.name}.")
+                if str(variant.product_id) not in eligible_product_ids or (
+                    variant.product.is_bundle_exclusive and str(variant.product_id) not in eligible_product_ids
+                ):
+                    raise CheckoutError(f"El producto elegido no está permitido en el paquete {product.name}.")
                 if variant.stock < sel_qty:
                     raise CheckoutError(
                         f"Stock insuficiente para completar el paquete {product.name} "
@@ -471,13 +500,19 @@ def _build_order(items_payload, shipping, payment_method):
                         f"producto incluido ({got} enviadas de uno de ellos)."
                     )
 
+            if model_limits:
+                for product_id, limit in model_limits.items():
+                    required = int(limit) * package_qty
+                    if selected_by_product.get(str(product_id), 0) != required:
+                        raise CheckoutError(f"El paquete {product.name} requiere exactamente {required} piezas del modelo configurado.")
+
             bundle_variant = lock_variant(product.variants[0].id) if product.variants else None
             if bundle_variant is None:
                 raise CheckoutError(f"Paquete sin variante configurada: {product.name}.")
             if bundle_variant.stock < package_qty:
                 raise CheckoutError(f"No hay suficientes paquetes disponibles de {product.name}.")
 
-            unit_price = apply_online_markup(float(product.price_for_quantity(1)))
+            unit_price = float(product.price_for_quantity(1))
             bundle_variant.stock -= package_qty
             parent_item = OrderItem(
                 product_id=product.id,
@@ -582,25 +617,8 @@ def _build_order(items_payload, shipping, payment_method):
         order.spei_payment_deadline = datetime.now(timezone.utc) + timedelta(hours=window)
 
     db.session.add(order)
-    db.session.flush()  # asigna order.id / order_number antes de crear el PaymentIntent
-
-    client_secret = None
-    if payment_method == PaymentMethod.CARD.value:
-        try:
-            intent = stripe.PaymentIntent.create(
-                amount=int(round(total * 100)),
-                currency="mxn",
-                payment_method_types=["card"],
-                metadata={"order_id": str(order.id), "order_number": order.order_number},
-            )
-        except stripe.StripeError:
-            db.session.rollback()
-            raise CheckoutError("No se pudo iniciar el pago con tarjeta. Intenta de nuevo.")
-        order.stripe_payment_intent_id = intent.id
-        client_secret = intent.client_secret
-
     db.session.commit()
-    return order, client_secret
+    return order
 
 
 @checkout_bp.post("")
@@ -611,7 +629,7 @@ def create_order():
     shipping = data.get("shipping") or {}
     payment_method = data.get("payment_method")
 
-    if payment_method not in (PaymentMethod.CARD.value, *MANUAL_PAYMENT_METHODS):
+    if payment_method not in ONLINE_PAYMENT_METHODS:
         return jsonify({"message": "Método de pago inválido."}), 400
 
     required_shipping_fields = ["full_name", "phone", "street", "city", "state"]
@@ -622,33 +640,9 @@ def create_order():
         return jsonify({"message": f"Faltan datos de envío: {', '.join(missing)}"}), 400
 
     try:
-        order, client_secret = _build_order(items_payload, shipping, payment_method)
+        order = _build_order(items_payload, shipping, payment_method)
     except CheckoutError as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 400
 
-    return jsonify({"order": serialize_order(order), "client_secret": client_secret}), 201
-
-
-@checkout_bp.post("/webhook")
-def stripe_webhook():
-    payload = request.get_data()
-    sig_header = request.headers.get("Stripe-Signature", "")
-    try:
-        event = stripe.Webhook.construct_event(payload, sig_header, current_app.config["STRIPE_WEBHOOK_SECRET"])
-    except (ValueError, stripe.SignatureVerificationError):
-        return jsonify({"message": "Firma inválida."}), 400
-
-    intent = event["data"]["object"]
-    order = Order.query.filter_by(stripe_payment_intent_id=intent.id).first()
-
-    if order and order.status == OrderStatus.PAYMENT_IN_VALIDATION:
-        if event["type"] == "payment_intent.succeeded":
-            order.status = OrderStatus.PAYMENT_CONFIRMED
-            db.session.commit()
-        elif event["type"] == "payment_intent.payment_failed":
-            adjust_stock(order, sign=1)  # libera inventario reservado
-            order.status = OrderStatus.CANCELLED
-            db.session.commit()
-
-    return jsonify({"received": True}), 200
+    return jsonify({"order": serialize_order(order)}), 201

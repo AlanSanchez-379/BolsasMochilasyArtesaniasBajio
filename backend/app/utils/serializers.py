@@ -1,7 +1,4 @@
-from app.utils.online_pricing import apply_online_markup
-
-
-def serialize_bundle_fixed_items(product, apply_online_pricing=False):
+def serialize_bundle_fixed_items(product):
     """Resuelve el contenido fijo de un paquete (producto + cantidad) a datos
     completos -- nombre/precio/variantes disponibles de cada producto real dentro --
     para que el cliente vea qué incluye, elija color, y el frontend calcule el ahorro.
@@ -21,8 +18,6 @@ def serialize_bundle_fixed_items(product, apply_online_pricing=False):
         if fixed_product is None:
             continue
         unit_price = float(fixed_product.price_normal)
-        if apply_online_pricing:
-            unit_price = apply_online_markup(unit_price)
         resolved.append(
             {
                 "product_id": str(fixed_product.id),
@@ -49,22 +44,19 @@ def serialize_variant(variant):
     }
 
 
-def serialize_product(product, apply_online_pricing=False):
-    """apply_online_pricing=True agrega el "impuesto fantasma" de Stripe+IVA a los 3
-    niveles de precio (usado solo por el catálogo público en línea) y oculta cost_price
-    (dato interno, nunca debe llegar a un cliente). Con False (default -- admin,
-    /venta-local, y cualquier otro consumidor interno) los precios son los que se
-    dieron de alta, tal cual."""
+def serialize_product(product, include_cost_price=False):
+    """Los precios que se muestran son siempre los que la tienda dio de alta, tal
+    cual -- en línea, en el panel admin, y en /venta-local. No se le agrega ningún
+    recargo/comisión al precio en ningún canal.
+
+    include_cost_price=True expone cost_price (lo que le costó el producto a la
+    tienda) -- dato interno, solo para el panel admin/POS. El catálogo público
+    (default False) nunca debe recibirlo."""
     price_normal = float(product.price_normal)
+    price_medio = float(product.price_medio)
     price_wholesale = float(product.price_wholesale)
     price_super_wholesale = float(product.price_super_wholesale)
     sale_price = float(product.sale_price) if product.sale_price is not None else None
-
-    if apply_online_pricing:
-        price_normal = apply_online_markup(price_normal)
-        price_wholesale = apply_online_markup(price_wholesale)
-        price_super_wholesale = apply_online_markup(price_super_wholesale)
-        sale_price = apply_online_markup(sale_price)
 
     data = {
         "id": str(product.id),
@@ -75,21 +67,26 @@ def serialize_product(product, apply_online_pricing=False):
         "category_id": str(product.category_id),
         "subcategory": product.subcategory,
         "price_normal": price_normal,
+        "price_medio": price_medio,
+        "medio_min_qty": product.medio_min_qty,
         "price_wholesale": price_wholesale,
         "price_super_wholesale": price_super_wholesale,
         "wholesale_min_qty": product.wholesale_min_qty,
         "super_wholesale_min_qty": product.super_wholesale_min_qty,
         "is_on_sale": product.is_on_sale,
         "sale_price": sale_price,
+        "is_bundle_exclusive": product.is_bundle_exclusive,
         "is_bundle": product.is_bundle,
         "bundle_limit": product.bundle_limit,
         "bundle_category_limits": product.bundle_category_limits,
         "bundle_eligible_subcategories": product.bundle_eligible_subcategories,
-        "bundle_fixed_items": serialize_bundle_fixed_items(product, apply_online_pricing),
+        "bundle_eligible_products": product.bundle_eligible_products,
+        "bundle_model_limits": product.bundle_model_limits,
+        "bundle_fixed_items": serialize_bundle_fixed_items(product),
         "created_at": product.created_at.isoformat(),
         "variants": [serialize_variant(v) for v in product.variants],
     }
-    if not apply_online_pricing:
+    if include_cost_price:
         data["cost_price"] = float(product.cost_price) if product.cost_price is not None else None
     return data
 
@@ -116,6 +113,7 @@ def serialize_order(order):
         "status": order.status.value,
         "payment_method": order.payment_method.value,
         "spei_payment_deadline": order.spei_payment_deadline.isoformat() if order.spei_payment_deadline else None,
+        "payment_voucher_url": order.payment_voucher_url,
         "shipping": {
             "full_name": order.shipping_full_name,
             "phone": order.shipping_phone,
