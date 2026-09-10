@@ -8,7 +8,7 @@ import {
   buildCheckoutItems,
   clearCart,
 } from "../state.js";
-import { navigate } from "../router.js";
+import { navigate, currentRenderToken } from "../router.js";
 import { getSettings } from "../settingsCache.js";
 
 const STEPS = ["Carrito", "Envío", "Pago"];
@@ -447,11 +447,13 @@ export function renderCheckout(container) {
   render();
 }
 
-async function renderSuccess(container, order) {
+async function renderSuccess(container, order, justQuoted = false) {
   const isSpei = order.payment_method === "spei";
   const isPaypal = order.payment_method === "paypal";
   const isMercadoPago = order.payment_method === "mercado_pago";
-  const settings = isPaypal || isSpei ? await getSettings() : null;
+  const isIntlPending = order.shipping.carrier === "international_pending";
+  const settings = (isPaypal || isSpei) && !isIntlPending ? await getSettings() : null;
+
   container.innerHTML = `
     <div class="max-w-xl mx-auto px-4 py-16 text-center fade-in">
       <i class="fa-solid fa-circle-check text-6xl text-brand-mexican mb-6"></i>
@@ -459,51 +461,63 @@ async function renderSuccess(container, order) {
       <p class="text-gray-500 mb-6">Número de pedido <strong>${order.order_number}</strong></p>
 
       ${
-        isSpei
-          ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
-              <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-clock mr-2"></i>Realiza tu transferencia SPEI antes de:</p>
-              <p class="text-lg text-orange-800 mb-2">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
-              ${
-                settings?.spei_clabe
-                  ? `<p class="text-sm text-orange-800">A esta CLABE: <strong>${settings.spei_clabe}</strong></p>`
-                  : ""
-              }
-              <div class="mt-4 pt-4 border-t border-orange-200">
-                <p class="text-sm font-semibold text-orange-800 mb-2">Sube tu comprobante de depósito:</p>
-                <div class="flex gap-2">
-                  <input type="file" id="voucher-file" accept="image/*,.pdf" class="flex-1 text-sm text-orange-800" />
-                  <button id="voucher-upload-btn" class="bg-orange-800 text-white text-sm font-semibold px-4 py-2 rounded hover:opacity-90">Subir</button>
-                </div>
-                <p id="voucher-status" class="text-xs mt-2"></p>
+        isIntlPending
+          ? `<div class="bg-blue-50 border border-blue-200 rounded p-5 mb-8 text-left">
+              <p class="font-bold mb-1 text-blue-800"><i class="fa-solid fa-globe mr-2"></i>Cotizando tu envío internacional...</p>
+              <p class="text-sm text-blue-800">
+                Estamos calculando el costo real de tu envío -- puede tardar unos minutos. En cuanto esté listo, verás aquí mismo
+                el total final y cómo pagar. No necesitas hacer nada, puedes dejar esta página abierta o volver después desde
+                "Mis Pedidos".
+              </p>
+              <div class="flex items-center gap-2 mt-3 text-blue-700 text-sm">
+                <i class="fa-solid fa-spinner fa-spin"></i> Esperando cotización de la tienda...
               </div>
             </div>`
-          : isPaypal
-          ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
-              <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-clock mr-2"></i>Envía tu pago por PayPal antes de:</p>
-              <p class="text-lg text-orange-800 mb-2">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
-              ${
-                settings?.paypal_receiving_email
-                  ? `<p class="text-sm text-orange-800">A este correo de PayPal: <strong>${settings.paypal_receiving_email}</strong></p>`
-                  : ""
-              }
-            </div>`
-          : isMercadoPago
-          ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
-              <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-wallet mr-2"></i>Pago en validación</p>
-              <p class="text-sm text-orange-800">Nos pondremos en contacto por WhatsApp al número que diste para enviarte el link de pago de Mercado Pago.</p>
-            </div>`
-          : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-5 mb-8 text-left">
-              <p><i class="fa-solid fa-circle-check mr-2 text-brand-mexican"></i>¡Tu pago fue aprobado! Estamos preparando tu pedido.</p>
-            </div>`
-      }
-
-      ${
-        order.shipping.carrier === "international_pending"
-          ? `<div class="bg-blue-50 border border-blue-200 rounded p-5 mb-8 text-left">
-              <p class="font-bold mb-1 text-blue-800"><i class="fa-solid fa-globe mr-2"></i>Envío internacional</p>
-              <p class="text-sm text-blue-800">El total de abajo no incluye el envío -- te contactaremos para confirmar el costo real y cobrarlo aparte.</p>
-            </div>`
-          : ""
+          : `${
+              justQuoted
+                ? `<div class="bg-blue-50 border border-blue-200 rounded p-4 mb-4 text-left text-sm text-blue-800">
+                    <i class="fa-solid fa-globe mr-1"></i>Ya tenemos el costo de tu envío internacional -- el total de abajo ya lo incluye.
+                  </div>`
+                : ""
+            }
+            ${
+              isSpei
+                ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
+                    <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-clock mr-2"></i>Realiza tu transferencia SPEI antes de:</p>
+                    <p class="text-lg text-orange-800 mb-2">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
+                    ${
+                      settings?.spei_clabe
+                        ? `<p class="text-sm text-orange-800">A esta CLABE: <strong>${settings.spei_clabe}</strong></p>`
+                        : ""
+                    }
+                    <div class="mt-4 pt-4 border-t border-orange-200">
+                      <p class="text-sm font-semibold text-orange-800 mb-2">Sube tu comprobante de depósito:</p>
+                      <div class="flex gap-2">
+                        <input type="file" id="voucher-file" accept="image/*,.pdf" class="flex-1 text-sm text-orange-800" />
+                        <button id="voucher-upload-btn" class="bg-orange-800 text-white text-sm font-semibold px-4 py-2 rounded hover:opacity-90">Subir</button>
+                      </div>
+                      <p id="voucher-status" class="text-xs mt-2"></p>
+                    </div>
+                  </div>`
+                : isPaypal
+                ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
+                    <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-clock mr-2"></i>Envía tu pago por PayPal antes de:</p>
+                    <p class="text-lg text-orange-800 mb-2">${new Date(order.spei_payment_deadline).toLocaleString("es-MX")}</p>
+                    ${
+                      settings?.paypal_receiving_email
+                        ? `<p class="text-sm text-orange-800">A este correo de PayPal: <strong>${settings.paypal_receiving_email}</strong></p>`
+                        : ""
+                    }
+                  </div>`
+                : isMercadoPago
+                ? `<div class="bg-orange-50 border border-orange-200 rounded p-5 mb-8 text-left">
+                    <p class="font-bold mb-1 text-orange-800"><i class="fa-solid fa-wallet mr-2"></i>Pago en validación</p>
+                    <p class="text-sm text-orange-800">Nos pondremos en contacto por WhatsApp al número que diste para enviarte el link de pago de Mercado Pago.</p>
+                  </div>`
+                : `<div class="bg-brand-peach-light bg-opacity-40 border border-gray-200 rounded p-5 mb-8 text-left">
+                    <p><i class="fa-solid fa-circle-check mr-2 text-brand-mexican"></i>¡Tu pago fue aprobado! Estamos preparando tu pedido.</p>
+                  </div>`
+            }`
       }
 
       <p class="text-2xl font-bold text-gray-900 mb-8">Total: ${money(order.total)}</p>
@@ -515,6 +529,25 @@ async function renderSuccess(container, order) {
     </div>
   `;
   container.querySelectorAll("[data-nav]").forEach((el) => el.addEventListener("click", () => navigate(el.dataset.nav)));
+
+  if (isIntlPending) {
+    const token = currentRenderToken();
+    const poll = async () => {
+      if (token !== currentRenderToken()) return; // el cliente ya salió de esta pantalla
+      try {
+        const { order: fresh } = await api.getOrder(order.id);
+        if (fresh.shipping.carrier !== "international_pending") {
+          renderSuccess(container, fresh, true);
+          return;
+        }
+      } catch {
+        // red inestable, etc. -- seguimos intentando
+      }
+      setTimeout(poll, 8000);
+    };
+    setTimeout(poll, 8000);
+    return;
+  }
 
   const uploadBtn = container.querySelector("#voucher-upload-btn");
   if (uploadBtn) {

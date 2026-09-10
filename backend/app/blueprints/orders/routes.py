@@ -106,6 +106,10 @@ def update_shipping_cost(order_id):
 
     order.shipping_cost = shipping_cost
     order.total = float(order.subtotal) + shipping_cost
+    if order.shipping_carrier == "international_pending":
+        # El checkout del cliente está esperando (sondeando) este cambio de estado
+        # para dejar de mostrar "pendiente de cotizar" y mostrar el total final.
+        order.shipping_carrier = "international_quoted"
     db.session.commit()
     return jsonify({"order": serialize_order(order)})
 

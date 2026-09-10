@@ -15,6 +15,7 @@ function carrierLabel(carrier) {
   if (!carrier) return "-";
   if (carrier === "3guerras") return "Tres Guerras";
   if (carrier === "zone_shipping") return "Envío (tarifa por zona)";
+  if (carrier === "international_quoted") return "Envío internacional (cotizado)";
   if (carrier.startsWith("skydropx:")) return "Paquetería (cotizado)";
   if (carrier === "fixed_estafeta") return "Estafeta (tarifa fija)";
   if (carrier === "fixed_dhl") return "DHL (tarifa fija)";
@@ -128,7 +129,7 @@ function orderDetailHtml(o) {
                <p class="text-sm text-gray-600">${o.shipping.street}, ${o.shipping.colonia || "-"}, ${o.shipping.city}, ${o.shipping.state}</p>
                <p class="text-sm text-gray-600">CP ${o.shipping.postal_code || "-"}${o.shipping.country && o.shipping.country !== "México" ? ` · ${o.shipping.country}` : ""}</p>
                ${
-                 o.shipping.carrier === "international_pending"
+                 o.shipping.carrier === "international_pending" || o.shipping.carrier === "international_quoted"
                    ? internationalShippingHtml(o)
                    : `<p class="text-sm text-gray-500 uppercase mt-2">${carrierLabel(o.shipping.carrier)} · ${money(o.shipping.cost)}</p>
                       ${o.shipping.real_cost != null ? shipmentReconciliationHtml(o.shipping) : ""}`
@@ -301,6 +302,11 @@ export function createPedidosSection(onUnauthorized) {
                         <i class="fa-solid ${o.channel === "in_store" ? "fa-store" : "fa-globe"} mr-1"></i>${o.channel === "in_store" ? "Tienda Física" : "Online"}
                       </span>
                       ${hasCustomBundle ? `<span class="block text-[10px] font-bold text-brand-mexican uppercase mt-0.5">Paquete personalizado</span>` : ""}
+                      ${
+                        o.shipping.carrier === "international_pending"
+                          ? `<span class="text-[10px] font-bold text-white bg-blue-600 rounded-full px-2 py-0.5 mt-1 inline-block"><i class="fa-solid fa-globe mr-1"></i>Falta cotizar envío</span>`
+                          : ""
+                      }
                     </td>
                     <td class="px-4 py-3 text-sm">${o.shipping.full_name || "Cliente de mostrador"}</td>
                     <td class="px-4 py-3 text-sm text-gray-500">${new Date(o.created_at).toLocaleDateString("es-MX")}</td>

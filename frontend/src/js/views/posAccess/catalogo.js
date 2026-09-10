@@ -234,15 +234,15 @@ export function createCatalogoSection(onUnauthorized) {
                 <input type="number" step="0.01" name="price_normal" required value="${product?.price_normal ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
               </div>
               <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Medio</label>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Medio ${product ? "" : `<span class="font-normal text-gray-400">(sugerido, edítalo si quieres)</span>`}</label>
                 <input type="number" step="0.01" name="price_medio" required value="${product?.price_medio ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
               </div>
               <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Mayoreo</label>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Mayoreo ${product ? "" : `<span class="font-normal text-gray-400">(sugerido, edítalo si quieres)</span>`}</label>
                 <input type="number" step="0.01" name="price_wholesale" required value="${product?.price_wholesale ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
               </div>
               <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Súper Mayoreo</label>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Precio Súper Mayoreo ${product ? "" : `<span class="font-normal text-gray-400">(sugerido, edítalo si quieres)</span>`}</label>
                 <input type="number" step="0.01" name="price_super_wholesale" required value="${product?.price_super_wholesale ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
               </div>
               ${window.posRole !== "employee" ? `
@@ -336,6 +336,31 @@ export function createCatalogoSection(onUnauthorized) {
         form.querySelector('[name="price_normal"]').addEventListener("input", updateMarginPreview);
         form.querySelector('[name="cost_price"]').addEventListener("input", updateMarginPreview);
         updateMarginPreview();
+
+        // Sugerencia automática de precios por volumen para productos NUEVOS -- son
+        // solo un punto de partida; la dueña siempre puede editarlos, y en cuanto
+        // toca un campo a mano dejamos de sobreescribirlo.
+        if (!product) {
+          const tierInputs = {
+            price_medio: form.querySelector('[name="price_medio"]'),
+            price_wholesale: form.querySelector('[name="price_wholesale"]'),
+            price_super_wholesale: form.querySelector('[name="price_super_wholesale"]'),
+          };
+          const SUGGESTED_DISCOUNTS = { price_medio: 0.9, price_wholesale: 0.8, price_super_wholesale: 0.7 };
+          Object.values(tierInputs).forEach((input) => {
+            input.addEventListener("input", () => {
+              input.dataset.touched = "1";
+            });
+          });
+          form.querySelector('[name="price_normal"]').addEventListener("input", () => {
+            const price = parseFloat(form.querySelector('[name="price_normal"]').value);
+            if (isNaN(price) || price <= 0) return;
+            Object.entries(tierInputs).forEach(([key, input]) => {
+              if (input.dataset.touched) return;
+              input.value = (price * SUGGESTED_DISCOUNTS[key]).toFixed(2);
+            });
+          });
+        }
 
         form.addEventListener("submit", async (e) => {
           e.preventDefault();

@@ -22,7 +22,8 @@ function carrierLabel(carrier) {
   if (!carrier) return "-";
   if (carrier === "3guerras") return "Tres Guerras";
   if (carrier === "zone_shipping") return "Envío";
-  if (carrier === "international_pending") return "Envío internacional";
+  if (carrier === "international_pending") return "Envío internacional (pendiente)";
+  if (carrier === "international_quoted") return "Envío internacional";
   if (carrier.startsWith("skydropx:")) return "Paquetería (cotizado)";
   if (carrier === "fixed_estafeta") return "Estafeta";
   if (carrier === "fixed_dhl") return "DHL";
@@ -76,12 +77,12 @@ function orderCardHtml(order) {
       }
           ${voucherWidgetHtml(order)}
       ${
-        order.shipping.carrier === "international_pending"
+        order.shipping.carrier === "international_pending" || order.shipping.carrier === "international_quoted"
           ? `<p class="text-sm text-brand-mexican font-semibold mt-2">
               <i class="fa-solid fa-globe mr-1"></i> ${
-                Number(order.shipping.cost) > 0
+                order.shipping.carrier === "international_quoted"
                   ? `Costo de envío confirmado: ${money(order.shipping.cost)} (se cobra aparte).`
-                  : "Costo de envío pendiente de confirmar, te contactaremos."
+                  : "Cotizando tu envío internacional, puede tardar unos minutos -- vuelve a revisar pronto."
               }
             </p>`
           : ""
