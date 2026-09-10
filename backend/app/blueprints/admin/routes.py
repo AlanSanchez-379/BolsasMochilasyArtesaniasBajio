@@ -17,7 +17,7 @@ from app.models import (
     BUNDLE_SUBCATEGORIES,
     MAX_VARIANT_IMAGES,
 )
-from app.utils.decorators import role_required, pos_access_required
+from app.utils.decorators import role_required, pos_admin_required
 from app.utils.serializers import serialize_product
 from app.utils.slugify import unique_slug
 from app.utils.supabase_client import get_supabase_admin
@@ -37,14 +37,14 @@ def _public_asset_url_is_valid(url):
 
 
 @admin_bp.get("/settings")
-@pos_access_required
+@pos_admin_required
 def get_admin_settings():
     settings = {s.key: s.value for s in Setting.query.all()}
     return jsonify({"logo_url": settings.get("logo_url"), "banner_url": settings.get("banner_url")})
 
 
 @admin_bp.post("/settings/upload")
-@pos_access_required
+@pos_admin_required
 def upload_setting_image():
     asset_type = request.form.get("type")
     setting_key = ALLOWED_SETTING_TYPES.get(asset_type)
@@ -84,7 +84,7 @@ def _list_folder_images(folder, limit=None):
 
 
 @admin_bp.get("/settings/history")
-@pos_access_required
+@pos_admin_required
 def settings_history():
     asset_type = request.args.get("type")
     if asset_type not in ALLOWED_SETTING_TYPES:
@@ -100,7 +100,7 @@ def settings_history():
 
 
 @admin_bp.patch("/settings")
-@pos_access_required
+@pos_admin_required
 def set_setting_value():
     """Reactiva una imagen ya subida (del historial) como logo/banner actual, sin
     volver a subir el archivo."""
@@ -121,14 +121,14 @@ def set_setting_value():
 
 
 @admin_bp.get("/shipping-settings")
-@pos_access_required
+@pos_admin_required
 def get_shipping_settings():
     rows = Setting.query.filter(Setting.key.in_(SHIPPING_SETTING_KEYS)).all()
     return jsonify({s.key: s.value for s in rows})
 
 
 @admin_bp.patch("/shipping-settings")
-@pos_access_required
+@pos_admin_required
 def update_shipping_settings():
     """Body: { <key>: <value>, ... } — uno o varios de SHIPPING_SETTING_KEYS a la vez.
     Guarda pesos por categoría, peso de empaque, dirección de origen y el costo fijo de
@@ -169,14 +169,14 @@ def update_shipping_settings():
 
 
 @admin_bp.get("/payment-settings")
-@pos_access_required
+@pos_admin_required
 def get_payment_settings():
     rows = Setting.query.filter(Setting.key.in_(PAYMENT_SETTING_KEYS)).all()
     return jsonify({s.key: s.value for s in rows})
 
 
 @admin_bp.patch("/payment-settings")
-@pos_access_required
+@pos_admin_required
 def update_payment_settings():
     """Body: { <key>: <value>, ... } — uno o varios de PAYMENT_SETTING_KEYS a la vez.
     paypal_receiving_email: la cuenta de PayPal a la que el cliente transfiere
@@ -198,7 +198,7 @@ def update_payment_settings():
 
 
 @admin_bp.get("/pos-access-settings")
-@pos_access_required
+@pos_admin_required
 def get_pos_access_settings():
     setting = Setting.query.get("pos_access_pin_hash")
     emp_setting = Setting.query.get("pos_access_employee_pin_hash")
@@ -209,7 +209,7 @@ def get_pos_access_settings():
 
 
 @admin_bp.patch("/pos-access-settings")
-@pos_access_required
+@pos_admin_required
 def update_pos_access_settings():
     """Body: {pin, emp_pin}. Cambia los PINs compartidos de la liga de venta local."""
     data = request.get_json() or {}
@@ -235,7 +235,7 @@ def update_pos_access_settings():
 
 
 @admin_bp.get("/products/image-history")
-@pos_access_required
+@pos_admin_required
 def product_image_history():
     """Últimas imágenes de producto subidas (de cualquier producto/variante), para
     reutilizarlas sin volver a subir el archivo."""
@@ -249,7 +249,7 @@ def product_image_history():
 
 
 @admin_bp.post("/upload-image")
-@pos_access_required
+@pos_admin_required
 def upload_generic_image():
     """Sube una imagen suelta (ej. variantes de un producto todavía no guardado) y
     devuelve su URL pública, sin asociarla todavía a ningún registro."""
@@ -426,14 +426,14 @@ def _validate_subcategory(data):
 
 
 @admin_bp.get("/products")
-@pos_access_required
+@pos_admin_required
 def list_products():
     products = Product.query.order_by(Product.name).all()
     return jsonify({"products": [serialize_product(p, include_cost_price=True) for p in products]})
 
 
 @admin_bp.post("/products")
-@pos_access_required
+@pos_admin_required
 def create_product():
     data = request.get_json() or {}
     required = ["name", "category_id", "subcategory", "price_normal", "price_medio", "price_wholesale", "price_super_wholesale"]
@@ -484,7 +484,7 @@ def create_product():
 
 
 @admin_bp.patch("/products/<product_id>")
-@pos_access_required
+@pos_admin_required
 def update_product(product_id):
     product = Product.query.get_or_404(product_id)
     data = request.get_json() or {}
@@ -520,7 +520,7 @@ def update_product(product_id):
 
 
 @admin_bp.delete("/products/<product_id>")
-@pos_access_required
+@pos_admin_required
 def delete_product(product_id):
     product = Product.query.get_or_404(product_id)
     db.session.delete(product)
@@ -533,7 +533,7 @@ def delete_product(product_id):
 
 
 @admin_bp.post("/products/<product_id>/variants")
-@pos_access_required
+@pos_admin_required
 def create_variant(product_id):
     product = Product.query.get_or_404(product_id)
     data = request.get_json() or {}
@@ -559,7 +559,7 @@ def create_variant(product_id):
 
 
 @admin_bp.patch("/variants/<variant_id>")
-@pos_access_required
+@pos_admin_required
 def update_variant(variant_id):
     variant = ProductVariant.query.get_or_404(variant_id)
     data = request.get_json() or {}
@@ -579,7 +579,7 @@ def update_variant(variant_id):
 
 
 @admin_bp.post("/variants/<variant_id>/image")
-@pos_access_required
+@pos_admin_required
 def upload_variant_image(variant_id):
     variant = ProductVariant.query.get_or_404(variant_id)
 
@@ -597,7 +597,7 @@ def upload_variant_image(variant_id):
 
 
 @admin_bp.delete("/variants/<variant_id>")
-@pos_access_required
+@pos_admin_required
 def delete_variant(variant_id):
     variant = ProductVariant.query.get_or_404(variant_id)
     product = variant.product

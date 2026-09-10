@@ -79,19 +79,42 @@ def verify_pos_access_token(token):
     return None
 
 
+def _pos_token_from_request():
+    token = request.cookies.get(POS_ACCESS_COOKIE_NAME)
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ", 1)[1]
+    return token
+
+
 def pos_access_required(fn):
+    """Cualquiera de los dos PINs (admin o empleado) -- para lo que un cajero
+    legítimamente necesita: vender, ver el catálogo, consultar su propia sesión."""
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        token = request.cookies.get(POS_ACCESS_COOKIE_NAME)
-        if not token:
-            auth_header = request.headers.get("Authorization")
-            if auth_header and auth_header.startswith("Bearer "):
-                token = auth_header.split(" ", 1)[1]
-
-        role = verify_pos_access_token(token)
+        role = verify_pos_access_token(_pos_token_from_request())
         if not role:
             return jsonify({"message": "Ingresa el PIN de la tienda."}), 401
-        
+
+        g.pos_role = role
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
+def pos_admin_required(fn):
+    """Solo el PIN de administrador -- ajustes, catálogo (alta/edición/borrado),
+    pedidos, envíos. El PIN de empleado nunca debe llegar a estos endpoints, aunque
+    los mande directo a la API sin pasar por la interfaz."""
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        role = verify_pos_access_token(_pos_token_from_request())
+        if not role:
+            return jsonify({"message": "Ingresa el PIN de la tienda."}), 401
+        if role != "admin":
+            return jsonify({"message": "Esta acción requiere el PIN de administrador."}), 403
+
         g.pos_role = role
         return fn(*args, **kwargs)
 

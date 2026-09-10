@@ -4,8 +4,11 @@ from flask import jsonify, request, make_response, current_app
 from werkzeug.security import check_password_hash
 
 from app.models import Setting, Product
+from flask import g
+
 from app.utils.decorators import (
     pos_access_required,
+    pos_admin_required,
     issue_pos_access_token,
     POS_ACCESS_COOKIE_NAME,
     POS_ACCESS_MAX_AGE,
@@ -89,19 +92,20 @@ def logout():
 @pos_access_bp.get("/me")
 @pos_access_required
 def me():
-    from flask import g
     return jsonify({"ok": True, "role": getattr(g, "pos_role", "admin")})
 
 
 @pos_access_bp.get("/products")
 @pos_access_required
 def list_products():
+    # El costo/margen es dato interno -- solo el PIN de administrador lo ve.
+    is_admin = getattr(g, "pos_role", None) == "admin"
     products = Product.query.order_by(Product.name).all()
-    return jsonify({"products": [serialize_product(p, include_cost_price=True) for p in products]})
+    return jsonify({"products": [serialize_product(p, include_cost_price=is_admin) for p in products]})
 
 
 @pos_access_bp.get("/stats")
-@pos_access_required
+@pos_admin_required
 def stats():
     period = request.args.get("period", "all")
     return jsonify(get_admin_stats_data(period=period))
