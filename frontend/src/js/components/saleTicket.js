@@ -98,21 +98,22 @@ export function buildSaleTicketHtml(order, ticketSettings = {}, posContext = nul
     width: 58mm;
     margin: 0;
     padding: 3mm;
-    font-family: "Courier New", Courier, monospace;
-    font-size: 11px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
     line-height: 1.4;
     color: #000;
   }
   .ticket-center { text-align: center; }
   .ticket-logo { max-width: 40mm; max-height: 20mm; margin: 0 auto 4px; display: block; }
-  .ticket-store-name { font-weight: bold; font-size: 13px; }
-  .ticket-divider { border-top: 1px dashed #000; margin: 6px 0; }
+  .ticket-store-name { font-weight: 900; font-size: 14px; }
+  .ticket-divider { border-top: 2px dashed #000; margin: 6px 0; }
   .ticket-item { margin-bottom: 4px; }
   .ticket-item-row { display: flex; justify-content: space-between; gap: 6px; }
-  .ticket-item-price { color: #333; }
-  .ticket-item-child { padding-left: 8px; font-size: 10px; color: #333; }
-  .ticket-total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; }
-  .ticket-small { font-size: 10px; }
+  .ticket-item-price { color: #000; font-weight: 900; }
+  .ticket-item-child { padding-left: 8px; font-size: 11px; color: #000; }
+  .ticket-total-row { display: flex; justify-content: space-between; font-weight: 900; font-size: 14px; }
+  .ticket-small { font-size: 11px; }
 </style>
 </head>
 <body>
