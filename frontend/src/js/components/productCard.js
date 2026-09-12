@@ -1,4 +1,4 @@
-import { escapeHtml } from "../html.js";
+import { escapeHtml, optimizeSupabaseImageUrl } from "../html.js";
 import { priceForQuantity } from "../pricing.js";
 import { NO_IMAGE_PLACEHOLDER } from "../imageFallback.js";
 
@@ -39,10 +39,12 @@ export function productCardHtml(product, customImage = null) {
     }
   }
 
+  const optimizedImage = optimizeSupabaseImageUrl(defaultImage, 300, 400);
+
   return `
     <a href="/producto/${encodeURIComponent(product.slug)}" data-nav="/producto/${encodeURIComponent(product.slug)}" class="flex flex-col cursor-pointer group bg-white border border-gray-100 p-3 sm:p-4 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full relative overflow-hidden">
       <div class="relative overflow-hidden bg-gray-50 aspect-[4/5] mb-4 rounded-lg w-full">
-        <img src="${escapeHtml(defaultImage)}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <img src="${escapeHtml(optimizedImage)}" width="300" height="400" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ${
           totalStock === 0
             ? `<div class="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center z-10">
@@ -63,7 +65,7 @@ export function productCardHtml(product, customImage = null) {
         <h3 class="text-sm font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-brand-mexican transition-colors leading-tight">${escapeHtml(product.name)}</h3>
         <div class="mt-auto">
           ${product.is_on_sale && product.sale_price != null && Number(priceForQuantity(product, 1)) < Number(product.price_normal)
-            ? `<p class="text-xs text-gray-500 line-through">Antes: ${money(product.price_normal)}</p>` : ""}
+            ? `<p class="text-xs text-gray-600 line-through">Antes: ${money(product.price_normal)}</p>` : ""}
           <p class="text-lg font-bold text-gray-900">${money(priceForQuantity(product, 1))}</p>
           <p class="text-xs text-gray-600">${product.is_bundle ? "Por paquete" : "Por pieza"} · MXN</p>
           ${!product.is_bundle && product.wholesale_min_qty > 1

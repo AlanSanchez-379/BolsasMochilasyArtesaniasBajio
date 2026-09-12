@@ -4,6 +4,7 @@ import { bindNavLinks } from "../dom.js";
 import { currentRenderToken } from "../router.js";
 import { getSettings } from "../settingsCache.js";
 import { getCategories, getCachedOrFetch } from "../catalogCache.js";
+import { optimizeSupabaseImageUrl } from "../html.js";
 
 function categoryIconClass(name) {
   const key = name.toLowerCase();
@@ -16,14 +17,15 @@ function categoryIconClass(name) {
 }
 
 function paint(container, { categories, bundles, bestsellers, settings, loteriaProducts }) {
-  const bannerSrc = settings.banner_url || "https://placehold.co/1200x500/ffffff/FE81D4?text=Emprende+Con+Nosotros";
+  const bannerSrcOrig = settings.banner_url || "https://placehold.co/1200x500/ffffff/FE81D4?text=Emprende+Con+Nosotros";
+  const bannerSrc = optimizeSupabaseImageUrl(bannerSrcOrig, 1600, 700);
 
   container.innerHTML = `
     <div class="animate-fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 bg-gray-50">
 
       <div class="relative w-full min-h-[360px] md:h-[70vh] md:min-h-[500px] mt-6 mb-12 md:mb-24 rounded-3xl overflow-hidden shadow-2xl group">
         <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent z-10"></div>
-        <img src="${bannerSrc}" alt="Colección de bolsas artesanales del Bajío" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover z-0 opacity-100 group-hover:scale-105 transition-transform duration-1000 ease-in-out" />
+        <img src="${bannerSrc}" width="1600" height="700" alt="Colección de bolsas artesanales del Bajío" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover z-0 opacity-100 group-hover:scale-105 transition-transform duration-1000 ease-in-out" />
         <div class="relative z-20 flex items-center h-full max-w-3xl px-4 py-6 md:px-16 animate-fade-in-up">
           <div class="glass-dark p-5 md:p-12 rounded-2xl max-w-lg border-l-4 border-l-brand-salmon">
             <h1 class="text-3xl md:text-5xl font-display font-bold text-white mb-6 leading-tight">Inicia tu negocio hoy con <span class="text-brand-salmon">precios de fábrica</span></h1>

@@ -3,6 +3,7 @@ import { api } from "../api.js";
 import { state, cartItemsCount, setCurrentUser } from "../state.js";
 import { navigate } from "../router.js";
 import { getSettings } from "../settingsCache.js";
+import { optimizeSupabaseImageUrl } from "../html.js";
 
 const NAV_LINKS = [
   { label: "Inicio", href: "/" },
@@ -34,7 +35,8 @@ function userMenuHtml() {
 
 function logoHtml(settings) {
   if (settings.logo_url) {
-    return `<img src="${settings.logo_url}" alt="Bolsas, Mochilas Y Artesanías del Bajío" class="w-auto h-auto max-h-20 max-w-[200px] object-contain" />`;
+    const optimized = optimizeSupabaseImageUrl(settings.logo_url, 200, 80);
+    return `<img src="${optimized}" width="200" height="80" alt="Bolsas, Mochilas Y Artesanías del Bajío" class="w-auto h-auto max-h-20 max-w-[200px] object-contain" />`;
   }
   return `<span class="text-2xl font-black text-white tracking-tight">BM&amp;A del Bajío</span>`;
 }
