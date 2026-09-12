@@ -7,7 +7,13 @@
 # guardada — usando el ETag/Last-Modified, así que si el archivo no cambió sigue
 # siendo rápido (304), y si cambió, se nota al instante.
 <IfModule mod_headers.c>
+  # Cabeceras de Seguridad (Auditoría)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set Content-Security-Policy "upgrade-insecure-requests"
+
   <FilesMatch "\.(js|css)$">
+    # Mantenemos must-revalidate dado que no usamos bundler, pero Apache usará ETags
+    # automáticamente para devolver 304 Not Modified cuando el archivo no cambie.
     Header set Cache-Control "no-cache, must-revalidate"
   </FilesMatch>
 </IfModule>
@@ -15,8 +21,14 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+  
+  # Archivos o directorios reales (imágenes, scripts, etc.) se sirven directo
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Enrutamiento de la SPA: SOLO enviar a index.html las rutas públicas conocidas.
+  # Cualquier otra URL devolverá el Error 404 nativo de Apache hacia los buscadores.
+  RewriteCond %{REQUEST_URI} ^/(categoria/|producto/|carrito|checkout|login|registro|mis-pedidos|politica-envios|politica-privacidad|terminos-y-condiciones|venta-local|auth/callback)? [NC]
+  RewriteRule ^ index.html [L]
 </IfModule>

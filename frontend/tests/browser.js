@@ -32,7 +32,7 @@ try {
   search.value = "loteria";
   search.dispatchEvent(new Event("input"));
   assert(view.textContent.includes("1 producto"), "Accented variant search matches");
-  assert(view.querySelector('a[href="#/producto/bolso-artesanal"]'), "Product is a native link");
+  assert(view.querySelector('a[href="/producto/bolso-artesanal"]'), "Product is a native link");
   await renderNavbar(document.getElementById("navbar"));
   const menu = document.getElementById("mobile-menu-btn");
   menu.click();

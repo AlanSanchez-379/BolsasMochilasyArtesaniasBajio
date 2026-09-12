@@ -19,10 +19,11 @@ import { getCategories } from "./catalogCache.js";
 import { getSettings } from "./settingsCache.js";
 
 const root = document.getElementById("root");
+root.className = "flex flex-col min-h-screen";
 root.innerHTML = `
   <div id="navbar-slot"></div>
-  <main id="view"></main>
-  <div id="footer-slot"></div>
+  <main id="view" class="flex-grow w-full"></main>
+  <div id="footer-slot" class="mt-auto"></div>
   <div id="whatsapp-float-slot"></div>
 `;
 

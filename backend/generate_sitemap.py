@@ -1,4 +1,5 @@
 import os
+import urllib.parse
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from dotenv import load_dotenv
@@ -11,11 +12,11 @@ from app.models import Product, Category
 
 app = create_app()
 
-FRONTEND_URL = os.environ.get("FRONTEND_ORIGIN", "https://www.bolsasmochilasyartesaniasbajio.com").rstrip("/")
+FRONTEND_URL = os.environ.get("FRONTEND_ORIGIN", "https://bolsasdelbajio.com").rstrip("/")
 # For production sitemap, we ideally want the production URL. 
-if "localhost" in FRONTEND_URL or "127.0.0.1" in FRONTEND_URL:
+if "localhost" in FRONTEND_URL or "127.0.0.1" in FRONTEND_URL or "bolsasmochilasyartesaniasbajio.com" in FRONTEND_URL:
     print(f"Warning: FRONTEND_ORIGIN is {FRONTEND_URL}. Using a placeholder production URL for sitemap.xml. Please update .env or environment variables.")
-    FRONTEND_URL = "https://www.bolsasmochilasyartesaniasbajio.com"
+    FRONTEND_URL = "https://bolsasdelbajio.com"
 
 SITEMAP_PATH = os.path.join(os.path.dirname(__file__), "..", "frontend", "sitemap.xml")
 ROBOTS_PATH = os.path.join(os.path.dirname(__file__), "..", "frontend", "robots.txt")
@@ -43,10 +44,11 @@ def generate_sitemap():
         # Categories
         categories = Category.query.all()
         for cat in categories:
-            create_url_element(urlset, f"{FRONTEND_URL}/categoria/{cat.name}", lastmod=now, changefreq="weekly", priority="0.8")
+            encoded_name = urllib.parse.quote(cat.name)
+            create_url_element(urlset, f"{FRONTEND_URL}/categoria/{encoded_name}", lastmod=now, changefreq="weekly", priority="0.8")
         
         # Products
-        products = Product.query.all()
+        products = Product.query.filter_by(is_public=True).all()
         for prod in products:
             # We use created_at as a fallback for lastmod if updated_at is not there
             lastmod_date = now

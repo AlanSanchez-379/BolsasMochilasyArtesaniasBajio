@@ -95,7 +95,7 @@ export function renderCheckout(container) {
         </p>
         ${appState.cart
           .map((item) => {
-            const qty = item.product.is_bundle ? item.quantity : combinedQtyForProductLine(item.product);
+            const qty = item.product.is_bundle ? 1 : combinedQtyForProductLine(item.product);
             const price = priceForQuantity(item.product, qty);
             return `
             <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">

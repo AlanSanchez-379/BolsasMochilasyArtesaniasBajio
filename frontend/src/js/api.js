@@ -61,6 +61,7 @@ export const api = {
     request("/auth/oauth-callback", { method: "POST", body: JSON.stringify({ access_token: accessToken }) }),
   logout: () => request("/auth/logout", { method: "POST" }),
   me: () => request("/auth/me"),
+  resetPassword: (email) => request("/auth/reset-password", { method: "POST", body: JSON.stringify({ email }) }),
 
   checkoutQuote: (shipping, items) =>
     request("/checkout/quote", { method: "POST", body: JSON.stringify({ ...shipping, items }) }),

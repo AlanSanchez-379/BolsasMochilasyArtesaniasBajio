@@ -72,6 +72,24 @@ def register():
     return response
 
 
+@auth_bp.post("/reset-password")
+def reset_password():
+    data = request.get_json() or {}
+    email = data.get("email")
+    if not email:
+        return jsonify({"message": "Correo es requerido."}), 400
+
+    try:
+        get_supabase().auth.reset_password_email(
+            email,
+            options={"redirect_to": f"{_frontend_origin()}/#/auth/update-password"}
+        )
+    except Exception as e:
+        return jsonify({"message": str(e)}), 400
+
+    return jsonify({"message": "Se ha enviado un enlace de recuperación a tu correo."})
+
+
 @auth_bp.post("/login")
 def login():
     data = request.get_json() or {}

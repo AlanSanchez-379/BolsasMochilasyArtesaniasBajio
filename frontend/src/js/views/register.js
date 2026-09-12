@@ -25,16 +25,16 @@ export function renderRegister(container) {
 
         <form id="register-form" class="space-y-4">
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">Nombre completo</label>
-            <input type="text" name="full_name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal" />
+            <label for="register-name" class="block text-sm font-bold text-gray-700 mb-1">Nombre completo</label>
+            <input id="register-name" type="text" name="full_name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal" />
           </div>
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">Correo</label>
-            <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal" />
+            <label for="register-email" class="block text-sm font-bold text-gray-700 mb-1">Correo</label>
+            <input id="register-email" type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal" />
           </div>
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">Contraseña</label>
-            <input type="password" name="password" required minlength="6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal" />
+            <label for="register-password" class="block text-sm font-bold text-gray-700 mb-1">Contraseña</label>
+            <input id="register-password" type="password" name="password" required minlength="6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-teal" />
           </div>
           <label class="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
             <input type="checkbox" id="accept-terms" required class="mt-1 w-4 h-4 flex-shrink-0" />

@@ -70,7 +70,7 @@ export function productCardHtml(product, customImage = null) {
           <p class="text-xs text-gray-600">${product.is_bundle ? "Por paquete" : "Por pieza"} · MXN</p>
           ${!product.is_bundle && product.wholesale_min_qty > 1
             ? `<p class="text-xs text-gray-700 mt-2">Mayoreo: <strong>${money(product.price_wholesale)}</strong> desde ${product.wholesale_min_qty} piezas de la misma línea.</p>` : ""}
-          ${totalStock > 0 ? '<p class="text-[11px] text-emerald-600 font-semibold mt-2"><i class="fa-solid fa-circle-check mr-1.5"></i>Disponible en stock</p>' : ""}
+          ${totalStock > 0 ? '<p class="text-xs text-emerald-700 font-semibold mt-2"><i class="fa-solid fa-circle-check mr-1.5"></i>Disponible en stock</p>' : ""}
         </div>
       </div>
     </a>

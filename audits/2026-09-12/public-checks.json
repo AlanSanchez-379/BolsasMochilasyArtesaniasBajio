@@ -1,0 +1,352 @@
+{
+  "product_count": 25,
+  "test_products": [],
+  "sitemap_count": 37,
+  "missing_from_sitemap": [],
+  "stale_sitemap_products": [],
+  "sitemap_unescaped_spaces": [
+    "https://bolsasdelbajio.com/categoria/Porta Celular",
+    "https://bolsasdelbajio.com/categoria/Tri Combo"
+  ],
+  "sitemap_http": [
+    {
+      "url": "https://bolsasdelbajio.com/",
+      "final_url": "https://bolsasdelbajio.com/",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/categoria/Todos",
+      "final_url": "https://bolsasdelbajio.com/categoria/Todos",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/politica-envios",
+      "final_url": "https://bolsasdelbajio.com/politica-envios",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/politica-privacidad",
+      "final_url": "https://bolsasdelbajio.com/politica-privacidad",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/terminos-y-condiciones",
+      "final_url": "https://bolsasdelbajio.com/terminos-y-condiciones",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/categoria/Bolsas",
+      "final_url": "https://bolsasdelbajio.com/categoria/Bolsas",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/categoria/Mochilas",
+      "final_url": "https://bolsasdelbajio.com/categoria/Mochilas",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/categoria/Carteras",
+      "final_url": "https://bolsasdelbajio.com/categoria/Carteras",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/categoria/Cosmetiqueras",
+      "final_url": "https://bolsasdelbajio.com/categoria/Cosmetiqueras",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/categoria/Monederos",
+      "final_url": "https://bolsasdelbajio.com/categoria/Monederos",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/categoria/Porta%20Celular",
+      "final_url": "https://bolsasdelbajio.com/categoria/Porta%20Celular",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/categoria/Tri%20Combo",
+      "final_url": "https://bolsasdelbajio.com/categoria/Tri%20Combo",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-cinturon-elegante-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-cinturon-elegante-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/mochila-con-cartuchera-animada",
+      "final_url": "https://bolsasdelbajio.com/producto/mochila-con-cartuchera-animada",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/tricombo-viaje-ligero-animado",
+      "final_url": "https://bolsasdelbajio.com/producto/tricombo-viaje-ligero-animado",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-fusion-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-fusion-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/mochila-plana-animada",
+      "final_url": "https://bolsasdelbajio.com/producto/mochila-plana-animada",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/porta-celular-cencillo",
+      "final_url": "https://bolsasdelbajio.com/producto/porta-celular-cencillo",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/mochila-fusion-media-animada",
+      "final_url": "https://bolsasdelbajio.com/producto/mochila-fusion-media-animada",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-tote-franja-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-tote-franja-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/mochila-cofre-animada",
+      "final_url": "https://bolsasdelbajio.com/producto/mochila-cofre-animada",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-maletin-doble-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-maletin-doble-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/mochila-escolar-animada",
+      "final_url": "https://bolsasdelbajio.com/producto/mochila-escolar-animada",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-tote-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-tote-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/tricombo-escolar-animado",
+      "final_url": "https://bolsasdelbajio.com/producto/tricombo-escolar-animado",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-cadena-animado",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-cadena-animado",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-media-vista-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-media-vista-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-oleaje-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-oleaje-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-trenzas-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-trenzas-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-elegante-de-mano-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-elegante-de-mano-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-regina-con-asa-fruncida-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-regina-con-asa-fruncida-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-maletin-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-maletin-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-linea-media-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-linea-media-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-broche-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-broche-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-cuadrado-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-cuadrado-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-cuadrado-animado",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-cuadrado-animado",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/bolso-transparente-artesanal",
+      "final_url": "https://bolsasdelbajio.com/producto/bolso-transparente-artesanal",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389
+    }
+  ],
+  "edge_routes": [
+    {
+      "url": "https://bolsasdelbajio.com/producto/prueba",
+      "final_url": "https://bolsasdelbajio.com/producto/prueba",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389,
+      "has_empty_root": true
+    },
+    {
+      "url": "https://bolsasdelbajio.com/producto/fd",
+      "final_url": "https://bolsasdelbajio.com/producto/fd",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389,
+      "has_empty_root": true
+    },
+    {
+      "url": "https://bolsasdelbajio.com/auditoria-pagina-inexistente-20260912",
+      "final_url": "https://bolsasdelbajio.com/auditoria-pagina-inexistente-20260912",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389,
+      "has_empty_root": true
+    },
+    {
+      "url": "https://bolsasdelbajio.com/src/js/archivo-inexistente-auditoria.js",
+      "final_url": "https://bolsasdelbajio.com/src/js/archivo-inexistente-auditoria.js",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389,
+      "has_empty_root": true
+    },
+    {
+      "url": "https://bolsasdelbajio.com/login",
+      "final_url": "https://bolsasdelbajio.com/login",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389,
+      "has_empty_root": true
+    },
+    {
+      "url": "https://bolsasdelbajio.com/checkout",
+      "final_url": "https://bolsasdelbajio.com/checkout",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1389,
+      "has_empty_root": true
+    }
+  ],
+  "unauthenticated_endpoints": [
+    {
+      "url": "https://bolsasmochilasyartesaniasbajio.onrender.com/api/auth/me",
+      "final_url": "https://bolsasmochilasyartesaniasbajio.onrender.com/api/auth/me",
+      "status": 401,
+      "content_type": "application/json",
+      "bytes": 30
+    },
+    {
+      "url": "https://bolsasmochilasyartesaniasbajio.onrender.com/api/orders/admin/all",
+      "final_url": "https://bolsasmochilasyartesaniasbajio.onrender.com/api/orders/admin/all",
+      "status": 401,
+      "content_type": "application/json",
+      "bytes": 43
+    },
+    {
+      "url": "https://bolsasmochilasyartesaniasbajio.onrender.com/api/admin/settings",
+      "final_url": "https://bolsasmochilasyartesaniasbajio.onrender.com/api/admin/settings",
+      "status": 401,
+      "content_type": "application/json",
+      "bytes": 43
+    }
+  ],
+  "categories_with_products": [
+    "Bolsas",
+    "Mochilas",
+    "Porta Celular",
+    "Tri Combo"
+  ],
+  "bundles": 0
+}

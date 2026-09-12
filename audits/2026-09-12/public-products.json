@@ -1,0 +1,3886 @@
+[
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Silueta fluida asimétrica, cierre magnético y asa de hombro.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-05T03:09:55.255143+00:00",
+    "description": "Inspirado en la fluidez de las olas, este hermoso bolso presenta un diseño asimétrico cautivador. Fabricado con detalles de yute de alta calidad, es el accesorio ideal para quienes buscan marcar tendencia con un toque mexicano.",
+    "id": "3b3d3846-3b64-495a-a267-7e8853710bc2",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute con patrón curvo tejido a mano",
+    "medidas": "36 cm x 26 cm x 14 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Oleaje Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-oleaje-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "910751fd-ba00-4334-a30a-729c4279ff11",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e1d97ea55c3b4be19578447f280649e8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e1d97ea55c3b4be19578447f280649e8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000001 ",
+        "stock": 20
+      },
+      {
+        "color": "Azul Lotería ",
+        "id": "b94e9c64-505d-4ad6-9d24-74e376b9d674",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/34dc9882b0e5453da524badb1b86cc22.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/34dc9882b0e5453da524badb1b86cc22.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000002",
+        "stock": 20
+      },
+      {
+        "color": "Cafe Rombos",
+        "id": "1f82be1c-8289-4f5b-bc68-ffdb735d5ca4",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ea6ce5e5211f4efabb4b16a95f2450ee.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ea6ce5e5211f4efabb4b16a95f2450ee.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000003",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mosaicos",
+        "id": "2bed7927-d4a9-450b-b818-2e88c38b7574",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/78e8d481cdcc48e090bcb44a0a3533ef.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/78e8d481cdcc48e090bcb44a0a3533ef.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000004",
+        "stock": 20
+      },
+      {
+        "color": "Negro Tenango",
+        "id": "70ab3398-af9d-414f-a057-97c5ce81a9b6",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/dda4edd890e7490ba74122527d48cf30.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/dda4edd890e7490ba74122527d48cf30.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000005",
+        "stock": 20
+      },
+      {
+        "color": "Rojo Gran Floral",
+        "id": "ad0361b0-fd4c-46e7-b354-d046170f897f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a752cd5155994e10a3f01399fede2310.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a752cd5155994e10a3f01399fede2310.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000006",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "49f34d18-0f4a-498c-9636-956eb3f4c877",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/578836212bcd4b229ad521efc3ad7d30.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/578836212bcd4b229ad521efc3ad7d30.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000007",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Gran capacidad de almacenamiento, sin separaciones internas para máxima flexibilidad.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-05T03:31:19.650946+00:00",
+    "description": "Un clásico infalible reinventado. Nuestro Bolso Tote combina la textura y elegancia rústica del yute con detalles artesanales de primera calidad. Es el complemento perfecto por su amplio espacio y versatilidad. Una pieza clave para el catálogo de cualquier emprendedor.",
+    "id": "fc62f42e-e4d9-4955-a3d1-e7814fef6be1",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute reforzado, forro textil y asas gruesas",
+    "medidas": "45 cm x 35 cm x 15 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Tote Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-tote-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "124d3d76-7aef-4b81-84b9-b1d2f1a4832f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b1d53ab4dace4cb49585c6c0de2c0382.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b1d53ab4dace4cb49585c6c0de2c0382.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000008",
+        "stock": 20
+      },
+      {
+        "color": "Azul Lotería ",
+        "id": "36164163-9c12-4f37-8c2e-495558b9e7bb",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c34909e4013a44ed8d5117801437c0e9.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c34909e4013a44ed8d5117801437c0e9.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000009",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaicos",
+        "id": "f3d37949-cd92-4642-b883-7911b42c6687",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d8d66798f5e044e4aae0aeb2007de703.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d8d66798f5e044e4aae0aeb2007de703.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000010",
+        "stock": 20
+      },
+      {
+        "color": "Café Mosaicos",
+        "id": "abdbed46-bc86-4cda-9466-106ce4affd8a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/af56a423328c447ebfe8f7a74c01fd8b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/af56a423328c447ebfe8f7a74c01fd8b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000011",
+        "stock": 20
+      },
+      {
+        "color": "Coral Floral",
+        "id": "92072d67-f09b-4cb1-8e25-c0b4e465f4f5",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/dab885f13f4548d2a804340c6e469c7e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/dab885f13f4548d2a804340c6e469c7e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000012",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandala",
+        "id": "523b2fa4-c8e4-4724-a92a-fa6279eb58d2",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/769f92a52a6242c492797b69c626ce44.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/769f92a52a6242c492797b69c626ce44.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000013",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "94b880be-6e7b-46cb-a9d9-ba7f827ea6fa",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ac16c8ead28a4db89394bf48488452f6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ac16c8ead28a4db89394bf48488452f6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000014",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "8e390d5f-6cd6-49c9-8516-50875a1ceb3e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a080ab293a6a4e15951bb0ed48e9af11.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a080ab293a6a4e15951bb0ed48e9af11.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000015",
+        "stock": 20
+      },
+      {
+        "color": "Verde Colibri",
+        "id": "c02e6db6-eb74-4df0-ad51-01f88e433f84",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/65757c67425b44e6a71e81ec4f87e847.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/65757c67425b44e6a71e81ec4f87e847.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000016",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "ff780761-4438-4fde-b214-5686dcf0f1f5",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1f0f2fbc4179448cbf4d33e185781cb6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1f0f2fbc4179448cbf4d33e185781cb6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000017",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Compartimento principal, bolsillo frontal y asas superiores reforzadas.",
+    "category": "Mochilas",
+    "category_id": "ab66c8c9-c3c0-458a-ae41-1d38fff463e3",
+    "created_at": "2026-09-07T08:12:02.850922+00:00",
+    "description": "Una mezcla perfecta entre tamaño práctico y diseño llamativo. La Mochila Fusión Media destaca por sus estampados únicos, correas ajustables y ligereza, convirtiéndola en una opción versátil tanto para estudiantes como para paseos casuales.",
+    "id": "b4469fe6-0fbe-4ed7-9a59-0516a2b22ab3",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Lona resistente y poliéster",
+    "medidas": "38 cm x 28 cm x 14 cm",
+    "medio_min_qty": 6,
+    "name": "Mochila Fusión Media Animada",
+    "price_medio": 165.0,
+    "price_normal": 180.0,
+    "price_super_wholesale": 145.0,
+    "price_wholesale": 150.0,
+    "print_type": "ANIMADO",
+    "sale_price": null,
+    "slug": "mochila-fusion-media-animada",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Negro Mickey",
+        "id": "ad7dd844-68e1-4c35-afe5-46b29e26203a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6f4bce1edbf444d485920018c777a032.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6f4bce1edbf444d485920018c777a032.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000239",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Snoopy",
+        "id": "0828c53c-9f06-4d94-ad47-3f1073a1cbe3",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bc680d0ef9c0403ab158ce76661cfedb.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bc680d0ef9c0403ab158ce76661cfedb.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000240",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Betty Boop",
+        "id": "f5310945-fa8a-42d4-81a5-782c35971d68",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a4586ee52fde4ed79a9422cea051283d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a4586ee52fde4ed79a9422cea051283d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000241",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Kitty",
+        "id": "b9979e70-7b7e-42b6-80ab-0250da7726fb",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9478469bc0f54cec8c50b35e0787cde1.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9478469bc0f54cec8c50b35e0787cde1.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000242",
+        "stock": 10
+      },
+      {
+        "color": "Negro Herry Potter",
+        "id": "15b9fa74-9b10-46fb-a197-353ec6252284",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f6bf2554bf5e408abf25dce456aa5950.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f6bf2554bf5e408abf25dce456aa5950.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000243",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Marie",
+        "id": "23452a77-7035-41e8-929a-ede926a8804c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a3e1d38c6d4f410189d0f5e901aec47d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a3e1d38c6d4f410189d0f5e901aec47d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000244",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Snoopy",
+        "id": "18527b97-e3b4-4fa1-9963-f5ce70fddd08",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/df3de9398beb4a69a424e6bc8d487088.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/df3de9398beb4a69a424e6bc8d487088.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000245",
+        "stock": 10
+      },
+      {
+        "color": "Negro Jack",
+        "id": "ec726583-b3c8-4d00-abde-493f79500dd0",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bb0a9fea370e4e838a94e511d45a0e9d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bb0a9fea370e4e838a94e511d45a0e9d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000246",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Coraline",
+        "id": "8bd62ac1-3732-4117-8565-7cd8251f7bc1",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/73297e94ccd34f128bca62a74defb536.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/73297e94ccd34f128bca62a74defb536.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000247",
+        "stock": 10
+      },
+      {
+        "color": "Morado Stitch",
+        "id": "c4140c6a-9fbf-4298-9a9c-97926b3f169f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c5a5ce98ce7d4804bd6b6ba0c668c3df.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c5a5ce98ce7d4804bd6b6ba0c668c3df.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000248",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Kitty y Amigos",
+        "id": "fbe4a6b4-96c1-4ede-8020-fffe2debcc98",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cc060b561c4945038a1a6d6b5c28abe8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cc060b561c4945038a1a6d6b5c28abe8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000249",
+        "stock": 10
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Diseño delgado y ergonómico, bolsillo frontal oculto y cierre principal.",
+    "category": "Mochilas",
+    "category_id": "ab66c8c9-c3c0-458a-ae41-1d38fff463e3",
+    "created_at": "2026-09-07T06:03:01.231216+00:00",
+    "description": "Diseño ultradelgado pero con gran capacidad. Esta mochila se adapta a tu espalda con total comodidad y presenta estampados vibrantes que no pasarán desapercibidos. Ideal para llevar tablets, libros o essentials sin abultar.",
+    "id": "6ffded9e-6f59-4e13-ab1a-cf0adffb74aa",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Poliéster ligero",
+    "medidas": "39 cm x 28 cm x 8 cm",
+    "medio_min_qty": 6,
+    "name": "Mochila Plana Animada",
+    "price_medio": 165.0,
+    "price_normal": 180.0,
+    "price_super_wholesale": 145.0,
+    "price_wholesale": 150.0,
+    "print_type": "ANIMADO",
+    "sale_price": null,
+    "slug": "mochila-plana-animada",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Morado Stitch ",
+        "id": "3c8fbe74-0431-4880-8c5b-c656207f666f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ad4b17a19e4e447786aab8f92d087113.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ad4b17a19e4e447786aab8f92d087113.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000141",
+        "stock": 10
+      },
+      {
+        "color": "Negro Snoopy",
+        "id": "f727a33a-4e8b-42c1-9643-6bd75f34d35c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/54194517126c4a87adcf85164709fe9b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/54194517126c4a87adcf85164709fe9b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000142",
+        "stock": 10
+      },
+      {
+        "color": "Negro Harry Potter",
+        "id": "fd60bcfa-2d66-4f61-b6fb-740de7838d40",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/df547aadd0294eaf8c0be3e4e8a98dbb.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/df547aadd0294eaf8c0be3e4e8a98dbb.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000143",
+        "stock": 10
+      },
+      {
+        "color": "Negro Jack",
+        "id": "e480cadc-4af5-4f14-8e44-88eb06744b5a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/13b6058427c149f0b5e887e4817024f3.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/13b6058427c149f0b5e887e4817024f3.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000144",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Stitch",
+        "id": "d5c1e73c-0880-4c44-9ac8-3f6585ff391e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/761862ce45bd48fa922c2bb5f1fc7ae6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/761862ce45bd48fa922c2bb5f1fc7ae6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000145",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Stitch",
+        "id": "63eb7950-0f06-4182-9341-b48d20ffcdc0",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/74908941447a4e7a955327906092b0d1.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/74908941447a4e7a955327906092b0d1.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000146",
+        "stock": 10
+      },
+      {
+        "color": "Negro Mickey",
+        "id": "0a27c79e-1cd9-420f-b4bd-757922151a18",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c713b3a1d60842af9a157efa7a6ae42c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c713b3a1d60842af9a157efa7a6ae42c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000147",
+        "stock": 10
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Tamaño clutch/mano, cierre de broche, incluye correa delgada removible.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-05T05:03:25.239607+00:00",
+    "description": "La joya de la corona para eventos especiales. Compacto, sofisticado y con acabados en yute de alta precisión. Este bolso de mano es la definición de elegancia artesanal, perfecto para clientes exigentes.",
+    "id": "5ecd688c-95b3-4baa-81cb-e06591e41307",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute de tejido fino",
+    "medidas": "24 cm x 16 cm x 6 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Elegante De Mano Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-elegante-de-mano-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "96ba7beb-fc76-4d7e-bb5f-b16cba3542ad",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/06fd08b5a43a47e09e6adac7f5db59b8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/06fd08b5a43a47e09e6adac7f5db59b8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000059",
+        "stock": 20
+      },
+      {
+        "color": "Azul Lotería ",
+        "id": "2d5abecd-9d0c-4e6b-b02c-09218d668d91",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b0de3e8619a4443397cf198b432ab7d7.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b0de3e8619a4443397cf198b432ab7d7.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000060",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaicos",
+        "id": "716887a2-1d0d-42e4-b4d5-53e66f25e902",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/415c695f1928423aa49843151f66cb8a.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/415c695f1928423aa49843151f66cb8a.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000061",
+        "stock": 20
+      },
+      {
+        "color": "Café Mosaicos",
+        "id": "3f1b93d2-b42b-487d-b3c6-d2ab3506df50",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d947749cd16a44e693c2ff2c8285ef83.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d947749cd16a44e693c2ff2c8285ef83.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000062",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandalas",
+        "id": "c3bb228a-79b3-4f6c-9cc2-0963d83439b8",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e8375821b2b6480ca0461f5b759b599c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e8375821b2b6480ca0461f5b759b599c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000063",
+        "stock": 20
+      },
+      {
+        "color": "Rojo Floral",
+        "id": "821012b0-ec3f-4f96-9d57-de884221863a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f250bad5e826453eb49b41f71690ce46.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f250bad5e826453eb49b41f71690ce46.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000064",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "b792009f-d17d-451c-a6a0-3dc18767fed0",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9a33dc35e3d4471fa7a4b8a3ae030eb2.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9a33dc35e3d4471fa7a4b8a3ae030eb2.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000065",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Gran Floral",
+        "id": "b14e1d44-5d93-47bf-8212-25cb47af0f91",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e12c7d58d8e943739af50c87b5443f8a.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e12c7d58d8e943739af50c87b5443f8a.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000066",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "d50fac5d-2fcb-4d30-bdb2-79cd0f794285",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a29f1961a6c14eafab0b24de83b70b97.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a29f1961a6c14eafab0b24de83b70b97.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000067",
+        "stock": 20
+      },
+      {
+        "color": "Verde Colibrí ",
+        "id": "7541533c-4692-4c7b-ad7a-5dba0181404e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1d462cbaf95846a594cc415bd3621713.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1d462cbaf95846a594cc415bd3621713.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000068",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "b20ccc69-b6d4-4e30-9133-58bd13c0a34f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ddb7de9ef0704fae86edc8ea1cade650.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ddb7de9ef0704fae86edc8ea1cade650.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000069",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Tamaño medio con cierre de cremallera, ideal para el uso diario.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-05T04:43:35.298008+00:00",
+    "description": "Equilibrio perfecto entre tamaño y diseño. El Bolso Línea Media es sutil, cómodo y destaca por sus acabados rústicos en yute. Un básico indispensable que toda mujer querrá tener en su colección.",
+    "id": "d01f415c-4b49-4419-bf6e-c6282a6af5c5",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute natural con acentos de color",
+    "medidas": "30 cm x 22 cm x 10 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Linea Media Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-linea-media-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "7f0cbde8-1751-424f-8139-c98c21ad2246",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/428acd1b400d482fb6a08101e3148fe9.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/428acd1b400d482fb6a08101e3148fe9.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000049",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaicos",
+        "id": "a34572ed-de30-49ff-99c7-eddb37cafe8a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fe49b38aa13d4d5cb4d544a24de5093d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fe49b38aa13d4d5cb4d544a24de5093d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000050",
+        "stock": 20
+      },
+      {
+        "color": "Naranja Mosaicos",
+        "id": "b36502d9-85a4-4d6d-a5d8-71539e656043",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d7776776c0b3497b978614669930ff5e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d7776776c0b3497b978614669930ff5e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000051",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mosaicos",
+        "id": "4cc748e2-30b2-424b-8c82-64de5a05d2c5",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9e11c1b570994017b6071236d7353f1f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9e11c1b570994017b6071236d7353f1f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000052",
+        "stock": 20
+      },
+      {
+        "color": "Rojo Floral",
+        "id": "9f8731eb-9e39-405f-895d-3c26ea85b6b0",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c969a6b561af4b44b76b0d8a9b446404.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c969a6b561af4b44b76b0d8a9b446404.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000053",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "fc4fb299-62ec-49d5-a49a-2de33b00bacd",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/93527352500d4d68aa8d54399cce02ef.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/93527352500d4d68aa8d54399cce02ef.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000054",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "49b71a48-fcac-4fd8-ad5b-3202c8def4dd",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d6c3fa8d898142a9a08ffa88488512ba.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d6c3fa8d898142a9a08ffa88488512ba.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000055",
+        "stock": 20
+      },
+      {
+        "color": "Verde Colibrí ",
+        "id": "b81a9357-5e57-4f37-95d3-636f2945caf1",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cca21e56871240ad9848b4bf758a4828.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cca21e56871240ad9848b4bf758a4828.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000056",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "638005a8-e8dd-44d7-90c9-cd778ee6aed0",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f8c273424fb04983887993718397974b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f8c273424fb04983887993718397974b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000057",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Estructura firme ideal para documentos o tablets, asas de mano y forro protector.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-05T04:10:44.670611+00:00",
+    "description": "Elegancia ejecutiva con un toque tradicional. Nuestro maletín artesanal es espacioso, estructurado y cuenta con detalles en yute que lo hacen único. Perfecto para la oficina o salidas donde se requiere llevar documentos o tablets con estilo.",
+    "id": "c6f12d82-408e-40ea-b58e-2e3a0a45cd16",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute estructurado",
+    "medidas": "40 cm x 30 cm x 12 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Maletin Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-maletin-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "f5ad64f4-9ad8-4220-a83c-4f2035ebd005",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/900196af3240453c90d0c49f8843ef8d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/900196af3240453c90d0c49f8843ef8d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000028",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaicos",
+        "id": "463f9c1a-6b14-4f4a-b85e-86b5a5dcf529",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e576ac4773f5496a8fdae0d13f461278.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e576ac4773f5496a8fdae0d13f461278.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000029",
+        "stock": 20
+      },
+      {
+        "color": "Cafe Mosaicos",
+        "id": "5ee0254f-3d19-4859-80dc-e37237b3a39f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a8c031a9ed0e421db2c7dfa066752ab8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a8c031a9ed0e421db2c7dfa066752ab8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000030",
+        "stock": 20
+      },
+      {
+        "color": "Coral Floral",
+        "id": "f9e2b897-2c13-4221-a907-deff16cbec96",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/86e83092d88541689aece2a6b0420981.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/86e83092d88541689aece2a6b0420981.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000031",
+        "stock": 20
+      },
+      {
+        "color": "Negro Corazones",
+        "id": "e92663e5-eaab-49ac-9cfe-1f3322dfc961",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/99a1d9ba0ee74ac69fe4a5fa4233970f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/99a1d9ba0ee74ac69fe4a5fa4233970f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000032",
+        "stock": 20
+      },
+      {
+        "color": "Negro Floral",
+        "id": "87c8d654-e53b-419a-b07d-699264a5da0d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ce595bf2662246a7b9be265af8f78fa5.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ce595bf2662246a7b9be265af8f78fa5.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000033",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandalas",
+        "id": "ca096802-39cf-4427-8bfb-6e2998090e2f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7436e3f7462c4078ab4286cfeca8765a.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7436e3f7462c4078ab4286cfeca8765a.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000034",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "09a04e6b-68ce-4483-9599-ff0164cc177e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/619e7dc0a40d46f29e99038b29b5562b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/619e7dc0a40d46f29e99038b29b5562b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000035",
+        "stock": 20
+      },
+      {
+        "color": "Verde Colibrí ",
+        "id": "f1898507-5888-4809-a902-b4b584d3c5c9",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/917bdebad903463b844fdc80e129d6a4.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/917bdebad903463b844fdc80e129d6a4.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000036",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "93bef244-498f-4f4b-983d-2de0d454b717",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fca23165729c4b61a77e6e700d2807ee.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fca23165729c4b61a77e6e700d2807ee.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000037",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Detalle de franja colorida, amplio espacio interior sin divisiones para mayor capacidad.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-07T04:25:16.149522+00:00",
+    "description": "Amplio, cómodo y con un detalle distintivo. La franja decorativa rompe con lo tradicional y aporta un estilo vibrante a nuestro querido Bolso Tote. Hecho en yute de primera, es perfecto para compras, playa o uso diario.",
+    "id": "b72ce7be-9fa3-4947-bb33-bb2867e47df5",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute con franja tejida en contraste",
+    "medidas": "42 cm x 34 cm x 16 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Tote Franja Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-tote-franja-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "f0f4350c-cbfc-4a31-9f63-042d49e905b0",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7799ceb323144c27bedbae213bdd72cd.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7799ceb323144c27bedbae213bdd72cd.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000112",
+        "stock": 20
+      },
+      {
+        "color": "Azul Lotería ",
+        "id": "4c2bcdea-9e30-4c6f-b6a1-81757f3e74bf",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c32e84f3a9bc4eaba72b37591b3d7679.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c32e84f3a9bc4eaba72b37591b3d7679.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000113",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaico",
+        "id": "d139f34a-4f2d-4fae-b930-3bc64d28f40d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5f03fe3d19764031b3bfc9ce1e6c00fb.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5f03fe3d19764031b3bfc9ce1e6c00fb.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000114",
+        "stock": 20
+      },
+      {
+        "color": "Naranja Mosaico",
+        "id": "92f80a1a-c616-4ed4-9456-51b26185b41e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4076ea77fa154bddb4b6b06d23ec2940.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4076ea77fa154bddb4b6b06d23ec2940.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000115",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandala",
+        "id": "5efe663f-0e74-4b35-890a-2530b941d075",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/465b1a74aff74c159e191cc372bb2da0.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/465b1a74aff74c159e191cc372bb2da0.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000116",
+        "stock": 20
+      },
+      {
+        "color": "Rojo Floral",
+        "id": "0c32e1ab-9146-40b3-a320-bd7b2324ae87",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3e31e67af16f4d1188ceb82d6ecb7887.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3e31e67af16f4d1188ceb82d6ecb7887.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000117",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "542f027a-c290-4d28-84c2-2219ef71fd1f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/74dbe48a02334cf6bbfe583bc7e36821.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/74dbe48a02334cf6bbfe583bc7e36821.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000118",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "20ecb1c3-17f9-4408-ad2f-49060781039b",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4812e35a31fd42c49ee45b601ad5960e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4812e35a31fd42c49ee45b601ad5960e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000119",
+        "stock": 20
+      },
+      {
+        "color": "Verde Colibrí ",
+        "id": "52be7c1e-6b59-48ee-b718-7fbb8c744109",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5350f61e75e642f99607784a915ac259.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5350f61e75e642f99607784a915ac259.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000120",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "7f0b02e4-88da-4251-80ed-29a0784d9537",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/48be0c28caed42e5aa0bfa877b74eb19.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/48be0c28caed42e5aa0bfa877b74eb19.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000121",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Diseño frontal simulando un cinturón de ajuste, cierre seguro.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-07T04:15:12.802832+00:00",
+    "description": "Un diseño que simula un delicado cinturón cruzado, aportando una estética lujosa y moderna. Combinado con la frescura del yute, este bolso es el equilibrio ideal entre lo casual y lo elegante.",
+    "id": "526898ec-9a80-49d8-a4f3-e6aa57f12eff",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute suave y correa estilo cinturón",
+    "medidas": "32 cm x 24 cm x 11 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Cinturón Elegante Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-cinturon-elegante-artesanal",
+    "subcategory": "",
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "84187218-4601-4a14-a8c0-61315670862d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fbc21a89d3a044f58e752936055927ba.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fbc21a89d3a044f58e752936055927ba.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000102",
+        "stock": 20
+      },
+      {
+        "color": "Azul Lotería ",
+        "id": "d67381fc-3805-40a6-b1e3-9b011424f457",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ad1686109fef491ea68ca75d757a2ba0.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ad1686109fef491ea68ca75d757a2ba0.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000103",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaico",
+        "id": "c5c9caea-3ce0-44b4-a898-e5441f390a4c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9719d0750f1f4852828aec3d9449ea09.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9719d0750f1f4852828aec3d9449ea09.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000104",
+        "stock": 20
+      },
+      {
+        "color": "Cafe Mosaico",
+        "id": "c9afb343-841e-48bb-a06a-a6507865d10d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a4bb58c4adb1435bb6df57df76e1cdb8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a4bb58c4adb1435bb6df57df76e1cdb8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000105",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandala",
+        "id": "11fcd34a-1bf1-4a22-8b41-890bbeb19b04",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e57631cb546b43e781adb35f0569e800.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e57631cb546b43e781adb35f0569e800.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000106",
+        "stock": 20
+      },
+      {
+        "color": "Rojo Floral",
+        "id": "28136be6-283d-4b79-ab29-094637c2e2b5",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c033e438cb174021b6b55a04d64dadd7.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c033e438cb174021b6b55a04d64dadd7.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000107",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "01f4c192-b74b-4500-b976-c06ef1c0a679",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2ed1bf6dcbdb441fb5b772e59f1ff140.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2ed1bf6dcbdb441fb5b772e59f1ff140.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000108",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "fd6d6360-5a35-4ebd-9fa2-211790b56bc1",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6168607bd3064ef7853a9f0435576d40.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6168607bd3064ef7853a9f0435576d40.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000109",
+        "stock": 20
+      },
+      {
+        "color": "Verde Colibrí ",
+        "id": "76c58016-83c9-4bd6-b6f8-760d47a6b097",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d100b8f53b334e758bce8866d661f08e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d100b8f53b334e758bce8866d661f08e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000110",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "e645af6a-8b5e-4def-ab32-13d9cb464e98",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a80ca439ebe649c59b7f212bfe39da3b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a80ca439ebe649c59b7f212bfe39da3b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000111",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Forma geométrica con gran estabilidad, base reforzada.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-07T03:55:04.221905+00:00",
+    "description": "Minimalismo estructurado con un toque tradicional. Su forma geométrica perfecta permite aprovechar al máximo el espacio interior, mientras que el acabado artesanal en yute lo convierte en un accesorio versátil y moderno.",
+    "id": "f033ac57-c86e-43dc-8e29-a7b61eab72a5",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute estructurado",
+    "medidas": "28 cm x 28 cm x 12 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Cuadrado Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-cuadrado-artesanal",
+    "subcategory": "Cuadrado",
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Azul Floral",
+        "id": "973ad8f7-76f9-4d54-98b4-c0e512b01aa1",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6d0c15e06f894add8325056a79c9793e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6d0c15e06f894add8325056a79c9793e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000087",
+        "stock": 20
+      },
+      {
+        "color": "Café Rombos",
+        "id": "327eb5e6-bf55-4ca7-a382-905a73cd5067",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7da8379d49d24e91a36c5949894aaf0f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7da8379d49d24e91a36c5949894aaf0f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000088",
+        "stock": 20
+      },
+      {
+        "color": "Negro Gran Floral",
+        "id": "37885641-0fa0-4788-a070-de1022dbe0e2",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/947de558cd5f4ad091946e793493fbd7.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/947de558cd5f4ad091946e793493fbd7.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000090",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandalas",
+        "id": "a078e85c-3acf-45db-932f-86cafbc3e3ab",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5eca504911a14eb08a2b025be5a8c1f2.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5eca504911a14eb08a2b025be5a8c1f2.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000091",
+        "stock": 20
+      },
+      {
+        "color": "Negro Tenango",
+        "id": "9bf3780d-94a3-41c3-8d1e-ae3e4be16907",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/58ec51bd5ec44df895146b91cad340f8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/58ec51bd5ec44df895146b91cad340f8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000092",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "1227aeb2-47b7-4a87-bc5b-3e6595a3290a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/061b4d0962c5494c8118f0dfc75c376b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/061b4d0962c5494c8118f0dfc75c376b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000093",
+        "stock": 20
+      },
+      {
+        "color": "Negro Corazón ",
+        "id": "924b9763-3bca-47d3-a1b7-b89a3a0804da",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9f6583856ad5486a96feaf03925da4c7.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9f6583856ad5486a96feaf03925da4c7.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000089",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": null,
+    "category": "Porta Celular",
+    "category_id": "381eab56-11de-45b4-a08a-c608fe4cb812",
+    "created_at": "2026-09-09T22:43:57.446066+00:00",
+    "description": "Portacelular ideal para viajes",
+    "id": "5270de30-b7fa-4ddd-8698-8267ed621ad2",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": null,
+    "medidas": null,
+    "medio_min_qty": 6,
+    "name": "Porta Celular Cencillo",
+    "price_medio": 70.0,
+    "price_normal": 70.0,
+    "price_super_wholesale": 50.0,
+    "price_wholesale": 55.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "porta-celular-cencillo",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "LELE",
+        "id": "feca49fb-f4f6-4b50-aad6-edb06bfc936f",
+        "image_url": null,
+        "image_urls": [],
+        "low_stock_threshold": 5,
+        "sku": "286",
+        "stock": 30
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Mezcla de materiales en el diseño frontal, asas dobles.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-07T04:38:48.852262+00:00",
+    "description": "Lo mejor de dos mundos en una sola pieza. Este bolso combina distintas texturas, destacando el yute como protagonista, en un diseño innovador y moderno. ¡Garantiza miradas y ventas rápidas!",
+    "id": "68013b9e-b6ea-4ebd-808a-eac23546123d",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute mezclado con texturas sintéticas",
+    "medidas": "34 cm x 26 cm x 12 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Fusión Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-fusion-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "eef260ad-3d72-4448-88f8-7aae6b7ec787",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1c2740668bbe49deaa0a2d5ba2a1c76c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1c2740668bbe49deaa0a2d5ba2a1c76c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000122",
+        "stock": 20
+      },
+      {
+        "color": "Azul Lotería ",
+        "id": "b458d573-90e8-4278-8ebc-17aef6d2aa6e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3c43b16fabd8429186afabb4cb9b3d78.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3c43b16fabd8429186afabb4cb9b3d78.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000123",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaico",
+        "id": "16cc1fe5-1457-42e1-9f95-89113710afbc",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3162fece94464da8a1033682be613805.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3162fece94464da8a1033682be613805.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000124",
+        "stock": 20
+      },
+      {
+        "color": "Café Mosaico",
+        "id": "e0244ad4-c91c-4a50-88cc-0c18f2b3bb21",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d32e5369048f48bb8aa0a9ab4cebb86d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d32e5369048f48bb8aa0a9ab4cebb86d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000125",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandala",
+        "id": "dbe6208e-8b13-4efa-a7fd-50d2a4fc140e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f705e1fa3faf49c6885ae3c0f0fdf4db.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f705e1fa3faf49c6885ae3c0f0fdf4db.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000126",
+        "stock": 20
+      },
+      {
+        "color": "Rojo Floral",
+        "id": "ec00c956-dba2-4605-bc5e-dd717df72f32",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/839f3a95b58d488dbfaa63b3a376eeb4.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/839f3a95b58d488dbfaa63b3a376eeb4.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000127",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "0e79d36b-f8c3-4562-81e7-4cd100cee6ff",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/99db60ac4e8d4a088e1633cda0cb1761.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/99db60ac4e8d4a088e1633cda0cb1761.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000128",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "d508d87c-4260-4f4b-8951-2edfcb27bfa4",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/48ca81ee577c4be89efc2cba56c63835.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/48ca81ee577c4be89efc2cba56c63835.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000129",
+        "stock": 20
+      },
+      {
+        "color": "Verde Colibrí ",
+        "id": "f98659b2-9047-4b6e-bedd-c80059bd5623",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/97f3521c9e824057848cd2cece3252a8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/97f3521c9e824057848cd2cece3252a8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000130",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "5a55756c-35b8-4daf-bc39-07cab635fb7b",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/280ccd17d18641a697e0de69447f907b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/280ccd17d18641a697e0de69447f907b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000131",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Bolsillo interno con cierre, forro interior de algodón, asas reforzadas.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-05T04:00:54.993882+00:00",
+    "description": "Destaca en cualquier ocasión con este bolso de tamaño medio. Sus hermosos acabados artesanales en yute le dan un toque orgánico y elegante, ofreciendo el tamaño perfecto para llevar tus esenciales del día a día con total comodidad.",
+    "id": "09443e2a-eb5a-4d15-9b98-631ae00c409a",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute natural y detalles en vinipiel",
+    "medidas": "32 cm x 24 cm x 12 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Media Vista Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-media-vista-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "f9dcc8a3-c95d-460c-94ad-071de56bed6e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6ad4159a65d5466e86cc1aac24219005.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6ad4159a65d5466e86cc1aac24219005.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000018",
+        "stock": 20
+      },
+      {
+        "color": "Azul Lotería ",
+        "id": "358dc396-02b0-4c73-9d7f-4d2b3173a460",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3251e9cd8b4e4f5cb5e5254ac012f37f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3251e9cd8b4e4f5cb5e5254ac012f37f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000019",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaicos",
+        "id": "f0ffbb18-bcd8-46c3-95f3-53f094d6d4d0",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f8c4e22e49994ae38e9990cd9b724092.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f8c4e22e49994ae38e9990cd9b724092.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000020",
+        "stock": 20
+      },
+      {
+        "color": "Café Mosaicos",
+        "id": "4016913d-3914-4325-98a3-810e7f542b07",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4180da5582e14f1590c1e9f46dea9c55.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4180da5582e14f1590c1e9f46dea9c55.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000021",
+        "stock": 20
+      },
+      {
+        "color": "Coral Floral",
+        "id": "8d012094-38fa-4d5f-bcc3-23910d114eb2",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0a92155d40874b2782b508831395246e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0a92155d40874b2782b508831395246e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000022",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandalas",
+        "id": "aa89191e-dada-414a-9131-c97753217706",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/60912f85e26a451bbd5f6efafa9cdca0.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/60912f85e26a451bbd5f6efafa9cdca0.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000023",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "f3dcee6c-2f7a-49be-b10a-a97e85e3404f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b1bbccb1b00646898dcd4e7aa672681e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b1bbccb1b00646898dcd4e7aa672681e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000024",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "be8450c9-6f7f-4808-9789-cfd217ba3e4c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e7918aa732194f348699ad3d322b4ce6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e7918aa732194f348699ad3d322b4ce6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000025",
+        "stock": 20
+      },
+      {
+        "color": "Verde Colibrí ",
+        "id": "863b8ae7-3999-4e11-80da-663d2590e001",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/461c5260147041b9a668435e5a291b56.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/461c5260147041b9a668435e5a291b56.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000026",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "a409136d-106e-488d-9517-df99fddef40e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/df0e779f013b486a80d47dec1953a750.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/df0e779f013b486a80d47dec1953a750.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000027",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Correa de cadena metálica, cierre magnético frontal.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-07T06:51:22.719082+00:00",
+    "description": "Un toque rebelde y moderno. Este bolso destaca por su llamativa correa de cadena, contrastando maravillosamente con estampados coloridos y divertidos. Un accesorio juvenil, perfecto para salir de noche o destacar en el día.",
+    "id": "d2d3bc01-cb56-499f-b7c3-afd5a0b2eabb",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Poliéster y cadena metálica",
+    "medidas": "28 cm x 20 cm x 8 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Cadena Animado",
+    "price_medio": 175.0,
+    "price_normal": 185.0,
+    "price_super_wholesale": 150.0,
+    "price_wholesale": 165.0,
+    "print_type": "ANIMADO",
+    "sale_price": null,
+    "slug": "bolso-cadena-animado",
+    "subcategory": "",
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Rosa Mexicano Dumbo",
+        "id": "8e71d351-84a2-4975-b803-878aa9c7b435",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/41e7aec3bae0474883bbbe6a1ade1d28.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/41e7aec3bae0474883bbbe6a1ade1d28.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000163",
+        "stock": 10
+      },
+      {
+        "color": "Morado Stitch",
+        "id": "a473ba51-da81-4d81-91dc-62d4a0485dc6",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1c00d0bddaf44752b5bf66575d181a3e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1c00d0bddaf44752b5bf66575d181a3e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000164",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Igor",
+        "id": "720d2c1e-c422-4667-89c8-6215652390d8",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b060255274794764b172a4e7ae727e9c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b060255274794764b172a4e7ae727e9c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000165",
+        "stock": 10
+      },
+      {
+        "color": "Azul Cielo Igor",
+        "id": "76726c72-d707-4a9d-9b3e-2c515f4ab85f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/684da30134984f5598f9196b6c0409d5.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/684da30134984f5598f9196b6c0409d5.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000166",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Igor",
+        "id": "131da5af-c87f-46ea-98d6-bc4bd6365efb",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3261b4391c5c4e17baff6be798c60f56.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3261b4391c5c4e17baff6be798c60f56.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000167",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Stitch ",
+        "id": "9e33a039-7c52-4a9d-8627-0c06083ef197",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e21abed30c4f4f2f9ac5b74f2ed0c4ef.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e21abed30c4f4f2f9ac5b74f2ed0c4ef.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000168",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy con Lentes",
+        "id": "79db0f76-c3ae-4f86-a58f-7ec68989295c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ec02c090170c457487cba9e3082f9a10.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ec02c090170c457487cba9e3082f9a10.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000169",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Snoopy Corazón ",
+        "id": "5eca2b69-a3b2-443b-a621-2d12139be262",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3f90eca9e9cc41fc985b4da1cfd3129e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3f90eca9e9cc41fc985b4da1cfd3129e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000170",
+        "stock": 10
+      },
+      {
+        "color": "Negro Betty Boop",
+        "id": "ac3de082-27cf-4519-9260-4da3115726d2",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/63469bef895649a1b630312b8b1662ff.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/63469bef895649a1b630312b8b1662ff.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000171",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Blanca Nieves",
+        "id": "8392e52d-5de3-40d2-bfe2-3ded70688736",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/eb277ccc54df415894162af243be8198.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/eb277ccc54df415894162af243be8198.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000172",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Marie",
+        "id": "8913a6f9-8908-4714-9b03-58203ff83a80",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bf14cb99eb2e4c068ddbcb8a7bb2e38a.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bf14cb99eb2e4c068ddbcb8a7bb2e38a.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000173",
+        "stock": 10
+      },
+      {
+        "color": "Negro Harry Potter",
+        "id": "d33623ec-756e-465a-b06d-f96be20a7a97",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0e6c7d1ab0a4447b87c837edced962ce.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0e6c7d1ab0a4447b87c837edced962ce.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000174",
+        "stock": 10
+      },
+      {
+        "color": "Negro Stitch",
+        "id": "c013ff32-cb69-4756-8887-109da58cc2e4",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0ddb14318468405aaadde2a5dd1c2167.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0ddb14318468405aaadde2a5dd1c2167.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000175",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Marie",
+        "id": "1749616f-3b47-4276-a642-15c43a32fe40",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/11e1fb45e549409db660c36f93992ad4.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/11e1fb45e549409db660c36f93992ad4.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000176",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Patricio",
+        "id": "8c5171fd-4dde-4935-a449-b9cabe964e78",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2d48f27efc18478ba80884b16c434b8b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2d48f27efc18478ba80884b16c434b8b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000177",
+        "stock": 10
+      },
+      {
+        "color": "Azul Stitch",
+        "id": "0b6cc1bd-a2d2-427d-99a8-8beb131c97d7",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ed6c2c5a68514155962fa562adaa2493.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ed6c2c5a68514155962fa562adaa2493.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000178",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Bob Sponja",
+        "id": "8b493d4c-67c7-4ec2-aea6-6e107cb3f78f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/945574642d1747fabfa9eb95bffb73c0.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/945574642d1747fabfa9eb95bffb73c0.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000179",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Betty Boop",
+        "id": "c7a07664-3b25-487c-9489-9cccb554312f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/eaf6ec102d2c45099b8d6bc3f943cdd3.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/eaf6ec102d2c45099b8d6bc3f943cdd3.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000180",
+        "stock": 10
+      },
+      {
+        "color": "Morado Ursula",
+        "id": "8514e383-84b1-4e70-8cda-636a2ec24984",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3af4b1b5403a423da45d470928268791.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3af4b1b5403a423da45d470928268791.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000181",
+        "stock": 10
+      },
+      {
+        "color": "Morado Stitch",
+        "id": "0b3d3dbb-114c-46d7-b20c-9f32017ad11e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/915654c07a9e4c42826e325ea491b507.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/915654c07a9e4c42826e325ea491b507.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000182",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Snoopy Pareja",
+        "id": "678899af-6c79-4776-a4a6-e49f771354b8",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1259dc31d51445a2ba0be2decddfb282.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1259dc31d51445a2ba0be2decddfb282.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000183",
+        "stock": 10
+      },
+      {
+        "color": "Negro Cadáver de la Novia",
+        "id": "fdd377ee-4da2-442b-a27b-e27b4d93cfd6",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/49e0e6fc65cf49578f2e780938f1ebd5.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/49e0e6fc65cf49578f2e780938f1ebd5.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000184",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Coraline",
+        "id": "54896c72-ba1a-4ef5-bace-61dcaeaba5b3",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bbd9fba0b5d74b2d941dabcc1c4947d2.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bbd9fba0b5d74b2d941dabcc1c4947d2.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000185",
+        "stock": 10
+      },
+      {
+        "color": "Negro Harry Potter",
+        "id": "6439e80a-dcc1-4166-9336-6f8e54748095",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/12595a4441c5442d9ff24ccf9b25dc45.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/12595a4441c5442d9ff24ccf9b25dc45.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000186",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy",
+        "id": "688b0adf-f3b0-49cd-a13f-d6a83563a62c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1b7e37c5195a46b68b2a9ef46bf0f303.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1b7e37c5195a46b68b2a9ef46bf0f303.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000187",
+        "stock": 10
+      },
+      {
+        "color": "Negro Ursula",
+        "id": "8b3f6d6e-3c1b-4c21-96bf-ba67980bc14b",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9ebe725d353e417f94e4c4996ad0f79b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9ebe725d353e417f94e4c4996ad0f79b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000188",
+        "stock": 10
+      },
+      {
+        "color": "Negro Blanca Nieve ",
+        "id": "fe12c3f1-0d3d-4bd3-83b7-427090b48084",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1781b0c48a3d4e52ab9adf97baf1f161.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1781b0c48a3d4e52ab9adf97baf1f161.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000189",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Bella",
+        "id": "5901326b-5924-4bd0-986b-9537a64002c7",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ea5b140f7f8849e1ace1453e0c57ae3f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ea5b140f7f8849e1ace1453e0c57ae3f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000190",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy Pareja",
+        "id": "83a85d8d-62ab-495b-bf99-ad8d6788e265",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d48a890207e047649fe56931e5191ccd.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d48a890207e047649fe56931e5191ccd.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000191",
+        "stock": 10
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Formato estructurado rígido para proteger el contenido, apertura amplia de cierre.",
+    "category": "Mochilas",
+    "category_id": "ab66c8c9-c3c0-458a-ae41-1d38fff463e3",
+    "created_at": "2026-09-07T07:15:34.280452+00:00",
+    "description": "Diseño estructurado y seguro. La Mochila Cofre mantiene su forma rígida protegiendo tus pertenencias, mientras deslumbra con sus increíbles estampados animados. Ideal para paseos largos y máxima durabilidad.",
+    "id": "c5be428c-c653-4af5-bdac-a12731db28dd",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Poliéster rígido (estructura cofre)",
+    "medidas": "35 cm x 25 cm x 15 cm",
+    "medio_min_qty": 6,
+    "name": "Mochila Cofre Animada",
+    "price_medio": 165.0,
+    "price_normal": 180.0,
+    "price_super_wholesale": 145.0,
+    "price_wholesale": 150.0,
+    "print_type": "ANIMADO",
+    "sale_price": null,
+    "slug": "mochila-cofre-animada",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Rosa Melody",
+        "id": "913da54a-84ee-4413-90af-2e8364fcdce2",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d415035aa6f94661a39bb96df7435f43.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d415035aa6f94661a39bb96df7435f43.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000192",
+        "stock": 10
+      },
+      {
+        "color": "Morado Stitch",
+        "id": "6f22e204-88fa-4938-af99-805d336f70f8",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b3690afe952945a1a4068a60c44a5da4.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b3690afe952945a1a4068a60c44a5da4.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000193",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Kitty",
+        "id": "4d871af3-90f9-4536-ac6f-175ddc7af26b",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9dce8b7e1e974660b2b1baa5b7268bc4.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9dce8b7e1e974660b2b1baa5b7268bc4.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000194",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Chicas Super Poderosas",
+        "id": "7f469b80-f4b9-4073-a3f7-044f3854bbdd",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1829595de62a4eb1b818ef576050ef30.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1829595de62a4eb1b818ef576050ef30.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000195",
+        "stock": 10
+      },
+      {
+        "color": "Azul Cielo Cinnamoroll",
+        "id": "d5704524-432d-44d5-b620-6f1f3dbb9b9d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/dc88c8ec6a6c4b63982ec29f26ec9008.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/dc88c8ec6a6c4b63982ec29f26ec9008.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000196",
+        "stock": 10
+      },
+      {
+        "color": "Negro Stitch",
+        "id": "fee8f0c8-c3a0-4bcd-b567-6c1740c4ea16",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/27b9482de2684327850242fbbb339275.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/27b9482de2684327850242fbbb339275.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000197",
+        "stock": 10
+      },
+      {
+        "color": "Azul Stitch",
+        "id": "7bf8d4b4-76a3-4671-a3d4-e1b8352d30f2",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1a17e2f5cb074481becaeecf3f137533.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1a17e2f5cb074481becaeecf3f137533.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000198",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Bob Sponja",
+        "id": "c42f0ba3-b22e-4711-8f29-f7800f906b8d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9383ae4955274f9189658a72cabaf802.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9383ae4955274f9189658a72cabaf802.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000199",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Kitty",
+        "id": "0a45e9ae-c4dc-42f9-b84b-4309917b8cca",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/db0fa7a8045342baa8f2329cbfc5425a.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/db0fa7a8045342baa8f2329cbfc5425a.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000200",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Stitch",
+        "id": "ae7cfef2-d651-4442-9e04-2f9b47d8531c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/008f5fdc3cba4ba6a4f1c260fac87c19.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/008f5fdc3cba4ba6a4f1c260fac87c19.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000201",
+        "stock": 10
+      },
+      {
+        "color": "Morado Stitch",
+        "id": "1afede72-28f9-4846-987c-d5eb4f73f714",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/789fc9fad46b491c95068dfa1fb8134a.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/789fc9fad46b491c95068dfa1fb8134a.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000202",
+        "stock": 10
+      },
+      {
+        "color": "Morado Kitty",
+        "id": "9a85a3c4-ccff-4420-bd4f-ec0ae049f83c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/31df69a8fe644c14a238f532edd72c65.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/31df69a8fe644c14a238f532edd72c65.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000203",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Stitch",
+        "id": "f0e195b2-d4c7-4214-9f26-b5a67916efb1",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2bb4481bbb924ed98e6d6696ff321e38.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2bb4481bbb924ed98e6d6696ff321e38.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000204",
+        "stock": 10
+      },
+      {
+        "color": "Negro Minnie",
+        "id": "f545571b-1714-4c3a-860b-db72176885d0",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9b95054ab0f14f178070863288e5219c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9b95054ab0f14f178070863288e5219c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000205",
+        "stock": 10
+      },
+      {
+        "color": "Negro Kuromi",
+        "id": "4e38a3ec-b59b-4b71-b7dc-2f692c7648c5",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3ee93f2023414c13be30d81daec11181.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3ee93f2023414c13be30d81daec11181.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000206",
+        "stock": 10
+      },
+      {
+        "color": "Negro Coraline",
+        "id": "706e6178-e98a-4aa1-be92-580ca958e73c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/aa25ea91bb014b81b352adc4278d3028.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/aa25ea91bb014b81b352adc4278d3028.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000207",
+        "stock": 10
+      },
+      {
+        "color": "Negro Harry Potter",
+        "id": "b48030c3-3b6b-4629-89dd-77c0d2357e2a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c2eb86b2ab9b4f698269afd78efc52eb.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c2eb86b2ab9b4f698269afd78efc52eb.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000208",
+        "stock": 10
+      },
+      {
+        "color": "Negro Cadáver de la Novia",
+        "id": "9f1ebeec-f21f-4623-a60d-5c31e16d271a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4ae2424402b64ce1813dc875779721f5.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4ae2424402b64ce1813dc875779721f5.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000209",
+        "stock": 10
+      },
+      {
+        "color": "Negro Mickey",
+        "id": "900305f0-a9ec-4f96-8e80-9f7341c8df39",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/86d4501504bb4f4f98602e1cbf1109c0.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/86d4501504bb4f4f98602e1cbf1109c0.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000210",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy",
+        "id": "e55e88d3-151f-419c-a1ed-137dd0eefd6f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c319243f5e384d01af71f012cf6f5359.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c319243f5e384d01af71f012cf6f5359.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000211",
+        "stock": 10
+      },
+      {
+        "color": "Negro Snoopy",
+        "id": "8c6a1b0c-e3a0-4937-bb1c-d5ce37b21e68",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/da9eb62abedc4e719b34a9bdd985f75f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/da9eb62abedc4e719b34a9bdd985f75f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000212",
+        "stock": 10
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Cierre con broche metálico frontal, correa de hombro ajustable y bolsillo trasero.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-05T04:26:30.992059+00:00",
+    "description": "La fusión perfecta entre seguridad y elegancia rústica. Destaca por su hermoso broche frontal y su resistente confección en yute. Ideal para clientas que buscan un bolso distintivo, seguro y lleno de personalidad.",
+    "id": "45c8a19e-263d-40bf-a403-b60f20d6041e",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute fino y acabados metálicos",
+    "medidas": "28 cm x 20 cm x 10 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Broche Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-broche-artesanal",
+    "subcategory": "",
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "69fbefd7-7d03-4e26-b141-ebade495970e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/87157338bf09455cb04d3eea2dd41408.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/87157338bf09455cb04d3eea2dd41408.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000038",
+        "stock": 19
+      },
+      {
+        "color": "Azul Mosaicos",
+        "id": "51810326-2bca-4735-938f-d8fdd61d91a8",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4f2144810ee7402ba142e0c9a0f7ddab.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4f2144810ee7402ba142e0c9a0f7ddab.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000040",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "91c2c3a1-f94f-447e-a2e4-7f93ddd5ba63",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d6df69c8887641228c0aabc0af43a310.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d6df69c8887641228c0aabc0af43a310.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000048",
+        "stock": 13
+      },
+      {
+        "color": "Verde Colibrí ",
+        "id": "7876da6d-adf1-4a7e-a8ab-52d522361695",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/242721664f15450988d4e615d0f4ae7f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/242721664f15450988d4e615d0f4ae7f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000047",
+        "stock": 14
+      },
+      {
+        "color": "Azul Lotería ",
+        "id": "5587c951-f895-4538-9338-538e2ebf825e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/23d55f686c064fa4acf0b04733652bc9.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/23d55f686c064fa4acf0b04733652bc9.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000039",
+        "stock": 18
+      },
+      {
+        "color": "Negro Corazón ",
+        "id": "4bbf4a58-8f08-41a1-90a2-1bb517aff6ed",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ef3bebd399b0448c8454603df9b6511e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ef3bebd399b0448c8454603df9b6511e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000043",
+        "stock": 18
+      },
+      {
+        "color": "Cafe Tenango",
+        "id": "ee3b915d-5284-44ec-87e1-cb834deecc3b",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a616fd0f0b294430aaa5bd361d5db748.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a616fd0f0b294430aaa5bd361d5db748.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000041",
+        "stock": 20
+      },
+      {
+        "color": "Guinda Mosaicos",
+        "id": "d479c022-3c14-4bb5-bb9b-bc290b67487b",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/722a7cc8b68d413fbf2587ebdaba2ed6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/722a7cc8b68d413fbf2587ebdaba2ed6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000042",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandalas",
+        "id": "25ae6546-b09e-480b-89e9-e3ca3103f06f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/636c03b7f96a4199835c20e3b691cd6f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/636c03b7f96a4199835c20e3b691cd6f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000044",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "73187e8e-cfaf-430b-bff1-128604730a69",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/90051f45065a4314adaa60defa225f8b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/90051f45065a4314adaa60defa225f8b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000045",
+        "stock": 20
+      },
+      {
+        "color": "Salmon Floral",
+        "id": "572a95dc-c684-4de8-b06f-a275525d484c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bf0afb01cfb44dc6b787740d31419237.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bf0afb01cfb44dc6b787740d31419237.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000046",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Mochila con múltiples compartimentos + Cartuchera a juego.",
+    "category": "Mochilas",
+    "category_id": "ab66c8c9-c3c0-458a-ae41-1d38fff463e3",
+    "created_at": "2026-09-07T08:21:39.241644+00:00",
+    "description": "¡El combo perfecto para la escuela! Esta mochila no solo ofrece un diseño espectacular y colorido, sino que incluye una cartuchera a juego, maximizando el valor para el cliente. Amplia, resistente y llena de personalidad.",
+    "id": "2a94488d-1154-4675-ac4c-1134cde3251a",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Poliéster de alta durabilidad",
+    "medidas": "Mochila: 40 cm x 29 cm x 14 cm | Cartuchera: 22 cm x 10 cm x 5 cm",
+    "medio_min_qty": 6,
+    "name": "Mochila con Cartuchera Animada",
+    "price_medio": 165.0,
+    "price_normal": 180.0,
+    "price_super_wholesale": 145.0,
+    "price_wholesale": 150.0,
+    "print_type": "ANIMADO",
+    "sale_price": null,
+    "slug": "mochila-con-cartuchera-animada",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Negro Harry Potter",
+        "id": "cd21115c-bac2-4be4-84f8-3ab25826ee70",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e9387674eeaf46238ec2bd14a8a5088f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e9387674eeaf46238ec2bd14a8a5088f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000250",
+        "stock": 10
+      },
+      {
+        "color": "Morado Stitch",
+        "id": "4988cdad-0904-425f-bf43-39849aae033e",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0aa8e110cbb144a881a51e170bf09b27.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0aa8e110cbb144a881a51e170bf09b27.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000251",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Betty Boop",
+        "id": "e722f113-a8f7-4f35-bc49-f83c1b4ccda4",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/17a30260f4bf4376ba145ceecd473add.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/17a30260f4bf4376ba145ceecd473add.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000252",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Coraline",
+        "id": "aa235eaa-a7f6-488f-96e7-5dbfb61ca8a9",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fa9f348ad27d483596ca3d7e8c8ef324.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fa9f348ad27d483596ca3d7e8c8ef324.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000253",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Bob Sponja",
+        "id": "2a185735-d9cd-4bde-9299-901fa44fafb1",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/79e031d11355480dbd6ec343e8bb9934.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/79e031d11355480dbd6ec343e8bb9934.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000254",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Mickey Mouse",
+        "id": "45709fa6-8a91-432d-93f1-040d240fd856",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0fdfde18a596431f855cc4af6d77194b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0fdfde18a596431f855cc4af6d77194b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000255",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Snoopy",
+        "id": "a59ca70b-89d1-43c3-b780-eba8a58f50d3",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5570359bdfca42b2a30a5830dd824e93.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5570359bdfca42b2a30a5830dd824e93.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000256",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Marie",
+        "id": "394557bc-8531-4949-a329-f8969d04b4ba",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fa526099a6bf4f57ba6e55576ccb98ca.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fa526099a6bf4f57ba6e55576ccb98ca.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000257",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Kitty",
+        "id": "f76ee181-5ada-406a-aed1-471a01cc25a6",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5779e9af88be4409902326a8ccef2989.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/5779e9af88be4409902326a8ccef2989.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000258",
+        "stock": 10
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": null,
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-07T04:02:00.808636+00:00",
+    "description": "Detalles que enamoran. Las delicadas trenzas tejidas en su diseño le otorgan a este bolso un carácter único y bohemio. Fabricado con yute resistente, es una pieza llamativa, espaciosa y perfecta para armar looks inolvidables.",
+    "id": "5af000d6-3fc7-4c56-82e7-a4d4a8d0f7ed",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": null,
+    "medidas": null,
+    "medio_min_qty": 6,
+    "name": "Bolso Trenzas Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-trenzas-artesanal",
+    "subcategory": "",
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Azul Mosaico",
+        "id": "83ecbadf-54c2-4090-8213-084c642d9f88",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/8e4850f66e784f0b9e659fe56e3320b5.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/8e4850f66e784f0b9e659fe56e3320b5.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000094",
+        "stock": 20
+      },
+      {
+        "color": "Blanco Colibrí ",
+        "id": "1b8f7f7a-d371-4a6a-837f-760176c65a52",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e31ac6ad6fcd4ca88fce10e89f20a72e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e31ac6ad6fcd4ca88fce10e89f20a72e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000095",
+        "stock": 20
+      },
+      {
+        "color": "Café Mosaico",
+        "id": "75ebf75a-467e-48c8-bcfc-6b8f9236b08d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/27fef7577213434a9e3b01ca611a41b9.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/27fef7577213434a9e3b01ca611a41b9.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000096",
+        "stock": 20
+      },
+      {
+        "color": "Café Rombo",
+        "id": "02ba3b9f-d80b-4d65-b0c7-27ea22a31287",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f9995c08210e4dd69aa7325a886e929c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f9995c08210e4dd69aa7325a886e929c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000097",
+        "stock": 20
+      },
+      {
+        "color": "Guinda Rombo",
+        "id": "a3652bed-cf8e-455b-b17b-84687d193b11",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/674a98176d9a4cc2902b033332e6dacf.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/674a98176d9a4cc2902b033332e6dacf.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000098",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandalas",
+        "id": "90ada896-45e6-4ed1-9a86-0760d0644f35",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/424e5b4a5c8e48f38b656f1ea1c6806b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/424e5b4a5c8e48f38b656f1ea1c6806b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000099",
+        "stock": 20
+      },
+      {
+        "color": "Negro Tenango",
+        "id": "9e32f768-b361-4fde-b930-b3be89c9087d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c5132a5b4351424c9ec0ee442bc5a885.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c5132a5b4351424c9ec0ee442bc5a885.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000100",
+        "stock": 20
+      },
+      {
+        "color": "Blanco Tenango",
+        "id": "c7f6d6c6-87af-4929-8a49-be62ee620d8f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e61f76e561cf47778dcc6d357da167d8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e61f76e561cf47778dcc6d357da167d8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000101",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Dos compartimentos principales separados por cierre, bolsillo interior y correa ajustable.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-07T03:22:02.975881+00:00",
+    "description": "Diseñado para quienes buscan máxima organización y estilo. Este maletín cuenta con compartimentos dobles que facilitan llevar de todo. Sus detalles en yute y acabados artesanales lo convierten en una opción sofisticada y sumamente práctica.",
+    "id": "e4e516cd-b642-447b-85d4-41dcc89f00ca",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute entrelazado con refuerzos de estructura",
+    "medidas": "38 cm x 28 cm x 16 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Maletin Doble Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-maletin-doble-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Azul Floral",
+        "id": "e77d3bb7-6a8b-4fd0-bb0f-a13ddb92efa4",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/156bfc1611574f318f75970cbaea40fc.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/156bfc1611574f318f75970cbaea40fc.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000071",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaico",
+        "id": "9a70a5a5-b0e2-4ed9-97cb-122f18977753",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d0083bf41c414eb097890287a560d58b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d0083bf41c414eb097890287a560d58b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000072",
+        "stock": 20
+      },
+      {
+        "color": "Negro Gran Floral",
+        "id": "f5a24ae0-7741-40a9-8982-97406f775ea5",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2d008b0d74c340a09bd5e970735dc37a.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2d008b0d74c340a09bd5e970735dc37a.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000073",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandalas",
+        "id": "46cce7e9-f29e-4b7c-b3dd-0e7062bd3a40",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/8852c4f74b964a8c9c5eb3864e7b1953.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/8852c4f74b964a8c9c5eb3864e7b1953.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000074",
+        "stock": 20
+      },
+      {
+        "color": "Negro Tenango",
+        "id": "65e277d1-688a-43f1-a14a-0738817b3156",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4a53c46161324f2f84a6011828c16fa4.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4a53c46161324f2f84a6011828c16fa4.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000075",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "fcca938f-a75f-4d89-a34f-4e025e480f67",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0a6c3733622a47ee82d46e4dd405f2ce.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0a6c3733622a47ee82d46e4dd405f2ce.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000076",
+        "stock": 20
+      },
+      {
+        "color": "Amarillo Floral",
+        "id": "82ec5488-972a-4351-93a5-d1d4205029a1",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/15a9f97e442e4ba582e861b35ab536c6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/15a9f97e442e4ba582e861b35ab536c6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000070",
+        "stock": 15
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Set de 3 piezas: Mochila, lonchera térmica y lapicera. Diseños coordinados.",
+    "category": "Tri Combo",
+    "category_id": "380efc1a-d0a8-4d87-b5ee-8e24e50a0937",
+    "created_at": "2026-09-07T08:42:59.776529+00:00",
+    "description": "El set definitivo para viajar o salir con estilo. Este tricombo animado incluye todo lo necesario para mantener tus pertenencias organizadas con diseños modernos y llenos de color. Su calidad y precio lo convierten en uno de los favoritos de nuestros clientes mayoristas.",
+    "id": "1fafbb75-442b-473c-8c8f-95a81e62cfe2",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Lona repelente al agua",
+    "medidas": "Mochila principal: 42 cm x 30 cm | Lonchera: 25 cm x 20 cm | Lapicera: 22 cm x 10 cm",
+    "medio_min_qty": 6,
+    "name": "Tricombo Viaje Ligero Animado",
+    "price_medio": 185.0,
+    "price_normal": 195.0,
+    "price_super_wholesale": 165.0,
+    "price_wholesale": 175.0,
+    "print_type": "ANIMADO",
+    "sale_price": null,
+    "slug": "tricombo-viaje-ligero-animado",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Negro Harry Potter",
+        "id": "17a3bff2-681c-46d3-8030-22c34ab106f1",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0d832305f5f246d7aeb234f3c452b309.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0d832305f5f246d7aeb234f3c452b309.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000259",
+        "stock": 10
+      },
+      {
+        "color": "Morado Stitch",
+        "id": "181cd423-be4c-4428-849c-676a2ffa0b6b",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3caf0f5066e748c0a246ec58043d1f52.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3caf0f5066e748c0a246ec58043d1f52.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000260",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Betty Boop",
+        "id": "6189bd17-7d1b-4c0b-82c0-b766f256216b",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4c3d06539d5d4714903c831a6a3abd5b.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4c3d06539d5d4714903c831a6a3abd5b.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000261",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Coraline",
+        "id": "d3ddfd90-d8db-469e-ba5d-991d52d71c8d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e282b1f4e1ab4367b3cc8f93d31916d6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e282b1f4e1ab4367b3cc8f93d31916d6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000262",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Bob Sponja",
+        "id": "73870c5b-6f75-4730-a181-a57a123855b9",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b9943c6fc58c4766aedba171346f079d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b9943c6fc58c4766aedba171346f079d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000263",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Mickey Mouse",
+        "id": "186799d9-e790-41cb-ab05-d9582fe2dbb0",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/045ec5ef09ee4b00a936453c20e850a0.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/045ec5ef09ee4b00a936453c20e850a0.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000264",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Mexicano Snoopy",
+        "id": "4330e1bb-89ec-4b4a-9d3b-aae38563677d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1ac7b9ecbefa4363bc374135bf279a03.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1ac7b9ecbefa4363bc374135bf279a03.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000265",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Miner",
+        "id": "76b83a13-32d2-4810-baf3-e29cb9f7d21a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2d95d7d62c8449e597c69ebd2272a734.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2d95d7d62c8449e597c69ebd2272a734.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000266",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Kitty",
+        "id": "e0f7f123-6849-4e69-aab0-0421be641e14",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fa49d9ed29ea4871b78b5addf7d8ccd8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/fa49d9ed29ea4871b78b5addf7d8ccd8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000267",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy",
+        "id": "72be50a3-f5b1-4f3a-a1d9-30814f1b1afa",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2d0aa8e8931e4a49aee7f6e7f32aa212.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2d0aa8e8931e4a49aee7f6e7f32aa212.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000268",
+        "stock": 10
+      },
+      {
+        "color": "Negro Jack",
+        "id": "6c6d840f-8233-4f4a-b3f9-94254e86b24d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/90291f04bc49498e9ef806b6d697d962.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/90291f04bc49498e9ef806b6d697d962.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000269",
+        "stock": 10
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Paneles transparentes con estructura artesanal en los bordes. Ideal para eventos.",
+    "category": "Tri Combo",
+    "category_id": "380efc1a-d0a8-4d87-b5ee-8e24e50a0937",
+    "created_at": "2026-09-07T04:45:44.297239+00:00",
+    "description": "La tendencia de lo transparente se encuentra con lo artesanal. Incluye detalles únicos que enmarcan la zona transparente, dándole un toque chic y moderno. Ideal para eventos, conciertos o salidas casuales.",
+    "id": "227961fb-3f5d-423d-bed5-cd8be88ceb82",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "PVC transparente de alta resistencia y ribetes de yute",
+    "medidas": "30 cm x 22 cm x 10 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Transparente Artesanal",
+    "price_medio": 185.0,
+    "price_normal": 195.0,
+    "price_super_wholesale": 165.0,
+    "price_wholesale": 175.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-transparente-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Amarillo Floral",
+        "id": "519bbff8-4fda-4557-bf16-542b518571e4",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4c8e833408374a7eb48d66323cebbb1d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4c8e833408374a7eb48d66323cebbb1d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000132",
+        "stock": 20
+      },
+      {
+        "color": "Azul Lotería ",
+        "id": "9007b64b-3188-4c9b-bfd4-aa4b4bbaa661",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/be936ff717d2477c8554d75c57f2adff.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/be936ff717d2477c8554d75c57f2adff.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000133",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaicos",
+        "id": "b0381994-f7a5-4eb1-b656-8aeb0fbb74fb",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a45fbbfa37b44b769e5838cafed35232.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a45fbbfa37b44b769e5838cafed35232.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000134",
+        "stock": 20
+      },
+      {
+        "color": "Coral Floral",
+        "id": "372fff6f-8408-4cd8-bfb1-223a64f8e100",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/981179b0eb064913959eb7c90ea0ff77.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/981179b0eb064913959eb7c90ea0ff77.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000135",
+        "stock": 20
+      },
+      {
+        "color": "Guinda Mosaico",
+        "id": "91385b79-e09f-4188-a342-30e11a8d2492",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/953f6271178449379c97509648da74b2.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/953f6271178449379c97509648da74b2.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000136",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "d8bf1d62-9a3b-4050-8a9c-de7c09ed8952",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/92030639f7554f20808fb08a0b3ffb9f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/92030639f7554f20808fb08a0b3ffb9f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000137",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Tenango",
+        "id": "7589416a-fcbc-4f77-bc7c-b83dfc20e2bc",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2e73ac968f884bc3862630bbd39eacd7.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2e73ac968f884bc3862630bbd39eacd7.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000138",
+        "stock": 20
+      },
+      {
+        "color": "Verde Colibrí ",
+        "id": "b85110dc-1de2-4a6e-a235-39f2a1d71658",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/15f9df3566884134bf746bc4a3077079.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/15f9df3566884134bf746bc4a3077079.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000139",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "3be8bbd2-6057-4541-b274-dd127bc58b79",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a69c92103d2b4fae82c0c76e3f624800.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a69c92103d2b4fae82c0c76e3f624800.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000140",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Mochila escolar, lonchera con interior térmico y lapicera doble cierre.",
+    "category": "Tri Combo",
+    "category_id": "380efc1a-d0a8-4d87-b5ee-8e24e50a0937",
+    "created_at": "2026-09-07T09:00:30.931977+00:00",
+    "description": "Prepárate para las clases con el mejor estilo. Este espectacular tricombo escolar incluye mochila, lonchera y lapicera con estampados animados a juego. Fabricado con materiales de alta resistencia, es un producto ganador para cualquier temporada escolar.",
+    "id": "aa11a79e-2802-49b5-b3bd-9cc123641055",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Poliéster ultra resistente",
+    "medidas": "Mochila: 41 cm x 30 cm | Lonchera térmica: 24 cm x 21 cm | Lapicera: 23 cm x 11 cm",
+    "medio_min_qty": 6,
+    "name": "Tricombo Escolar Animado",
+    "price_medio": 185.0,
+    "price_normal": 195.0,
+    "price_super_wholesale": 165.0,
+    "price_wholesale": 175.0,
+    "print_type": "ANIMADO",
+    "sale_price": null,
+    "slug": "tricombo-escolar-animado",
+    "subcategory": "",
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Rosa Miner",
+        "id": "d656b96b-8b49-4494-8fb5-0f965c484e72",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ad47a421a7c348d1af97fd164d188bef.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ad47a421a7c348d1af97fd164d188bef.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000270",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Betty Boop",
+        "id": "a20ab69e-3249-46ac-90d1-a6f1bd5b6bef",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4f0fe242a2cd432b95510caff9da20af.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4f0fe242a2cd432b95510caff9da20af.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000271",
+        "stock": 10
+      },
+      {
+        "color": "Morado Coraline",
+        "id": "497e7a4d-b29c-4f65-9de0-b3c954c3a893",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c4f5f133f10b49cab495c1c9b9aa9387.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/c4f5f133f10b49cab495c1c9b9aa9387.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000272",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Chicas Super Poderosas",
+        "id": "0e3d17bf-44d6-4e61-96be-b66ff4811cac",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/259722e22cb3465f90d47c12447d8833.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/259722e22cb3465f90d47c12447d8833.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000273",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Betty Boop",
+        "id": "5a98ca10-23d2-498a-aa24-feb647049f53",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4490148700664881aa14dd7453fab892.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4490148700664881aa14dd7453fab892.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000274",
+        "stock": 10
+      },
+      {
+        "color": "Azul Stitch",
+        "id": "dd57a80e-ec8d-426e-b77e-88fd74d20832",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/84fa0a95af7a44b6b327c815ee3c3c68.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/84fa0a95af7a44b6b327c815ee3c3c68.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000275",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Mickey Mouse",
+        "id": "3d61fef4-5ca9-4f00-bcf8-fa7825d51caa",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/24087a7fe0194a9fa3dccbbde44f0c5c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/24087a7fe0194a9fa3dccbbde44f0c5c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000276",
+        "stock": 10
+      },
+      {
+        "color": "Morado Stitch",
+        "id": "1346e466-5027-44eb-b3e7-838aab9b165f",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/49053f98d7d4481a90a8858264bfee95.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/49053f98d7d4481a90a8858264bfee95.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000277",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Snoopy",
+        "id": "10c197c1-8c37-42e1-8394-1b38d6f63a49",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7089243721194f9d94a37ea9f3b15301.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7089243721194f9d94a37ea9f3b15301.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000278",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy",
+        "id": "2697bc69-586e-404b-9970-6632f0525d95",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4a6ed7dae66c44bc8dbaecc0c02d038d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4a6ed7dae66c44bc8dbaecc0c02d038d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000279",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Kitty",
+        "id": "508da2b7-e713-46e7-8a76-a50310311e37",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/20972534944745d0afe1635dbdf519da.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/20972534944745d0afe1635dbdf519da.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000280",
+        "stock": 10
+      },
+      {
+        "color": "Negro Harry Potter",
+        "id": "60b6af77-7915-46df-ba0b-1eb7fcff1887",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/02f2e21458cd408ebc7fbf1971a97677.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/02f2e21458cd408ebc7fbf1971a97677.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000281",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy",
+        "id": "7ba93965-cf20-4275-b196-a8ebd8c79dcc",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/38243195c5f54bc9bad369d119d2da63.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/38243195c5f54bc9bad369d119d2da63.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000282",
+        "stock": 10
+      },
+      {
+        "color": "Morado Snoopy",
+        "id": "6085c44d-df36-46ce-8c28-abf3e9cd1321",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b505f5fe80d64cafb66398587ba8de40.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b505f5fe80d64cafb66398587ba8de40.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000283",
+        "stock": 10
+      },
+      {
+        "color": "Azul Stitch",
+        "id": "1b7b261b-c06e-42ff-95f1-a80c28c53672",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/8bef93d94dbe414f8de0deb1134e20c4.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/8bef93d94dbe414f8de0deb1134e20c4.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000284",
+        "stock": 10
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Formato pequeño y estructurado, asa larga ajustable.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-07T06:22:51.014778+00:00",
+    "description": "Divertido, estructurado y lleno de color. Su formato cuadrado lo hace muy práctico para organizar todo fácilmente, y sus estampados animados le dan un giro alegre a cualquier conjunto.",
+    "id": "f22ceb1d-70c9-4c82-810f-1f6c1323c864",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Poliéster rígido con estampado",
+    "medidas": "25 cm x 25 cm x 10 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Cuadrado Animado",
+    "price_medio": 175.0,
+    "price_normal": 185.0,
+    "price_super_wholesale": 150.0,
+    "price_wholesale": 165.0,
+    "print_type": "ANIMADO",
+    "sale_price": null,
+    "slug": "bolso-cuadrado-animado",
+    "subcategory": "",
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Rosa Patricio",
+        "id": "ae6dff79-411a-403e-99d8-b317fdf2d5c6",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e620d105101642cb844a5136537af89e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e620d105101642cb844a5136537af89e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000148",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Bella",
+        "id": "67b104de-7f8d-4ea4-b085-b18f56de2589",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/105adc05d39e4ed7b3fa034632ae663c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/105adc05d39e4ed7b3fa034632ae663c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000149",
+        "stock": 10
+      },
+      {
+        "color": "Negro Stitch",
+        "id": "3698a5f5-a5ce-47c4-bff3-93e917c44bc5",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1bdb41a59f674356a22b5b3eb2f21da6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1bdb41a59f674356a22b5b3eb2f21da6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000150",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Snoopy",
+        "id": "7578e450-800c-4d30-944d-fcd57b574ffb",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a9e75d19e4aa4650893a8b069db4fd69.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/a9e75d19e4aa4650893a8b069db4fd69.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000151",
+        "stock": 10
+      },
+      {
+        "color": "Morado Ursula",
+        "id": "93f098a6-3e44-43b2-a65d-438714c8e373",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3399fedf53d4452b96ddac6fd2528d1e.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3399fedf53d4452b96ddac6fd2528d1e.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000152",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Coraline",
+        "id": "1546edf1-0f8b-41a8-bd7d-a31b8d8c4581",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e09efa6c8bc34024a48f0e11fe6250c3.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e09efa6c8bc34024a48f0e11fe6250c3.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000153",
+        "stock": 10
+      },
+      {
+        "color": "Negro Cadáver de la Novia Pareja",
+        "id": "d001bf6b-01cd-4ed7-bdce-1e4b04b2a722",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1fc158cd9f9c47fc97f3884ecf8bce29.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1fc158cd9f9c47fc97f3884ecf8bce29.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000154",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy Pareja",
+        "id": "e087d210-c4dd-4036-896e-2ed0dfa01ace",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/850c39c4192e46cfb12927ffc7e8a6d5.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/850c39c4192e46cfb12927ffc7e8a6d5.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000155",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Blanca Nieve",
+        "id": "2274c17a-0d99-42cb-bb37-c46e4bd8930c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3f56e1a4d76346d0b393cd5fd0bcf64c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3f56e1a4d76346d0b393cd5fd0bcf64c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000156",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy",
+        "id": "f5cf4c59-8257-4ad7-8526-2f95f042defd",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4fa3edc6708d4a7eba35da2e6c34dce6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/4fa3edc6708d4a7eba35da2e6c34dce6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000157",
+        "stock": 10
+      },
+      {
+        "color": "Negro Harry",
+        "id": "6509c837-09c8-453a-9042-9edff3d80a3c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3893d0b0f0724652a164e4d21133a813.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/3893d0b0f0724652a164e4d21133a813.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000158",
+        "stock": 10
+      },
+      {
+        "color": "Negro Cadaver de la Novia ",
+        "id": "352763ec-fbb9-4d2a-8bb0-1929180a7dce",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6a0018a296e241409a07d88096aa0130.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6a0018a296e241409a07d88096aa0130.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000159",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Bob Sponja",
+        "id": "ad3b7207-6a06-45cf-a6e1-f7365243cfa5",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6826402f3dd84f8a8d230d4674cdb0d6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/6826402f3dd84f8a8d230d4674cdb0d6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000160",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Marie",
+        "id": "99cd6248-fe89-4d68-a447-e1ab9339c0a1",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/08f5b151958c4be2b89035f2cd4699d6.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/08f5b151958c4be2b89035f2cd4699d6.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000161",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Bella",
+        "id": "3717f223-dda2-4bf5-9eae-babb48631100",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2e3f9db7119f4aafa2a00b4bd9934ed2.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2e3f9db7119f4aafa2a00b4bd9934ed2.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000162",
+        "stock": 10
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Asa fruncida para un look artesanal único, forro interior y bolsillo para celular.",
+    "category": "Bolsas",
+    "category_id": "a5b8532b-6137-4e2d-aa9b-72cb0a9d4a00",
+    "created_at": "2026-09-07T03:39:59.312976+00:00",
+    "description": "Una verdadera obra de arte en tus manos. El hermoso detalle fruncido en su asa le da un volumen y textura incomparables. Combinado con el diseño en yute, el Bolso Regina es sinónimo de moda artesanal de lujo.",
+    "id": "698daab6-c5e2-437e-8058-e584c937f229",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Yute premium y asa textil fruncida",
+    "medidas": "34 cm x 25 cm x 13 cm",
+    "medio_min_qty": 6,
+    "name": "Bolso Regina con Asa Fruncida Artesanal",
+    "price_medio": 125.0,
+    "price_normal": 145.0,
+    "price_super_wholesale": 110.0,
+    "price_wholesale": 118.0,
+    "print_type": "YUTE",
+    "sale_price": null,
+    "slug": "bolso-regina-con-asa-fruncida-artesanal",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Negro Tenango",
+        "id": "967651cc-6663-4144-a94d-334c0e7354be",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9af23e9206b84c0a91649b8ab3d512bd.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9af23e9206b84c0a91649b8ab3d512bd.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000083",
+        "stock": 20
+      },
+      {
+        "color": "Amarillo Floral",
+        "id": "6b7fb45b-6b7a-40da-a160-f11640787741",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/24c63dda013647f396ab684e52aa9026.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/24c63dda013647f396ab684e52aa9026.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000077",
+        "stock": 20
+      },
+      {
+        "color": "Azul Mosaico",
+        "id": "1d174aec-2730-4895-9767-ae3caef47985",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/75e63f6a7345403581e9d9e4e0b0ac24.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/75e63f6a7345403581e9d9e4e0b0ac24.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000078",
+        "stock": 20
+      },
+      {
+        "color": "Café Mosaico",
+        "id": "306a3dc4-d83f-41fc-99d4-b3f4ea5a3805",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7e07af0f7fa84ece82be749bb7cb56ce.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/7e07af0f7fa84ece82be749bb7cb56ce.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000079",
+        "stock": 20
+      },
+      {
+        "color": "Café Rombos",
+        "id": "e529393c-9492-4ddb-9357-6e8e720b7ec7",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1298324521914f1ab145599e6531baf5.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1298324521914f1ab145599e6531baf5.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000080",
+        "stock": 20
+      },
+      {
+        "color": "Negro Gran Floral",
+        "id": "5aaf6b06-58d5-4627-ac43-280bbbf741f7",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1ffa4cc5d05d4cbc9bcb47bacfbe3488.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1ffa4cc5d05d4cbc9bcb47bacfbe3488.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000081",
+        "stock": 20
+      },
+      {
+        "color": "Negro Mandalas",
+        "id": "ec2638de-c95a-42c0-8b82-5bf074a07a45",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/297fa5fb9aa84cc19bd8d23b6a864e46.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/297fa5fb9aa84cc19bd8d23b6a864e46.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000082",
+        "stock": 20
+      },
+      {
+        "color": "Rojo Floral",
+        "id": "1f90bda3-2dca-43f6-a5e8-ad3c1891e0e2",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1ab9231f1445429b96135740f4c35884.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/1ab9231f1445429b96135740f4c35884.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000084",
+        "stock": 20
+      },
+      {
+        "color": "Rosa Floral",
+        "id": "260baee6-edda-47e2-944f-a8368313f25d",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cf146a0899604e8a9b76fc9c8079b578.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cf146a0899604e8a9b76fc9c8079b578.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000085",
+        "stock": 20
+      },
+      {
+        "color": "Verde Floral",
+        "id": "68ccdf22-a5c5-4cd5-ba89-b6524ddca567",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cb3318265ad646f6bb8b099f3104f559.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cb3318265ad646f6bb8b099f3104f559.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000086",
+        "stock": 20
+      }
+    ],
+    "wholesale_min_qty": 12
+  },
+  {
+    "bundle_category_limits": null,
+    "bundle_eligible_products": null,
+    "bundle_eligible_subcategories": null,
+    "bundle_fixed_items": null,
+    "bundle_limit": null,
+    "bundle_mandatory_models": null,
+    "bundle_model_limits": null,
+    "caracteristicas": "Compartimento principal amplio, 1 bolsillo frontal con cierre, 2 bolsillos laterales para agua. Tirantes acolchados y ajustables.",
+    "category": "Mochilas",
+    "category_id": "ab66c8c9-c3c0-458a-ae41-1d38fff463e3",
+    "created_at": "2026-09-07T08:03:03.243525+00:00",
+    "description": "Ideal para el regreso a clases o para llevar la diversión a todas partes. Esta mochila cuenta con diseños vibrantes y animados que capturan la atención, ofreciendo además un excelente espacio interior, comodidad y durabilidad inigualable. ¡Un producto estrella que se vende solo!",
+    "id": "ee535ec9-99b2-4731-b95d-058b4d6922ed",
+    "is_bundle": false,
+    "is_bundle_exclusive": false,
+    "is_on_sale": false,
+    "material": "Poliéster impermeable de alta resistencia",
+    "medidas": "42 cm x 30 cm x 15 cm",
+    "medio_min_qty": 6,
+    "name": "Mochila Escolar Animada",
+    "price_medio": 165.0,
+    "price_normal": 180.0,
+    "price_super_wholesale": 145.0,
+    "price_wholesale": 150.0,
+    "print_type": "ANIMADO",
+    "sale_price": null,
+    "slug": "mochila-escolar-animada",
+    "subcategory": null,
+    "super_wholesale_min_qty": 50,
+    "variants": [
+      {
+        "color": "Negro Kitty",
+        "id": "d54df8ef-f53c-43d8-8eba-c0d016204db7",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/79845527d8a94f6abeb5d5bbb6de2397.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/79845527d8a94f6abeb5d5bbb6de2397.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000221",
+        "stock": 10
+      },
+      {
+        "color": "Negro Stitch",
+        "id": "230811a4-f8fa-45ef-800f-91a14faf3aff",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0d456d4d47854df9bf472e194d3b1fc9.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/0d456d4d47854df9bf472e194d3b1fc9.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000223",
+        "stock": 10
+      },
+      {
+        "color": "Negro Snoopy",
+        "id": "84806c84-3b6d-40d5-87c8-77b6787645ba",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/03251f77c49146d9bcdf9c4a45abf863.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/03251f77c49146d9bcdf9c4a45abf863.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000224",
+        "stock": 10
+      },
+      {
+        "color": "Negro Snoopy Pareja",
+        "id": "c98c8d04-eaed-49b9-8ebf-31d8eaab2715",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f542b5136a5d4716a4866e96233dafcb.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/f542b5136a5d4716a4866e96233dafcb.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000225",
+        "stock": 10
+      },
+      {
+        "color": "Negro Jack",
+        "id": "e8ea5ca4-eef3-4603-b6a7-939a5c951afa",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bda9ba40466c42c7a0ab0dccc94a385d.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/bda9ba40466c42c7a0ab0dccc94a385d.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000226",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy ",
+        "id": "337228e3-e14c-4b4f-b229-f678628a517c",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/43d0dd425511417da2a90604d0ed500f.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/43d0dd425511417da2a90604d0ed500f.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000227",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Mickey",
+        "id": "5c412dfc-b9fc-4a50-be01-4376555864eb",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/76632aebac0d4c9ebbdd86acaba5b699.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/76632aebac0d4c9ebbdd86acaba5b699.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000228",
+        "stock": 10
+      },
+      {
+        "color": "Negro Coraline",
+        "id": "1f459718-3d9c-44a2-bc08-a5dd42abf794",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/180b2d7dccb94d0dbb42ce567a4e0258.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/180b2d7dccb94d0dbb42ce567a4e0258.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000229",
+        "stock": 10
+      },
+      {
+        "color": "Azul Stitch",
+        "id": "5f3fb895-26c7-4f16-90e8-a443dcab8d14",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d9c4687b81e446448ee68c128bde6042.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d9c4687b81e446448ee68c128bde6042.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000230",
+        "stock": 10
+      },
+      {
+        "color": "Amarillo Bob Sponja",
+        "id": "3dd163ed-c656-45ba-9048-cb2f84dcb4b8",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ec7805ef835c43379b535c49406eb9de.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/ec7805ef835c43379b535c49406eb9de.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000231",
+        "stock": 10
+      },
+      {
+        "color": "Azul Cielo Stitch",
+        "id": "6ddb808f-1926-47f6-a91e-e5eb4af7a1d2",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2c5ef5a020ec4994bf7d0e696217d718.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/2c5ef5a020ec4994bf7d0e696217d718.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000232",
+        "stock": 10
+      },
+      {
+        "color": "Rosa Kitty",
+        "id": "46d2c0a1-e028-437a-bccc-0b88d0c9d3f5",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/dd9989781e424af7bac236897741660c.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/dd9989781e424af7bac236897741660c.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000233",
+        "stock": 10
+      },
+      {
+        "color": "Negro Minnie",
+        "id": "f45a2ffd-7732-494c-b049-78c761842a61",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d4803e5162654b758f58563cf940bd62.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/d4803e5162654b758f58563cf940bd62.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000234",
+        "stock": 10
+      },
+      {
+        "color": "Negro Harry Potter",
+        "id": "c36c32f1-367b-4198-aac1-349db732ba57",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cbb73d17d5124558b8ca0097cbba9791.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/cbb73d17d5124558b8ca0097cbba9791.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000235",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Minnie",
+        "id": "340a6a5a-f288-42e8-8f46-016c14eb3941",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e3edb3b89cb341c3bacb801c8e6b15e2.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/e3edb3b89cb341c3bacb801c8e6b15e2.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000236",
+        "stock": 10
+      },
+      {
+        "color": "Rojo Snoopy",
+        "id": "87bd3316-d316-4fa1-a438-7c026d737707",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b098c6f0bcfc4557b3e12fc509d221ba.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/b098c6f0bcfc4557b3e12fc509d221ba.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000237",
+        "stock": 10
+      },
+      {
+        "color": "Negro Mickey",
+        "id": "ab35f3f4-23bb-47d8-93aa-23aa9567401a",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9bd52a7737004a5ea59ee18fb40ba7b8.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/9bd52a7737004a5ea59ee18fb40ba7b8.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000238",
+        "stock": 10
+      },
+      {
+        "color": "Azul Sirenita",
+        "id": "7ade25c6-6b8c-4d33-9054-8343ba55b777",
+        "image_url": "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/60ffd149a05143208f62e1e95e334d7a.jpg",
+        "image_urls": [
+          "https://rfgdinrcqbgzhrwdhdbt.supabase.co/storage/v1/object/public/site-assets/products/60ffd149a05143208f62e1e95e334d7a.jpg"
+        ],
+        "low_stock_threshold": 5,
+        "sku": "000222",
+        "stock": 10
+      }
+    ],
+    "wholesale_min_qty": 12
+  }
+]

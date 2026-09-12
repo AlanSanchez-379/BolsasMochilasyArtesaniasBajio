@@ -286,19 +286,17 @@ def _build_order(items_payload, shipping, payment_method):
         return variants.get(key)
 
     # Mayoreo combinado (mix & match): el precio por volumen se decide por el total de
-    # piezas de productos normales de la MISMA línea (subcategory) en el carrito -- no
-    # se puede combinar, por ejemplo, animado con yute para alcanzar el mínimo de
-    # mayoreo. Los paquetes tienen precio fijo y no participan en esta suma.
-    combined_qty_by_subcategory = {}
+    # piezas de productos normales de la MISMA línea (Categoría + Tipo de Estampado) en el carrito.
+    # Los paquetes tienen precio fijo y no participan en esta suma.
+    combined_qty_by_line = {}
     for item in items_payload:
         if item.get("type") != "simple":
             continue
         p = products.get(item.get("product_id"))
         if p is None:
             continue
-        combined_qty_by_subcategory[p.subcategory] = combined_qty_by_subcategory.get(
-            p.subcategory, 0
-        ) + int(item.get("quantity") or 0)
+        key = (p.category_id, p.print_type)
+        combined_qty_by_line[key] = combined_qty_by_line.get(key, 0) + int(item.get("quantity") or 0)
 
     order_items = []
     subtotal = 0.0
@@ -320,7 +318,7 @@ def _build_order(items_payload, shipping, payment_method):
                 raise CheckoutError(
                     f"Stock insuficiente para {product.name} ({variant.color}). Disponible: {variant.stock}."
                 )
-            combined_qty = combined_qty_by_subcategory.get(product.subcategory, quantity)
+            combined_qty = combined_qty_by_line.get((product.category_id, product.print_type), quantity)
             unit_price = float(product.price_for_quantity(combined_qty))
             variant.stock -= quantity
             order_items.append(

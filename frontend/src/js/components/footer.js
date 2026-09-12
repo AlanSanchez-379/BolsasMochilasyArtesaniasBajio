@@ -28,7 +28,7 @@ export function renderFooter(container) {
           <h4 class="font-display font-bold text-white text-sm mb-6 uppercase tracking-widest">Menú Principal</h4>
           <ul class="space-y-3 text-sm text-gray-400 font-sans">
             <li><a href="/categoria/Todos" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Catálogo Completo</a></li>
-            <li><a href="/categoria/Paquetes" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Paquetes Emprendedor</a></li>
+            <!-- <li><a href="/categoria/Paquetes" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Paquetes Emprendedor</a></li> -->
             <li><a href="/mis-pedidos" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Mis Pedidos</a></li>
             <li>
               <a href="${SOCIAL_LINKS.location}" target="_blank" rel="noopener noreferrer" class="hover:text-brand-pink transition-colors inline-flex items-center gap-2 hover:-translate-x-1 duration-200 mt-2 text-brand-salmon">
@@ -65,7 +65,7 @@ export function renderFooter(container) {
           </ul>
         </div>
       </div>
-      <div class="max-w-7xl mx-auto border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 font-sans">
+      <div class="max-w-7xl mx-auto border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400 font-sans">
         <p>&copy; 2026 Bolsas, Mochilas Y Artesanías del Bajío. Todos los derechos reservados.</p>
         <p class="mt-2 md:mt-0">Diseñado para emprender.</p>
       </div>

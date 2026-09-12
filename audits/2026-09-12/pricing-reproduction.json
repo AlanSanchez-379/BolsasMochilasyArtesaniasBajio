@@ -1,0 +1,25 @@
+{
+  "mode": "actual source executed with in-memory fixtures; stopped before shipping or persistence",
+  "items": [
+    {
+      "name": "Bolso Oleaje Artesanal",
+      "category": "Bolsas",
+      "print_type": "YUTE",
+      "subcategory": null,
+      "quantity": 3,
+      "frontend_unit": 145.0,
+      "backend_unit": 145.0
+    },
+    {
+      "name": "Mochila Plana Animada",
+      "category": "Mochilas",
+      "print_type": "ANIMADO",
+      "subcategory": null,
+      "quantity": 3,
+      "frontend_unit": 180.0,
+      "backend_unit": 180.0
+    }
+  ],
+  "frontend_subtotal": 975.0,
+  "backend_subtotal": 975.0
+}
