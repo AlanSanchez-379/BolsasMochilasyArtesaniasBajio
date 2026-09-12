@@ -105,7 +105,7 @@ export function buildSaleTicketHtml(order, ticketSettings = {}, posContext = nul
     color: #000;
   }
   .ticket-center { text-align: center; }
-  .ticket-logo { max-width: 40mm; max-height: 20mm; margin: 0 auto 4px; display: block; }
+  .ticket-logo { max-width: 48mm; max-height: 35mm; margin: 0 auto 4px; display: block; }
   .ticket-store-name { font-weight: 900; font-size: 14px; }
   .ticket-divider { border-top: 2px dashed #000; margin: 6px 0; }
   .ticket-item { margin-bottom: 4px; }
