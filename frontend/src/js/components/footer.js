@@ -27,9 +27,9 @@ export function renderFooter(container) {
         <div>
           <h4 class="font-display font-bold text-white text-sm mb-6 uppercase tracking-widest">Menú Principal</h4>
           <ul class="space-y-3 text-sm text-gray-400 font-sans">
-            <li><a href="#/categoria/Todos" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Catálogo Completo</a></li>
-            <li><a href="#/" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Paquetes Emprendedor</a></li>
-            <li><a href="#/mis-pedidos" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Mis Pedidos</a></li>
+            <li><a href="/categoria/Todos" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Catálogo Completo</a></li>
+            <li><a href="/categoria/Paquetes" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Paquetes Emprendedor</a></li>
+            <li><a href="/mis-pedidos" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Mis Pedidos</a></li>
             <li>
               <a href="${SOCIAL_LINKS.location}" target="_blank" rel="noopener noreferrer" class="hover:text-brand-pink transition-colors inline-flex items-center gap-2 hover:-translate-x-1 duration-200 mt-2 text-brand-salmon">
                 <i class="fa-solid fa-location-dot"></i>Nuestra Ubicación
@@ -40,12 +40,12 @@ export function renderFooter(container) {
         <div>
           <h4 class="font-display font-bold text-white text-sm mb-6 uppercase tracking-widest">Condiciones</h4>
           <ul class="space-y-3 text-sm text-gray-400 font-sans">
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-salmon text-xs"></i> Mayoreo desde 6 piezas</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-salmon text-xs"></i> Súper mayoreo 50+ piezas</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-salmon text-xs"></i> Precios por volumen según producto</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-salmon text-xs"></i> Combina piezas de la misma línea</li>
             <li class="flex items-center gap-2"><i class="fa-solid fa-credit-card text-brand-salmon text-xs"></i> Pago con tarjeta o SPEI</li>
-            <li class="mt-4"><a href="#/politica-envios" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Política de Envíos</a></li>
-            <li><a href="#/politica-privacidad" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Política de Privacidad</a></li>
-            <li><a href="#/terminos-y-condiciones" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Términos y Condiciones</a></li>
+            <li class="mt-4"><a href="/politica-envios" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Política de Envíos</a></li>
+            <li><a href="/politica-privacidad" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Política de Privacidad</a></li>
+            <li><a href="/terminos-y-condiciones" class="hover:text-brand-pink transition-colors inline-block hover:-translate-x-1 duration-200">Términos y Condiciones</a></li>
           </ul>
         </div>
         <div>

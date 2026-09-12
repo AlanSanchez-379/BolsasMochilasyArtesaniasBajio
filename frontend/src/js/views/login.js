@@ -13,8 +13,8 @@ export function renderLogin(container) {
           <i class="fa-brands fa-google text-brand-salmon"></i> Continuar con Google
         </button>
         <p class="text-center text-xs text-gray-400 mt-2 mb-6">
-          Al continuar aceptas nuestros <a href="#/terminos-y-condiciones" target="_blank" class="text-brand-mexican hover:underline">Términos y Condiciones</a>
-          y <a href="#/politica-privacidad" target="_blank" class="text-brand-mexican hover:underline">Política de Privacidad</a>.
+          Al continuar aceptas nuestros <a href="/terminos-y-condiciones" target="_blank" class="text-brand-mexican hover:underline">Términos y Condiciones</a>
+          y <a href="/politica-privacidad" target="_blank" class="text-brand-mexican hover:underline">Política de Privacidad</a>.
         </p>
 
         <div class="flex items-center gap-3 mb-6">

@@ -1,7 +1,8 @@
+import { matchesProductSearch } from "../catalogFilters.js";
 import { api } from "../api.js";
 import { productCardHtml, findLoteriaVariantImage } from "../components/productCard.js";
 import { bindNavLinks } from "../dom.js";
-import { currentRenderToken } from "../router.js";
+import { currentRenderToken, navigate } from "../router.js";
 import { getCategories } from "../catalogCache.js";
 
 const SPECIAL_CATEGORIES = { Ofertas: "Ofertas", Paquetes: "Paquetes Emprendedores", Nuevos: "Nuevos Productos", Loteria: "Colección Fiesta Mexicana" };
@@ -64,22 +65,16 @@ function getBaseColor(colorName) {
 }
 
 function applyFilters(products, { search, subcategory, printType, color, maxPrice }) {
-  const words = search.trim().toLowerCase().split(/\s+/).filter(Boolean);
+
   
   return products.filter((p) => {
     const matchesSubcategory = subcategory === "Todas" || (p.subcategory || "") === subcategory;
     const matchesPrintType = printType === "Todos" || (p.print_type || "") === printType;
-    const matchesColor = color === "Todos" || p.variants.some((v) => getBaseColor(v.color) === color);
+    const matchesColor = color === "Todos" || (p.variants ?? []).some((v) => getBaseColor(v.color) === color);
     const matchesPrice = maxPrice == null || Number(p.price_normal) <= maxPrice;
     
-    const matchesSearch = words.length === 0 || words.every((word) => {
-      return p.name.toLowerCase().includes(word) ||
-             p.category.toLowerCase().includes(word) ||
-             p.subcategory.toLowerCase().includes(word) ||
-             (p.description && p.description.toLowerCase().includes(word)) ||
-             p.variants.some((v) => (v.sku || "").toLowerCase().includes(word) || (v.color || "").toLowerCase().includes(word));
-    });
-    
+    const matchesSearch = matchesProductSearch(p, search);
+
     return matchesSubcategory && matchesPrintType && matchesColor && matchesPrice && matchesSearch;
   });
 }
@@ -110,7 +105,7 @@ function categoryShell(categories, activeCategory) {
 
       <div class="flex flex-col lg:flex-row gap-8">
         <div class="w-full lg:w-64 flex-shrink-0">
-          <button id="toggle-filters-btn" class="lg:hidden w-full mb-4 bg-white border border-gray-200 py-3 rounded-lg font-semibold text-gray-700 flex justify-center items-center gap-2 shadow-sm">
+          <button id="toggle-filters-btn" aria-expanded="false" aria-controls="filters-container" class="lg:hidden w-full mb-4 bg-white border border-gray-200 py-3 rounded-lg font-semibold text-gray-700 flex justify-center items-center gap-2 shadow-sm">
             <i class="fa-solid fa-sliders"></i> Mostrar Filtros
           </button>
           <div id="filters-container" class="hidden lg:block border border-gray-200 rounded-lg p-6 bg-white lg:sticky lg:top-28">
@@ -167,26 +162,26 @@ function categoryShell(categories, activeCategory) {
 
             <div class="mb-6">
               <div class="relative">
-                <input id="filter-search" type="text" placeholder="Buscar..."
+                <input id="filter-search" aria-label="Buscar en el catálogo" type="search" placeholder="Buscar..."
                   class="w-full pl-8 pr-3 py-2 border-b border-gray-200 outline-none text-sm focus:border-brand-pink transition-colors" />
                 <i class="fa-solid fa-search absolute left-0 top-2.5 text-gray-400 text-sm"></i>
               </div>
             </div>
 
             <div class="mb-4 border-t border-gray-100 pt-4">
-              <label class="block font-semibold text-sm text-gray-900 mb-2">Subcategoría</label>
+              <label for="filter-subcategory" class="block font-semibold text-sm text-gray-900 mb-2">Subcategoría</label>
               <select id="filter-subcategory" class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink"></select>
             </div>
             <div class="mb-4">
-              <label class="block font-semibold text-sm text-gray-900 mb-2">Tipo de Estampado</label>
+              <label for="filter-print-type" class="block font-semibold text-sm text-gray-900 mb-2">Tipo de Estampado</label>
               <select id="filter-print-type" class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink"></select>
             </div>
             <div class="mb-4">
-              <label class="block font-semibold text-sm text-gray-900 mb-2">Color disponible</label>
+              <label for="filter-color" class="block font-semibold text-sm text-gray-900 mb-2">Color disponible</label>
               <select id="filter-color" class="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none focus:border-brand-pink"></select>
             </div>
             <div class="mb-2">
-              <label class="block font-semibold text-sm text-gray-900 mb-2">Precio máximo</label>
+              <label for="filter-price" class="block font-semibold text-sm text-gray-900 mb-2">Precio máximo</label>
               <input id="filter-price" type="range" min="0" max="0" step="50" class="w-full accent-brand-mexican" />
               <div class="flex justify-between text-xs text-gray-500 mt-1">
                 <span>$0</span>
@@ -196,10 +191,10 @@ function categoryShell(categories, activeCategory) {
           </div>
         </div>
 
-        <div class="flex-1">
+        <div class="flex-1 min-w-0">
           <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-            <h2 class="text-2xl font-bold text-gray-900">${SPECIAL_CATEGORIES[activeCategory] || activeCategory}</h2>
-            <span id="result-count" class="text-sm text-gray-500"></span>
+            <h1 class="text-2xl font-bold text-gray-900">${SPECIAL_CATEGORIES[activeCategory] || activeCategory}</h1>
+            <span id="result-count" role="status" class="text-sm text-gray-500"></span>
           </div>
           <div id="product-grid">
             <div class="text-center py-20 bg-gray-50 rounded-lg border border-gray-200 text-gray-400">Cargando productos...</div>
@@ -221,16 +216,16 @@ function renderGrid(gridEl, countEl, products, activeCategory, selectedColor = "
   } else {
     const searchWords = searchTerm.trim().toLowerCase().split(/\s+/).filter(Boolean);
     
-    gridEl.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    gridEl.innerHTML = `<div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
       ${products.map((p) => {
         let customImage = null;
         if (selectedColor !== "Todos") {
-          const matchingVar = p.variants.find(v => getBaseColor(v.color) === selectedColor);
+          const matchingVar = (p.variants ?? []).find(v => getBaseColor(v.color) === selectedColor);
           if (matchingVar && matchingVar.image_url) customImage = matchingVar.image_url;
         } else if (searchWords.length > 0) {
           let bestVar = null;
           let bestScore = 0;
-          p.variants.forEach(v => {
+          (p.variants ?? []).forEach(v => {
             const vColor = (v.color || "").toLowerCase();
             let score = 0;
             searchWords.forEach(w => { if (vColor.includes(w)) score++; });
@@ -267,7 +262,7 @@ export async function renderCategory(container, categoryName, query = null) {
 
   container.querySelectorAll(".cat-link").forEach((el) => {
     el.addEventListener("click", () => {
-      window.location.hash = `/categoria/${encodeURIComponent(el.dataset.cat)}`;
+      navigate(`/categoria/${encodeURIComponent(el.dataset.cat)}`);
     });
   });
 
@@ -277,6 +272,7 @@ export async function renderCategory(container, categoryName, query = null) {
     toggleFiltersBtn.addEventListener("click", () => {
       filtersContainer.classList.toggle("hidden");
       const isHidden = filtersContainer.classList.contains("hidden");
+      toggleFiltersBtn.setAttribute("aria-expanded", String(!isHidden));
       toggleFiltersBtn.innerHTML = isHidden 
         ? '<i class="fa-solid fa-sliders"></i> Mostrar Filtros'
         : '<i class="fa-solid fa-times"></i> Ocultar Filtros';
@@ -336,7 +332,7 @@ export async function renderCategory(container, categoryName, query = null) {
   
   const rawColors = new Set(
     categoryProducts.flatMap((p) =>
-      p.variants
+      (p.variants ?? [])
         .filter((v) => v.stock > 0 && v.color) // Solo variantes con stock y color definido
         .map((v) => getBaseColor(v.color))
     )

@@ -1,3 +1,5 @@
+import { priceForQuantity } from "./pricing.js";
+export { priceForQuantity } from "./pricing.js";
 const CART_STORAGE_KEY = "bma_cart";
 
 function loadCart() {
@@ -66,12 +68,6 @@ export function cartItemsCount() {
 // Mayoreo combinado (Mix & Match): el precio por volumen se decide por el total de
 // piezas de productos normales de la MISMA línea (Categoría + Tipo de Estampado) en el carrito.
 // Los paquetes tienen precio fijo y no participan en esta suma.
-export function priceForQuantity(product, quantity) {
-  if (quantity >= product.super_wholesale_min_qty) return product.price_super_wholesale;
-  if (quantity >= product.wholesale_min_qty) return product.price_wholesale;
-  if (quantity >= product.medio_min_qty) return product.price_medio;
-  return product.price_normal;
-}
 
 export function combinedQtyForProductLine(product) {
   return state.cart
@@ -81,7 +77,7 @@ export function combinedQtyForProductLine(product) {
 
 export function cartTotal() {
   return state.cart.reduce((total, item) => {
-    const qty = item.product.is_bundle ? item.quantity : combinedQtyForProductLine(item.product);
+    const qty = item.product.is_bundle ? 1 : combinedQtyForProductLine(item.product);
     const price = priceForQuantity(item.product, qty);
     return total + price * item.quantity;
   }, 0);

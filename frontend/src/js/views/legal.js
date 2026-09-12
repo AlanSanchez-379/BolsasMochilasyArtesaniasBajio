@@ -54,7 +54,7 @@ export function renderShippingPolicy(container) {
     <p>Nuestra responsabilidad sobre tu pedido termina en el momento en que la paquetería lo recibe y sale de nuestras manos. A partir de ahí, la entrega depende de la paquetería: si el repartidor tocó la puerta en la dirección proporcionada y nadie respondió, y como consecuencia el paquete fue devuelto a la paquetería (o quedó en su sucursal sin poder entregarse), eso ya no es responsabilidad de la tienda. En estos casos te contactaremos para coordinar un reenvío, cuyo costo corre por cuenta del cliente.</p>
 
     ${h2("Dudas sobre tu envío")}
-    <p>Si tienes dudas sobre el estatus de tu pedido, puedes consultarlo en <a href="#/mis-pedidos" class="text-brand-mexican font-semibold hover:underline">Mis Pedidos</a> o contactarnos:</p>
+    <p>Si tienes dudas sobre el estatus de tu pedido, puedes consultarlo en <a href="/mis-pedidos" class="text-brand-mexican font-semibold hover:underline">Mis Pedidos</a> o contactarnos:</p>
     ${contactBlockHtml()}
     `
   );
@@ -117,11 +117,11 @@ export function renderTerms(container) {
     <p><strong>Suspensión o cancelación de cuentas.</strong> Nos reservamos el derecho de suspender, cancelar o restringir el acceso a cualquier cuenta que presente actividad sospechosa, intentos de fraude, o que incumpla estos Términos, sin que ello genere responsabilidad para nosotros.</p>
 
     ${h2("Pagos")}
-    <p>Aceptamos pago mediante un enlace de Mercado Pago, que te enviamos por WhatsApp, y transferencia SPEI. Para SPEI puedes subir tu comprobante desde el checkout o desde <a href="#/mis-pedidos" class="text-brand-mexican font-semibold hover:underline">Mis Pedidos</a>. No nos hacemos responsables por interrupciones o fallas en la disponibilidad de estos proveedores de pago externos, ajenas a nuestro control.</p>
+    <p>Aceptamos pago mediante un enlace de Mercado Pago, que te enviamos por WhatsApp, y transferencia SPEI. Para SPEI puedes subir tu comprobante desde el checkout o desde <a href="/mis-pedidos" class="text-brand-mexican font-semibold hover:underline">Mis Pedidos</a>. No nos hacemos responsables por interrupciones o fallas en la disponibilidad de estos proveedores de pago externos, ajenas a nuestro control.</p>
     <p>Los pedidos pagados por SPEI quedan como <strong>Pendiente de pago</strong> dentro de la ventana de tiempo indicada en el checkout. Si el depósito no se recibe dentro de ese plazo, el pedido se cancela automáticamente y el inventario reservado se libera; si llegaras a realizar el depósito después de la cancelación, contáctanos para resolverlo mediante reembolso o saldo a favor.</p>
 
     ${h2("Envíos")}
-    <p>Consulta el detalle completo en nuestra <a href="#/politica-envios" class="text-brand-mexican font-semibold hover:underline">Política de Envíos</a>.</p>
+    <p>Consulta el detalle completo en nuestra <a href="/politica-envios" class="text-brand-mexican font-semibold hover:underline">Política de Envíos</a>.</p>
 
     ${h2("Cambios y devoluciones")}
     <p>Debido a la naturaleza de nuestros productos, <strong>todas las ventas son finales</strong>: no se aceptan devoluciones ni cambios por motivos de preferencia del cliente (talla, color, cambio de opinión, etc.).</p>
@@ -137,7 +137,7 @@ export function renderTerms(container) {
     <p>Te comprometes a usar el sitio de forma lícita y a no interferir con su funcionamiento normal.</p>
 
     ${h2("Privacidad")}
-    <p>El tratamiento de tus datos personales se rige por nuestra <a href="#/politica-privacidad" class="text-brand-mexican font-semibold hover:underline">Política de Privacidad</a>.</p>
+    <p>El tratamiento de tus datos personales se rige por nuestra <a href="/politica-privacidad" class="text-brand-mexican font-semibold hover:underline">Política de Privacidad</a>.</p>
 
     ${h2("Jurisdicción y ley aplicable")}
     <p>Para la interpretación y cumplimiento de los presentes Términos, las partes se someten a las leyes aplicables de los Estados Unidos Mexicanos y a la jurisdicción de los tribunales competentes en León, Guanajuato, renunciando a cualquier otro fuero que pudiera corresponderles por razón de sus domicilios presentes o futuros.</p>

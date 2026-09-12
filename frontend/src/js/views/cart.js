@@ -1,3 +1,4 @@
+import { shippingEstimateHtml, bindShippingEstimate } from "../components/shippingEstimate.js";
 import {
   state as appState,
   updateCartQuantity,
@@ -21,7 +22,7 @@ function productLineTotals() {
   appState.cart
     .filter((item) => !item.product.is_bundle)
     .forEach((item) => {
-      const key = `${item.product.category} ${item.product.print_type}`;
+      const key = [item.product.category, item.product.print_type].filter(Boolean).join(" ");
       totals[key] = (totals[key] || 0) + item.quantity;
     });
   return totals;
@@ -30,14 +31,14 @@ function productLineTotals() {
 function lineHtml(item) {
   const price = priceForQuantity(
     item.product,
-    item.product.is_bundle ? item.quantity : combinedQtyForProductLine(item.product)
+    item.product.is_bundle ? 1 : combinedQtyForProductLine(item.product)
   );
   const lineTotal = price * item.quantity;
   const isCustomBundle = item.variant.isCustom;
 
   return `
     <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-b border-gray-100 py-6 last:border-0" data-line="${item.variant.id}">
-      <img src="${item.variant.image_url || NO_IMAGE_PLACEHOLDER}" class="w-24 h-24 border border-gray-200 rounded object-cover flex-shrink-0" />
+      <img alt="Producto en el carrito" src="${item.variant.image_url || NO_IMAGE_PLACEHOLDER}" class="w-24 h-24 border border-gray-200 rounded object-cover flex-shrink-0" />
       <div class="flex-grow">
         <p class="text-xs text-gray-400 uppercase tracking-wide">${item.product.category}</p>
         <p data-nav="/producto/${item.product.slug}" class="font-semibold text-gray-900 cursor-pointer hover:text-brand-mexican">${item.product.name}</p>
@@ -49,13 +50,13 @@ function lineHtml(item) {
           isCustomBundle
             ? `<span class="px-4 py-2 text-gray-500 text-sm">Paquete: ${item.quantity}</span>`
             : `<div class="flex items-center border border-gray-300 rounded">
-                <button data-qty-minus="${item.variant.id}" class="w-9 h-9 font-bold text-gray-600 hover:text-gray-900">-</button>
+                <button aria-label="Reducir cantidad" data-qty-minus="${item.variant.id}" class="w-9 h-9 font-bold text-gray-600 hover:text-gray-900">-</button>
                 <span class="w-10 text-center font-bold">${item.quantity}</span>
-                <button data-qty-plus="${item.variant.id}" class="w-9 h-9 font-bold text-gray-600 hover:text-gray-900">+</button>
+                <button aria-label="Aumentar cantidad" data-qty-plus="${item.variant.id}" class="w-9 h-9 font-bold text-gray-600 hover:text-gray-900">+</button>
               </div>`
         }
         <span class="text-lg font-bold w-24 text-right">${money(lineTotal)}</span>
-        <button data-remove="${item.variant.id}" class="text-gray-400 hover:text-red-500">
+        <button aria-label="Eliminar del carrito" data-remove="${item.variant.id}" class="text-gray-400 hover:text-red-500">
           <i class="fa-solid fa-trash-can"></i>
         </button>
       </div>
@@ -104,16 +105,17 @@ export function renderCart(container) {
           savings > 0
             ? `<div class="bg-green-50 border border-green-200 rounded px-4 py-3 mb-6 text-sm text-green-800 font-semibold">
                 <i class="fa-solid fa-piggy-bank mr-2"></i>
-                Estás ahorrando ${money(savings)} por precio de mayoreo/súper mayoreo.
+                Estás ahorrando ${money(savings)} con los precios actuales.
               </div>`
             : ""
         }
         <div class="border border-gray-200 rounded-lg p-6 mb-8 bg-white">
           ${appState.cart.map((item) => lineHtml(item)).join("")}
         </div>
+        ${shippingEstimateHtml()}
         <div class="border border-gray-200 rounded-lg p-6 flex flex-col sm:flex-row justify-between items-center gap-4 bg-brand-peach-light bg-opacity-30">
           <div>
-            <p class="text-gray-600 text-sm">Total (precios ya reflejan descuento por volumen)</p>
+            <p class="text-gray-600 text-sm">Subtotal de productos (sin envío)</p>
             <p class="text-3xl font-bold text-gray-900">${money(total)}</p>
           </div>
           <button id="checkout-btn" class="bg-gray-900 hover:bg-brand-mexican text-white px-8 py-4 rounded text-lg font-semibold transition-colors">
@@ -122,6 +124,8 @@ export function renderCart(container) {
         </div>
       </div>
     `;
+
+    bindShippingEstimate(container, total);
 
     container.querySelectorAll("[data-qty-minus]").forEach((el) => {
       el.addEventListener("click", () => {

@@ -13,8 +13,8 @@ export function renderRegister(container) {
           <i class="fa-brands fa-google text-brand-salmon"></i> Continuar con Google
         </button>
         <p class="text-center text-xs text-gray-400 mt-2 mb-6">
-          Al continuar aceptas nuestros <a href="#/terminos-y-condiciones" target="_blank" class="text-brand-mexican hover:underline">Términos y Condiciones</a>
-          y <a href="#/politica-privacidad" target="_blank" class="text-brand-mexican hover:underline">Política de Privacidad</a>.
+          Al continuar aceptas nuestros <a href="/terminos-y-condiciones" target="_blank" class="text-brand-mexican hover:underline">Términos y Condiciones</a>
+          y <a href="/politica-privacidad" target="_blank" class="text-brand-mexican hover:underline">Política de Privacidad</a>.
         </p>
 
         <div class="flex items-center gap-3 mb-6">
@@ -39,8 +39,8 @@ export function renderRegister(container) {
           <label class="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
             <input type="checkbox" id="accept-terms" required class="mt-1 w-4 h-4 flex-shrink-0" />
             <span>
-              He leído y acepto los <a href="#/terminos-y-condiciones" target="_blank" class="text-brand-blue-dark font-semibold hover:underline">Términos y Condiciones</a>
-              y la <a href="#/politica-privacidad" target="_blank" class="text-brand-blue-dark font-semibold hover:underline">Política de Privacidad</a>.
+              He leído y acepto los <a href="/terminos-y-condiciones" target="_blank" class="text-brand-blue-dark font-semibold hover:underline">Términos y Condiciones</a>
+              y la <a href="/politica-privacidad" target="_blank" class="text-brand-blue-dark font-semibold hover:underline">Política de Privacidad</a>.
             </span>
           </label>
           <p id="register-error" class="text-red-500 text-sm hidden"></p>

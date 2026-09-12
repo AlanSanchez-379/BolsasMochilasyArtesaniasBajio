@@ -380,7 +380,7 @@ export function renderCheckout(container) {
 
         <p class="text-xs text-gray-400 mt-4">
           Al confirmar aceptas nuestra
-          <a href="#/politica-envios" target="_blank" class="text-brand-mexican hover:underline">Política de Envíos</a>.
+          <a href="/politica-envios" target="_blank" class="text-brand-mexican hover:underline">Política de Envíos</a>.
         </p>
       </div>
       <div class="flex justify-between">

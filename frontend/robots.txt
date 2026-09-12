@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /carrito
+Disallow: /checkout
+Disallow: /login
+Disallow: /registro
+Disallow: /mis-pedidos
+
+Sitemap: https://bolsasdelbajio.com/sitemap.xml

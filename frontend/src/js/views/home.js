@@ -21,26 +21,26 @@ function paint(container, { categories, bundles, bestsellers, settings, loteriaP
   container.innerHTML = `
     <div class="animate-fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 bg-gray-50">
 
-      <div class="relative w-full h-[70vh] min-h-[500px] mt-6 mb-24 rounded-3xl overflow-hidden shadow-2xl group cursor-pointer" data-nav="/categoria/Todos">
+      <div class="relative w-full min-h-[360px] md:h-[70vh] md:min-h-[500px] mt-6 mb-12 md:mb-24 rounded-3xl overflow-hidden shadow-2xl group">
         <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent z-10"></div>
-        <img src="${bannerSrc}" alt="Banner" class="absolute inset-0 w-full h-full object-cover z-0 opacity-100 group-hover:scale-105 transition-transform duration-1000 ease-in-out" />
-        <div class="relative z-20 flex items-center h-full max-w-3xl px-8 md:px-16 animate-fade-in-up">
-          <div class="glass-dark p-8 md:p-12 rounded-2xl max-w-lg border-l-4 border-l-brand-salmon">
-            <h2 class="text-3xl md:text-5xl font-display font-bold text-white mb-6 leading-tight">Inicia tu negocio hoy con <span class="text-brand-salmon">precios de fábrica</span></h2>
+        <img src="${bannerSrc}" alt="Colección de bolsas artesanales del Bajío" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover z-0 opacity-100 group-hover:scale-105 transition-transform duration-1000 ease-in-out" />
+        <div class="relative z-20 flex items-center h-full max-w-3xl px-4 py-6 md:px-16 animate-fade-in-up">
+          <div class="glass-dark p-5 md:p-12 rounded-2xl max-w-lg border-l-4 border-l-brand-salmon">
+            <h1 class="text-3xl md:text-5xl font-display font-bold text-white mb-6 leading-tight">Inicia tu negocio hoy con <span class="text-brand-salmon">precios de fábrica</span></h1>
             <p class="text-gray-300 mb-8 font-sans text-lg">Impulsa tu emprendimiento con los diseños más innovadores del Bajío.</p>
-            <button class="bg-brand-mexican hover:bg-white hover:text-brand-mexican text-white font-bold py-3.5 px-8 transition-all duration-300 uppercase text-sm tracking-widest rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1">
+            <button data-nav="/categoria/Todos" class="bg-brand-mexican hover:bg-white hover:text-brand-mexican text-white font-bold py-3.5 px-8 transition-all duration-300 uppercase text-sm tracking-widest rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1">
               Descubrir Colección <i class="fa-solid fa-arrow-right ml-2"></i>
             </button>
           </div>
         </div>
       </div>
 
-      <div class="glass p-12 md:p-16 text-center max-w-4xl mx-auto rounded-3xl mb-24 shadow-sm border-white/50 relative overflow-hidden">
+      <div class="glass p-6 md:p-16 text-center max-w-4xl mx-auto rounded-3xl mb-24 shadow-sm border-white/50 relative overflow-hidden">
         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-salmon via-brand-mexican to-brand-salmon"></div>
         <h2 class="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-6 tracking-tight">Sobre Nuestra Tienda</h2>
         <p class="text-gray-600 leading-relaxed text-lg max-w-2xl mx-auto font-sans">
           Somos los principales distribuidores del Bajío. Nuestro objetivo es impulsar tu emprendimiento con productos de alta calidad,
-          precios competitivos y paquetes diseñados especialmente para garantizar tu margen de ganancia. Ofrecemos los diseños más
+          precios competitivos y paquetes diseñados especialmente para ayudarte a surtir tu negocio. Ofrecemos los diseños más
           innovadores en bolsas, mochilas, carteras, monederos y cosmetiqueras.
         </p>
       </div>
@@ -107,7 +107,7 @@ function paint(container, { categories, bundles, bestsellers, settings, loteriaP
           <div class="text-center mb-12">
             <span class="bg-brand-mexican text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Oferta Especial</span>
             <h2 class="text-3xl md:text-5xl font-display font-bold mt-6 text-white tracking-tight">Paquetes Emprendedores</h2>
-            <p class="text-lg text-gray-300 mt-4 max-w-2xl mx-auto">La forma más fácil y económica de surtir tu primer inventario con márgenes de ganancia garantizados.</p>
+            <p class="text-lg text-gray-300 mt-4 max-w-2xl mx-auto">La forma más fácil y económica de surtir tu primer inventario con precios por paquete.</p>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             ${bundles.map((b) => productCardHtml(b)).join("")}

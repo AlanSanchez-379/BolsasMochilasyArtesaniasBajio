@@ -6,7 +6,10 @@ import { api } from "./api.js";
 let categoriesPromise = null;
 
 export function getCategories() {
-  if (!categoriesPromise) categoriesPromise = api.getCategories();
+  if (!categoriesPromise) categoriesPromise = api.getCategories().catch(error => {
+    categoriesPromise = null;
+    throw error;
+  });
   return categoriesPromise;
 }
 

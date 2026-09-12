@@ -1,3 +1,4 @@
+import { bindNavLinks } from "../dom.js";
 import { api } from "../api.js";
 import { state, cartItemsCount, setCurrentUser } from "../state.js";
 import { navigate } from "../router.js";
@@ -68,7 +69,7 @@ export async function renderNavbar(container) {
           <div class="hidden lg:flex items-center space-x-8 flex-shrink-0">
             ${NAV_LINKS.map(
               (link) => `
-              <button data-nav="${link.href}" class="relative text-sm font-bold text-white hover:text-gray-100 transition-colors uppercase tracking-widest whitespace-nowrap group">
+              <button data-nav="${link.href}" class="relative text-sm font-bold text-gray-900 hover:text-gray-700 transition-colors uppercase tracking-widest whitespace-nowrap group">
                 ${link.label}
                 <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all group-hover:w-full"></span>
               </button>`
@@ -77,15 +78,15 @@ export async function renderNavbar(container) {
 
           <div class="hidden md:flex flex-1 justify-center px-2">
             <div class="relative w-full max-w-sm">
-              <input type="text" placeholder="Buscar productos..."
+              <input type="search" aria-label="Buscar productos" placeholder="Buscar productos..."
                 class="search-input w-full pl-11 pr-4 py-2.5 bg-gray-100/50 border border-gray-200 rounded-full text-sm outline-none focus:border-brand-pink focus:bg-white focus:shadow-sm transition-all" />
-              <i class="search-icon fa-solid fa-search absolute left-4 top-3 text-gray-400 cursor-pointer hover:text-brand-pink"></i>
+              <button type="button" aria-label="Buscar" class="search-icon absolute left-1 top-0 w-10 h-10 text-gray-700"><i aria-hidden="true" class="fa-solid fa-search"></i></button>
             </div>
           </div>
 
           <div class="flex items-center space-x-3 sm:space-x-4 flex-shrink-0">
             <div class="hidden lg:block relative">
-              <button id="user-menu-btn" class="flex items-center gap-2 text-white hover:text-gray-100 transition-colors">
+              <button id="user-menu-btn" aria-expanded="false" aria-controls="user-menu" class="flex items-center gap-2 text-gray-900 hover:text-gray-700 transition-colors">
                 <i class="fa-regular fa-user text-xl"></i>
                 <span class="text-sm font-medium">
                   ${state.currentUser ? "Mi Cuenta" : "Invitado"}
@@ -96,7 +97,7 @@ export async function renderNavbar(container) {
               </div>
             </div>
 
-            <button data-nav="/carrito" class="bg-white hover:bg-gray-100 text-brand-pink w-11 h-11 lg:w-auto lg:px-6 lg:py-2.5 rounded-full flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:-translate-y-0.5 shadow-md relative">
+            <button data-nav="/carrito" aria-label="Carrito: ${count} piezas" class="bg-white hover:bg-gray-100 text-brand-mexican w-11 h-11 lg:w-auto lg:px-6 lg:py-2.5 rounded-full flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:-translate-y-0.5 shadow-md relative">
               <i class="fa-solid fa-cart-shopping"></i>
               <span class="font-semibold text-sm hidden lg:block tracking-wide">CARRITO</span>
               ${
@@ -106,13 +107,19 @@ export async function renderNavbar(container) {
               }
             </button>
             
-            <button id="mobile-menu-btn" class="lg:hidden text-white hover:text-gray-100 w-11 h-11 flex items-center justify-center transition-colors">
+            <button id="mobile-menu-btn" aria-label="Menú principal" aria-expanded="false" aria-controls="mobile-menu" class="lg:hidden text-gray-900 hover:text-gray-700 w-11 h-11 flex items-center justify-center transition-colors">
               <i class="fa-solid fa-bars text-2xl"></i>
             </button>
           </div>
         </div>
       </div>
 
+      <div class="md:hidden px-4 pb-3">
+        <div class="relative">
+          <input type="search" aria-label="Buscar productos" placeholder="Buscar productos..." class="search-input w-full pl-11 pr-4 py-3 bg-white rounded-full text-sm" />
+          <button type="button" aria-label="Buscar" class="search-icon absolute left-1 top-0 w-11 h-11 text-gray-700"><i aria-hidden="true" class="fa-solid fa-search"></i></button>
+        </div>
+      </div>
       <!-- Menú Móvil -->
       <div id="mobile-menu" class="hidden lg:hidden bg-white shadow-xl absolute top-full left-0 w-full animate-fade-in-down border-t border-gray-100 z-40">
         <div class="px-4 py-4 bg-gray-50 flex items-center gap-4 border-b border-gray-100">
@@ -150,27 +157,29 @@ export async function renderNavbar(container) {
 
         <div class="px-4 py-4 mt-2 border-t border-gray-100 bg-gray-50">
           <div class="relative w-full">
-            <input type="text" placeholder="Buscar productos..."
+            <input type="search" aria-label="Buscar productos" placeholder="Buscar productos..."
               class="search-input w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-full text-sm outline-none focus:border-brand-pink focus:shadow-sm transition-all" />
-            <i class="search-icon fa-solid fa-search absolute left-4 top-3.5 text-gray-400 cursor-pointer hover:text-brand-pink"></i>
+            <button type="button" aria-label="Buscar" class="search-icon absolute left-1 top-0 w-11 h-11 text-gray-700"><i aria-hidden="true" class="fa-solid fa-search"></i></button>
           </div>
         </div>
       </div>
     </nav>
   `;
 
-  container.querySelectorAll("[data-nav]").forEach((el) => {
-    el.addEventListener("click", () => navigate(el.dataset.nav));
-  });
+  bindNavLinks(container);
 
   const menuBtn = container.querySelector("#user-menu-btn");
   const menu = container.querySelector("#user-menu");
-  menuBtn.addEventListener("click", () => menu.classList.toggle("hidden"));
+  menuBtn.addEventListener("click", () => {
+    menu.classList.toggle("hidden");
+    menuBtn.setAttribute("aria-expanded", String(!menu.classList.contains("hidden")));
+  });
 
   const mobileMenuBtn = container.querySelector("#mobile-menu-btn");
   const mobileMenu = container.querySelector("#mobile-menu");
   mobileMenuBtn.addEventListener("click", () => {
     mobileMenu.classList.toggle("hidden");
+    mobileMenuBtn.setAttribute("aria-expanded", String(!mobileMenu.classList.contains("hidden")));
     const icon = mobileMenuBtn.querySelector("i");
     icon.classList.toggle("fa-bars");
     icon.classList.toggle("fa-xmark");
@@ -179,6 +188,7 @@ export async function renderNavbar(container) {
   container.querySelectorAll(".mobile-nav-link").forEach(el => {
     el.addEventListener("click", () => {
       mobileMenu.classList.add("hidden");
+      mobileMenuBtn.setAttribute("aria-expanded", "false");
       mobileMenuBtn.querySelector("i").classList.remove("fa-xmark");
       mobileMenuBtn.querySelector("i").classList.add("fa-bars");
     });
@@ -197,6 +207,7 @@ export async function renderNavbar(container) {
       navigate(`/categoria/Todos?q=${encodeURIComponent(val.trim())}`);
       if (mobileMenu) {
         mobileMenu.classList.add("hidden");
+      mobileMenuBtn.setAttribute("aria-expanded", "false");
         mobileMenuBtn.querySelector("i").classList.remove("fa-xmark");
         mobileMenuBtn.querySelector("i").classList.add("fa-bars");
       }
