@@ -1,3 +1,4 @@
+import { setProductMetadata, setPageMetadata } from "../seo.js";
 import { api } from "../api.js";
 import { addToCart, combinedQtyForProductLine } from "../state.js";
 import { productCardHtml } from "../components/productCard.js";
@@ -16,7 +17,7 @@ function pricingTiersHtml(product, totalProposedQty) {
   <div class="glass border border-brand-salmon/20 rounded-2xl p-6 md:p-8 mb-8 relative overflow-hidden">
     <div class="absolute top-0 right-0 w-32 h-32 bg-brand-salmon rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
     <h3 class="font-display font-bold text-xl mb-2 text-center text-gray-900 tracking-tight">Niveles de Precio</h3>
-    <p class="text-xs text-gray-500 text-center mb-6 font-sans">Se calculan automáticamente al sumar productos en tu carrito.</p>
+    <p class="text-xs text-gray-500 text-center mb-6 font-sans">Precios por pieza en MXN. Combina productos de la misma categoría y tipo de estampado; animado y yute se cuentan por separado. Los paquetes no participan.</p>
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 text-center">
       <div class="p-4 rounded-xl transition-all duration-300 ${tierClass(totalProposedQty < product.medio_min_qty)}">
         <p class="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1">Menudeo</p>
@@ -61,11 +62,12 @@ export async function renderProductDetail(container, slug) {
     ({ product } = await api.getProduct(slug));
   } catch {
     if (token !== currentRenderToken()) return;
-    container.innerHTML = `<p class="max-w-7xl mx-auto px-4 py-20 text-center text-xl text-gray-500">Producto no encontrado.</p>`;
+    setPageMetadata({ title: "Producto no disponible", noindex: true });
+    container.innerHTML = `<p class="max-w-7xl mx-auto px-4 py-20 text-center text-xl text-gray-500">No pudimos cargar el producto. <a href="/categoria/Todos" class="underline">Volver al catálogo</a></p>`;
     return;
   }
 
-  const { products: categoryProducts } = await api.getProducts({ category: product.category });
+  const { products: categoryProducts } = await api.getProducts({ category: product.category }).catch(() => ({ products: [] }));
   const relatedProducts = categoryProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
   let eligibleBundleProducts = [];
@@ -83,8 +85,10 @@ export async function renderProductDetail(container, slug) {
 
   if (token !== currentRenderToken()) return;
 
+  setProductMetadata(product);
+
   const view = {
-    selectedVariant: product.variants.find((v) => v.stock > 0) || product.variants[0],
+    selectedVariant: product.variants.find((v) => v.stock > 0) || product.variants[0] || { stock: 0, image_urls: [] },
     selectedImageIndex: 0,
     quantity: 1,
     bundleMode: "surtido", // 'surtido' | 'personalizado'
@@ -142,7 +146,7 @@ export async function renderProductDetail(container, slug) {
               view.selectedVariant.image_urls && view.selectedVariant.image_urls.length > 1
                 ? `<div class="flex gap-3 mb-6 overflow-x-auto pb-2">
                     ${view.selectedVariant.image_urls.map((url, idx) => `
-                      <button data-img-index="${idx}" class="carousel-thumb relative rounded-lg overflow-hidden border-2 aspect-square w-20 flex-shrink-0 transition-all ${idx === view.selectedImageIndex ? "border-brand-mexican shadow-md" : "border-transparent opacity-60 hover:opacity-100"}">
+                      <button aria-label="Ver foto ${idx + 1}" data-img-index="${idx}" class="carousel-thumb relative rounded-lg overflow-hidden border-2 aspect-square w-20 flex-shrink-0 transition-all ${idx === view.selectedImageIndex ? "border-brand-mexican shadow-md" : "border-transparent opacity-60 hover:opacity-100"}">
                         <img src="${url}" class="w-full h-full object-cover" />
                       </button>
                     `).join("")}
@@ -170,25 +174,37 @@ export async function renderProductDetail(container, slug) {
 
           <div class="w-full lg:w-1/2 flex flex-col">
             <nav class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3 font-sans">
-              ${product.category} <span class="mx-2 text-gray-300">/</span> ${product.subcategory}
+              ${product.category || ""}${product.subcategory ? ` <span class="mx-2 text-gray-300">/</span> ${product.subcategory}` : ""}
             </nav>
             <h1 class="text-3xl md:text-5xl font-display font-bold text-gray-900 mb-6 tracking-tight leading-tight">
               ${product.name}
               ${product.is_on_sale ? '<span class="ml-3 align-middle bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm tracking-widest uppercase">Oferta</span>' : ""}
             </h1>
-            <p class="text-gray-600 mb-10 leading-relaxed font-sans text-lg">${product.description || ""}</p>
+            <p class="text-gray-600 mb-6 leading-relaxed font-sans text-lg">
+              ${(product.description || "").replace(/\n/g, '<br>')}
+            </p>
+            ${product.material || product.medidas || product.caracteristicas ? `
+            <div class="bg-gray-50 rounded-xl p-5 mb-10 border border-gray-100">
+              <h3 class="font-bold text-gray-900 mb-3 uppercase tracking-widest text-sm">Detalles del producto</h3>
+              <ul class="space-y-2 text-gray-600 text-sm">
+                ${product.material ? `<li><strong class="text-gray-900">Material:</strong> ${product.material}</li>` : ''}
+                ${product.medidas ? `<li><strong class="text-gray-900">Medidas:</strong> ${product.medidas}</li>` : ''}
+                ${product.caracteristicas ? `<li><strong class="text-gray-900">Características:</strong> ${(product.caracteristicas).replace(/\n/g, '<br>')}</li>` : ''}
+              </ul>
+            </div>
+            ` : '<div class="mb-10"></div>'}
 
             ${
               product.is_bundle
                 ? bundleSectionHtml()
                 : `
               ${pricingTiersHtml(product, totalProposedQty)}
-              <div class="flex items-center gap-6 mb-8">
+              <div class="flex flex-wrap items-center gap-4 mb-8">
                 <label class="font-bold text-sm text-gray-900 uppercase tracking-widest">Cantidad:</label>
                 <div class="flex items-center border-2 border-gray-200 rounded-full h-14 bg-white shadow-sm overflow-hidden w-40">
-                  <button id="qty-minus" class="px-5 h-full text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
+                  <button id="qty-minus" aria-label="Reducir cantidad" class="px-5 h-full text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
                   <span id="qty-value" class="flex-1 font-bold text-lg text-center">${view.quantity}</span>
-                  <button id="qty-plus" class="px-5 h-full text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
+                  <button id="qty-plus" aria-label="Aumentar cantidad" class="px-5 h-full text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
                 </div>
                 <span class="text-sm text-gray-500 font-medium">${view.selectedVariant.stock} disponibles</span>
               </div>

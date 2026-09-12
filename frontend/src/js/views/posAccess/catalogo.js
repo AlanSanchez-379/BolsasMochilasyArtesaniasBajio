@@ -249,6 +249,18 @@ export function createCatalogoSection(onUnauthorized) {
                 <label class="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
                 <textarea name="description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg">${product?.description || ""}</textarea>
               </div>
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Material</label>
+                <input name="material" value="${product?.material || ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Medidas</label>
+                <input name="medidas" value="${product?.medidas || ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Características</label>
+                <textarea name="caracteristicas" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg">${product?.caracteristicas || ""}</textarea>
+              </div>
               <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Precio Normal</label>
                 <input type="number" step="0.01" name="price_normal" required value="${product?.price_normal ?? ""}" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
@@ -392,6 +404,9 @@ export function createCatalogoSection(onUnauthorized) {
             category_id: fd.get("category_id"),
             subcategory: fd.get("subcategory"),
             description: fd.get("description"),
+            material: fd.get("material"),
+            medidas: fd.get("medidas"),
+            caracteristicas: fd.get("caracteristicas"),
             price_normal: parseFloat(fd.get("price_normal")),
             price_medio: parseFloat(fd.get("price_medio")),
             price_wholesale: parseFloat(fd.get("price_wholesale")),

@@ -314,6 +314,9 @@ PRODUCT_FIELDS = [
     "sale_price",
     "is_bundle_exclusive",
     "is_bundle",
+    "material",
+    "medidas",
+    "caracteristicas",
 ]
 
 

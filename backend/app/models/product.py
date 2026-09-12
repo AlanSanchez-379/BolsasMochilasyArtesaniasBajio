@@ -26,6 +26,11 @@ class Product(db.Model, UUIDPrimaryKeyMixin, TimestampMixin):
     name = db.Column(db.String(255), nullable=False)
     slug = db.Column(db.String(255), unique=True, nullable=False)
     description = db.Column(db.Text)
+    
+    # Nuevos campos detallados del producto
+    material = db.Column(db.String(255), nullable=True)
+    medidas = db.Column(db.String(255), nullable=True)
+    caracteristicas = db.Column(db.Text, nullable=True)
 
     # Precios por volumen (Documento de Requerimientos secc. 2)
     price_normal = db.Column(db.Numeric(10, 2), nullable=False)
