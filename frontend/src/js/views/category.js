@@ -299,13 +299,20 @@ export async function renderCategory(container, categoryName, query = null) {
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .slice(0, 24);
   } else if (activeCategory === "Halloween") {
-    const [p1, p2, p3] = await Promise.all([
+    const halloweenResponses = await Promise.all([
       api.getProducts({ search: "halloween" }),
       api.getProducts({ search: "calavera" }),
       api.getProducts({ search: "calabaza" }),
+      api.getProducts({ search: "chuky" }),
+      api.getProducts({ search: "jack" }),
+      api.getProducts({ search: "cadaver" }),
+      api.getProducts({ search: "coraline" }),
+      api.getProducts({ search: "harry potter" }),
     ]);
     const halloweenMap = new Map();
-    [...p1.products, ...p2.products, ...p3.products].forEach((p) => halloweenMap.set(p.id, p));
+    halloweenResponses.forEach(res => {
+      (res.products || []).forEach((p) => halloweenMap.set(p.id, p));
+    });
     categoryProducts = Array.from(halloweenMap.values());
   } else {
     ({ products: categoryProducts } = await api.getProducts(

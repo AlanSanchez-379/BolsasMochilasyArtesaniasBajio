@@ -130,9 +130,7 @@ async function loadHomeData() {
     { products: bundles },
     { products: bestsellers },
     settings,
-    { products: p1 },
-    { products: p2 },
-    { products: p3 },
+    ...halloweenResponses
   ] = await Promise.all([
     getCategories(),
     api.getProducts({ is_bundle: "true" }),
@@ -141,10 +139,17 @@ async function loadHomeData() {
     api.getProducts({ search: "halloween" }),
     api.getProducts({ search: "calavera" }),
     api.getProducts({ search: "calabaza" }),
+    api.getProducts({ search: "chuky" }),
+    api.getProducts({ search: "jack" }),
+    api.getProducts({ search: "cadaver" }),
+    api.getProducts({ search: "coraline" }),
+    api.getProducts({ search: "harry potter" }),
   ]);
 
   const halloweenMap = new Map();
-  [...p1, ...p2, ...p3].forEach((p) => halloweenMap.set(p.id, p));
+  halloweenResponses.forEach(res => {
+    (res.products || []).forEach((p) => halloweenMap.set(p.id, p));
+  });
   const halloweenProducts = Array.from(halloweenMap.values());
 
   return { categories, bundles, bestsellers, settings, halloweenProducts };
