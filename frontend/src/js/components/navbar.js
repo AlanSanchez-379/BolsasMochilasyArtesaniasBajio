@@ -61,10 +61,10 @@ export async function renderNavbar(container) {
 
   container.innerHTML = `
     <nav class="bg-brand-pink sticky top-0 z-50 shadow-md">
-      <div class="bg-gradient-to-r from-green-600 via-white to-red-600 text-center py-2 shadow-sm relative overflow-hidden">
+      <div class="bg-gradient-to-r from-purple-600 via-orange-500 to-purple-600 text-center py-2 shadow-sm relative overflow-hidden">
         <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:10px_10px]"></div>
-        <p class="text-xs sm:text-sm md:text-base font-black uppercase tracking-[0.15em] text-gray-900 relative z-10 drop-shadow-md">
-          🇲🇽 ¡Viva México! Celebra el mes patrio con nuestros mejores estilos 🌮
+        <p class="text-xs sm:text-sm md:text-base font-black uppercase tracking-[0.15em] text-white relative z-10 drop-shadow-md">
+          🎃 ¡Llegó el terror! Descubre nuestros mejores estilos para este Halloween 👻
         </p>
       </div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
