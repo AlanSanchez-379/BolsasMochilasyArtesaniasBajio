@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { productCardHtml, findLoteriaVariantImage } from "../components/productCard.js";
+import { productCardHtml } from "../components/productCard.js";
 import { bindNavLinks } from "../dom.js";
 import { currentRenderToken } from "../router.js";
 import { getSettings } from "../settingsCache.js";
@@ -16,7 +16,7 @@ function categoryIconClass(name) {
   return "fa-bag-shopping";
 }
 
-function paint(container, { categories, bundles, bestsellers, settings, loteriaProducts }) {
+function paint(container, { categories, bundles, bestsellers, settings, halloweenProducts }) {
   const bannerSrcOrig = settings.banner_url || "https://placehold.co/1200x500/ffffff/FE81D4?text=Emprende+Con+Nosotros";
   const bannerSrc = optimizeSupabaseImageUrl(bannerSrcOrig, 1600, 700);
 
@@ -48,19 +48,19 @@ function paint(container, { categories, bundles, bestsellers, settings, loteriaP
       </div>
 
       ${
-        loteriaProducts && loteriaProducts.length
+        halloweenProducts && halloweenProducts.length
           ? `
       <div class="mb-24">
         <div class="flex items-center justify-center gap-4 mb-12">
-          <i class="fa-solid fa-star text-green-600 text-2xl"></i>
-          <h2 class="text-3xl md:text-5xl font-display font-bold text-center text-brand-mexican tracking-tight">COLECCIÓN FIESTA MEXICANA</h2>
-          <i class="fa-solid fa-star text-red-600 text-2xl"></i>
+          <i class="fa-solid fa-ghost text-orange-600 text-2xl"></i>
+          <h2 class="text-3xl md:text-5xl font-display font-bold text-center text-brand-mexican tracking-tight">COLECCIÓN HALLOWEEN</h2>
+          <i class="fa-solid fa-spider text-purple-600 text-2xl"></i>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-          ${loteriaProducts.slice(0, 4).map((p) => productCardHtml(p, findLoteriaVariantImage(p))).join("")}
+          ${halloweenProducts.slice(0, 4).map((p) => productCardHtml(p)).join("")}
         </div>
         <div class="mt-12 text-center">
-          <button data-nav="/categoria/Loteria" class="bg-brand-mexican hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-md hover:shadow-lg uppercase text-sm tracking-wider">
+          <button data-nav="/categoria/Halloween" class="bg-brand-mexican hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-md hover:shadow-lg uppercase text-sm tracking-wider">
             Ver Toda la Colección
           </button>
         </div>
@@ -138,16 +138,16 @@ async function loadHomeData() {
     api.getProducts({ is_bundle: "true" }),
     api.getBestsellers(4),
     getSettings(),
-    api.getProducts({ search: "loteria" }),
-    api.getProducts({ search: "lotería" }),
-    api.getProducts({ search: "patrio" }),
+    api.getProducts({ search: "halloween" }),
+    api.getProducts({ search: "calavera" }),
+    api.getProducts({ search: "calabaza" }),
   ]);
 
-  const loteriaMap = new Map();
-  [...p1, ...p2, ...p3].forEach((p) => loteriaMap.set(p.id, p));
-  const loteriaProducts = Array.from(loteriaMap.values());
+  const halloweenMap = new Map();
+  [...p1, ...p2, ...p3].forEach((p) => halloweenMap.set(p.id, p));
+  const halloweenProducts = Array.from(halloweenMap.values());
 
-  return { categories, bundles, bestsellers, settings, loteriaProducts };
+  return { categories, bundles, bestsellers, settings, halloweenProducts };
 }
 
 export async function renderHome(container) {

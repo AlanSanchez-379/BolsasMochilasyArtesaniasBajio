@@ -7,15 +7,6 @@ function money(n) {
   return currencyFormatter.format(n);
 }
 
-export function findLoteriaVariantImage(product) {
-  const kws = ["loteria", "lotería", "patrio"];
-  const matchedVar = (product.variants ?? []).find(v => kws.some(kw =>
-    (v.color || "").toLowerCase().includes(kw) ||
-    (v.sku || "").toLowerCase().includes(kw)
-  ));
-  return matchedVar?.image_url || null;
-}
-
 export function getHourlyRandomIndex(productId, maxIndex) {
   const hour = Math.floor(Date.now() / 3600000);
   let hash = hour;
