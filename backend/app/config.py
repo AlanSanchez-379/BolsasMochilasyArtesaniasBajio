@@ -5,7 +5,13 @@ basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "changeme-dev-secret")
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+    db_url = os.environ.get("DATABASE_URL")
+    if db_url:
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+        elif db_url.startswith("postgresql://"):
+            db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    SQLALCHEMY_DATABASE_URI = db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     SUPABASE_URL = os.environ.get("SUPABASE_URL")
