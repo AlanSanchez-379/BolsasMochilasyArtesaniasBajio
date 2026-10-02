@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { productCardHtml } from "../components/productCard.js";
+import { productCardHtml, findHalloweenVariantImage } from "../components/productCard.js";
 import { bindNavLinks } from "../dom.js";
 import { currentRenderToken } from "../router.js";
 import { getSettings } from "../settingsCache.js";
@@ -57,7 +57,7 @@ function paint(container, { categories, bundles, bestsellers, settings, hallowee
           <i class="fa-solid fa-spider text-purple-600 text-2xl"></i>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-          ${halloweenProducts.slice(0, 4).map((p) => productCardHtml(p)).join("")}
+          ${halloweenProducts.slice(0, 4).map((p) => productCardHtml(p, findHalloweenVariantImage(p))).join("")}
         </div>
         <div class="mt-12 text-center">
           <button data-nav="/categoria/Halloween" class="bg-brand-mexican hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-full transition-colors shadow-md hover:shadow-lg uppercase text-sm tracking-wider">

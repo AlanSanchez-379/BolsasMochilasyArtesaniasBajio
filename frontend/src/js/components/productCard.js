@@ -7,6 +7,15 @@ function money(n) {
   return currencyFormatter.format(n);
 }
 
+export function findHalloweenVariantImage(product) {
+  const kws = ["halloween", "calavera", "calabaza", "chuky", "jack", "cadaver", "coraline", "harry potter"];
+  const matchedVar = (product.variants ?? []).find(v => kws.some(kw =>
+    (v.color || "").toLowerCase().includes(kw) ||
+    (v.sku || "").toLowerCase().includes(kw)
+  ));
+  return matchedVar?.image_url || null;
+}
+
 export function getHourlyRandomIndex(productId, maxIndex) {
   const hour = Math.floor(Date.now() / 3600000);
   let hash = hour;

@@ -1,6 +1,6 @@
 import { matchesProductSearch } from "../catalogFilters.js";
 import { api } from "../api.js";
-import { productCardHtml } from "../components/productCard.js";
+import { productCardHtml, findHalloweenVariantImage } from "../components/productCard.js";
 import { bindNavLinks } from "../dom.js";
 import { currentRenderToken, navigate } from "../router.js";
 import { getCategories } from "../catalogCache.js";
@@ -235,6 +235,9 @@ function renderGrid(gridEl, countEl, products, activeCategory, selectedColor = "
             }
           });
           if (bestVar && bestVar.image_url) customImage = bestVar.image_url;
+          else if (activeCategory === "Halloween") customImage = findHalloweenVariantImage(p);
+        } else if (activeCategory === "Halloween") {
+          customImage = findHalloweenVariantImage(p);
         }
         return productCardHtml(p, customImage);
       }).join("")}
