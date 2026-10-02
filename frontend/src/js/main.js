@@ -17,6 +17,7 @@ import { subscribe, setCurrentUser } from "./state.js";
 import { api } from "./api.js";
 import { getCategories } from "./catalogCache.js";
 import { getSettings } from "./settingsCache.js";
+import { initHalloweenTheme, renderThemeToggle } from "./components/halloweenTheme.js";
 
 const root = document.getElementById("root");
 root.className = "flex flex-col min-h-screen";
@@ -42,6 +43,9 @@ getSettings();
 renderNavbar(navbarSlot);
 renderFooter(footerSlot);
 subscribe(() => renderNavbar(navbarSlot));
+
+initHalloweenTheme();
+renderThemeToggle();
 
 // El checkout no debe llevar footer (evita distracciones durante el pago). La liga de
 // venta local es una pantalla de terminal aparte: sin navbar ni footer del sitio público.
