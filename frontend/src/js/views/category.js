@@ -1,11 +1,11 @@
 import { matchesProductSearch } from "../catalogFilters.js";
 import { api } from "../api.js";
-import { productCardHtml, findLoteriaVariantImage } from "../components/productCard.js";
+import { productCardHtml } from "../components/productCard.js";
 import { bindNavLinks } from "../dom.js";
 import { currentRenderToken, navigate } from "../router.js";
 import { getCategories } from "../catalogCache.js";
 
-const SPECIAL_CATEGORIES = { Ofertas: "Ofertas", Paquetes: "Paquetes Emprendedores", Nuevos: "Nuevos Productos", Loteria: "Colección Fiesta Mexicana" };
+const SPECIAL_CATEGORIES = { Ofertas: "Ofertas", Paquetes: "Paquetes Emprendedores", Nuevos: "Nuevos Productos", Halloween: "Colección Halloween" };
 
 // Subcategorías vigentes por categoría (Bolsas/Mochilas admiten Tricombo, el resto no).
 // Para categorías fuera de este mapa (p. ej. "Todos") se derivan de los productos cargados.
@@ -235,9 +235,6 @@ function renderGrid(gridEl, countEl, products, activeCategory, selectedColor = "
             }
           });
           if (bestVar && bestVar.image_url) customImage = bestVar.image_url;
-          else if (activeCategory === "Loteria") customImage = findLoteriaVariantImage(p);
-        } else if (activeCategory === "Loteria") {
-          customImage = findLoteriaVariantImage(p);
         }
         return productCardHtml(p, customImage);
       }).join("")}
@@ -301,15 +298,15 @@ export async function renderCategory(container, categoryName, query = null) {
     categoryProducts = [...products]
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .slice(0, 24);
-  } else if (activeCategory === "Loteria") {
+  } else if (activeCategory === "Halloween") {
     const [p1, p2, p3] = await Promise.all([
-      api.getProducts({ search: "loteria" }),
-      api.getProducts({ search: "lotería" }),
-      api.getProducts({ search: "patrio" }),
+      api.getProducts({ search: "halloween" }),
+      api.getProducts({ search: "calavera" }),
+      api.getProducts({ search: "calabaza" }),
     ]);
-    const loteriaMap = new Map();
-    [...p1.products, ...p2.products, ...p3.products].forEach((p) => loteriaMap.set(p.id, p));
-    categoryProducts = Array.from(loteriaMap.values());
+    const halloweenMap = new Map();
+    [...p1.products, ...p2.products, ...p3.products].forEach((p) => halloweenMap.set(p.id, p));
+    categoryProducts = Array.from(halloweenMap.values());
   } else {
     ({ products: categoryProducts } = await api.getProducts(
       activeCategory === "Todos" ? {} : { category: activeCategory }
